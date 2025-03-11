@@ -6,7 +6,7 @@ authors = ["Guilhem <guilhem.mathieux.pro@gmail.com>"]
 
 [dependencies]
 slint = {version = "1.10.0", features = ["gettext"]}
-# clap = { version = "4.5.13", features = ["derive"] }
+clap = { version = "4.5.13", features = ["derive"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 rand = "0.8"

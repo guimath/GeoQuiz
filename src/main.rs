@@ -2,15 +2,16 @@ use std::{
     error::Error,
     sync::{Arc, Mutex},
 };
+use clap::Parser;
 
 use slint::{ComponentHandle, Image};
 
 use geo_quiz::logic::{AppLogic, AppWindow};
 macro_rules! update_country {
-    ($ui:ident, $stat:ident) => {{
+    ($ui:ident, $stat:ident, $learn_mode:ident) => {{
         // $ui.set_photo_path($img.image);
         if let Some(stat) = $stat {
-            let level = if stat.score != 0 { 3 } else { 0 };
+            let level = if stat.score != 0 || $learn_mode { 3 } else { 0 };
             $ui.set_info_level(level);
             $ui.invoke_set_score(stat.score as i32);
             $ui.set_country_name(stat.name.into());
@@ -23,13 +24,25 @@ macro_rules! update_country {
     }};
 }
 
+
+/// args
+#[derive(Parser)]
+struct Cli {
+    /// show well know flags first (according to own score)
+    #[clap(long, short)]
+    easy_first: bool,
+    /// enable learn mode : all info is displayed by default
+    #[clap(long, short)]
+    learn_mode: bool,
+}
 fn main() -> Result<(), Box<dyn Error>> {
     slint::init_translations!(concat!(env!("CARGO_MANIFEST_DIR"), "/lang/"));
-
-    let logic = Arc::new(Mutex::new(AppLogic::new()));
+    let args = Cli::parse();
+    let learn_mode = args.learn_mode;
+    let logic = Arc::new(Mutex::new(AppLogic::new(args.easy_first)));
     let ui = AppWindow::new()?;
     let stat = Some(logic.lock().unwrap().get_stat());
-    update_country!(ui, stat);
+    update_country!(ui, stat, learn_mode);
 
     ui.on_next({
         let ui_handle = ui.as_weak();
@@ -38,7 +51,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             let ui = ui_handle.unwrap();
             let mut logic = logic_ref.lock().unwrap();
             let stat = logic.next(result as u32);
-            update_country!(ui, stat);
+            update_country!(ui, stat, learn_mode);
         }
     });
     ui.on_prev({
@@ -48,7 +61,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             let ui = ui_handle.unwrap();
             let mut logic = logic_ref.lock().unwrap();
             let stat = logic.prev();
-            update_country!(ui, stat);
+            update_country!(ui, stat, learn_mode);
         }
     });
     ui.on_close({

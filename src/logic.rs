@@ -1,13 +1,14 @@
 use rand::seq::SliceRandom;
 use rand::thread_rng;
 use serde_json;
+use std::cmp::Ordering;
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::{Read, Write};
 use std::path::{Path, PathBuf};
 use std::str::FromStr;
 
-use crate::info_parse::{CountryStat, Score, CurrencyType};
+use crate::info_parse::{CountryStat, CurrencyType, Score};
 
 pub struct StatDisplay {
     pub name: String,
@@ -25,7 +26,7 @@ pub struct AppLogic {
     all_countries: Vec<CountryStat>,
 }
 impl AppLogic {
-    pub fn new() -> Self {
+    pub fn new(easy_first: bool) -> Self {
         // let mut file = File::open("data/countries.json").expect("File data/countries.json not found");
         // let mut file_content = String::new();
         // file.read_to_string(&mut file_content).expect("File read failed");
@@ -58,14 +59,18 @@ impl AppLogic {
             }
             s
         };
-
-        all_countries.sort_by(|a, b| {
+        let compare = |a: &CountryStat, b: &CountryStat| -> Ordering {
             scores
-                .get(&a.cca3.clone())
+                .get(&b.cca3.clone())
                 .unwrap()
                 .score
-                .cmp(&scores.get(&b.cca3.clone()).unwrap().score)
-        });
+                .cmp(&scores.get(&a.cca3.clone()).unwrap().score)
+        };
+        if easy_first {
+            all_countries.sort_by(|a, b| compare(a, b));
+        } else {
+            all_countries.sort_by(|a, b| compare(b, a));
+        }
         let len = all_countries.len();
         Self {
             all_countries,

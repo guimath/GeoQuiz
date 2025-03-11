@@ -47,7 +47,6 @@ fn main() -> Result<(), Box<dyn Error>> {
     let ui = AppWindow::new()?;
     let stat = Some(logic.lock().unwrap().get_stat());
     update_country!(ui, stat, args);
-    
     ui.on_next({
         let ui_handle = ui.as_weak();
         let logic_ref = logic.clone();

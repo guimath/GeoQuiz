@@ -1,14 +1,15 @@
 use rand::seq::SliceRandom;
 use rand::thread_rng;
-use serde_json;
+
 use std::cmp::Ordering;
 use std::collections::HashMap;
-use std::fs::File;
-use std::io::{Read, Write};
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use std::str::FromStr;
 
-use crate::info_parse::{CountryStat, CurrencyType, Score};
+use crate::info_parse::{self, CountryStat, CurrencyType, Score};
+
+slint::include_modules!();
+
 
 pub struct StatDisplay {
     pub name: String,
@@ -30,8 +31,7 @@ impl AppLogic {
         // let mut file = File::open("data/countries.json").expect("File data/countries.json not found");
         // let mut file_content = String::new();
         // file.read_to_string(&mut file_content).expect("File read failed");
-        let json_data = include_str!("../data/countries.json");
-        let all_countries_no_filter: Vec<CountryStat> = serde_json::from_str(&json_data).unwrap();
+        let all_countries_no_filter = info_parse::get_data();
         let mut all_countries: Vec<CountryStat> = all_countries_no_filter
             .into_iter()
             .filter(|country| country.independent.unwrap_or(false))
@@ -39,26 +39,7 @@ impl AppLogic {
 
         let mut rng = thread_rng();
         all_countries.shuffle(&mut rng);
-        let score_path = PathBuf::from_str("score.json").unwrap();
-        let scores: HashMap<String, Score> = if Path::exists(&score_path) {
-            let mut file = File::open(score_path).expect("File data/countries.json not found");
-            let mut file_content = String::new();
-            file.read_to_string(&mut file_content)
-                .expect("File read failed");
-            serde_json::from_str(&file_content).unwrap()
-        } else {
-            let mut s: HashMap<String, Score> = HashMap::new();
-            for i in 0..all_countries.len() {
-                s.insert(
-                    all_countries[i].cca3.clone(),
-                    Score {
-                        score: 0,
-                        time_played: 0,
-                    },
-                );
-            }
-            s
-        };
+        let scores = info_parse::read(&all_countries);
         let compare = |a: &CountryStat, b: &CountryStat| -> Ordering {
             scores
                 .get(&b.cca3.clone())
@@ -134,9 +115,6 @@ impl AppLogic {
     }
 
     pub fn save_scores(&self) {
-        let json_data = serde_json::to_string(&self.scores).unwrap();
-        let mut file = File::create("score.json").unwrap();
-        file.write_all(json_data.as_bytes()).unwrap();
+        info_parse::save(&self.scores);
     }
 }
-slint::include_modules!();

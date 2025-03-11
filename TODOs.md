@@ -9,10 +9,10 @@
 - [x] Add learn mode
 - [x] Add a first letter hint on ui (for country and capital)
   - kinda dumb because as of yet no string manipulation possible on slint so have to do it from rust...
+- [x] More of the load and save on info_parse
 
 ## Priority 
 - [ ] Make more info actually take more info
-- [ ] More of the load and save on info_parse
 
 ## Bonus
 - [ ] Animate

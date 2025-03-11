@@ -1,0 +1,244 @@
+import { Button, VerticalBox, HorizontalBox, TextEdit} from "std-widgets.slint";
+
+
+// ***************************************************************** //
+//                            External Elements
+// ***************************************************************** //
+
+
+// ***************************************************************** //
+//                            Default Widgets
+// ***************************************************************** //
+component MainText inherits Text {
+  // font-family: 
+  font-size: 25pt;
+  // color: white;
+}
+
+component ToggleStar inherits TouchArea {
+  in property <bool> on;
+  property <image> off_img: @image-url("star_off.svg");
+  property <image> on_img: @image-url("star_on.svg");
+  height: 75px;
+  width: 75px;
+  im := Image {
+    height: 75px;
+    width: 75px;
+    source: root.off_img;
+  }
+  public function set_status(on:bool) {
+    if on {
+      im.source = root.on_img;
+    }
+    else {
+      im.source = root.off_img;
+    }
+  }
+}
+
+component ThreeStartScore {
+  in property <int> score;
+  callback score_changed(score:int);
+  VerticalBox {
+    padding: 0;
+    HorizontalBox {
+      padding: 0;
+
+      star1 := ToggleStar{
+        clicked => {internal_score_change(1)}
+      }
+      star2 := ToggleStar{
+        clicked => {internal_score_change(2)}
+      }
+      star3 := ToggleStar{
+        clicked => {internal_score_change(3)}
+      }
+    }
+  }
+  
+  function internal_score_change(score:int) {
+    set_score(score);
+    score_changed(score);
+
+  }
+  public function set_score(score:int) {
+    star1.set_status(score > 0);
+    star2.set_status(score > 1);
+    star3.set_status(score > 2);
+  }
+}
+
+component HiddenText inherits TouchArea {
+  in property<string> text; 
+  in property<string> type; 
+  in property<bool> show;
+  
+  Rectangle {
+    background: grey;
+    border-radius: 10px;
+    width: 90%;    
+    HorizontalBox {
+      // vertical-stretch: center;
+      VerticalBox {
+        alignment: center;
+        MainText {
+          width:33%;
+          
+          horizontal-alignment: right;
+          text: root.type;
+        }
+      }
+      VerticalBox {
+        alignment: center;
+        height: 70pt;
+        MainText {
+        horizontal-alignment: left;
+          text: root.text;
+          visible: root.show;
+          wrap:word-wrap;
+        }
+      }
+    }
+  }
+
+}
+
+
+export component AppWindow inherits Window {
+  title: "Geo quiz";
+  // ***************************************************************** //
+  //                            PROPERTIES
+  // ***************************************************************** //
+  in property <image> flag: @image-url("../data/flags/jam.svg");
+  in property <string> country_name : "Jamaica";
+  in property <string> capital: "Kingston";
+  in property <string> other_info: "Jamaican dollar (JMD, $)";
+  in-out property <int> info_level: 2;
+  in property <int> num: 0;
+  in property <int> out_of: 110;
+  property <int> score_delayed: 0;
+  // **************************z*************************************** //
+  //                            CALLBACKS
+  // ***************************************************************** //
+  callback close();
+  callback next(int);
+  callback prev();
+  
+
+  // ***************************************************************** //
+  //                            UI LOGIC
+  // ***************************************************************** //
+  public function set_score(score:int) {
+    w_score.set_score(score)
+  }
+
+  function prep_next(score:int) {
+    if score == 0 {
+      root.next(score);
+    }
+    else {
+      w_score.set_score(score);
+      root.score_delayed = score;
+      root.info_level = 3;
+      timer.running = true;
+    }
+  }
+
+  timer:= Timer {
+    interval: 200ms;
+    running: false;
+    triggered() => {
+      self.running = false;
+      root.next(root.score_delayed);
+    }
+  }
+  
+  forward-focus: my-key-handler;
+  my-key-handler := FocusScope {
+    key-pressed(event) => {
+      if event.text == Key.Escape && !event.repeat {
+        root.close();
+      }
+      else if event.text == Key.LeftArrow {
+        root.prev();
+      }
+      else if event.text == Key.RightArrow {
+        prep_next(0);
+      }
+      if (event.text == "&" || event.text == "1") && !event.repeat {
+        prep_next(1);
+      }
+      if (event.text == "é" || event.text == "2") && !event.repeat {
+        prep_next(2);
+      }
+      if ((event.text == "\"" && "\""!= "o") || event.text == "3") && !event.repeat {
+        ;
+        prep_next(3); 
+      }
+      if event.text == Key.Space && !event.repeat {
+        root.info_level += 1;
+      }
+      if event.text == Key.Space && event.modifiers.control {
+        root.info_level = 3;
+      }
+        // else if event.text == "d" && event.modifiers.alt {
+       
+      accept
+    }
+  }
+
+  // ***************************************************************** //
+  //                            WIDGETS
+  // ***************************************************************** //
+  // main box, always shown
+  
+  VerticalBox {
+    height: 100%;
+    Rectangle {
+      height: 20px;
+    }
+    HorizontalBox {
+      padding: 0;
+      VerticalBox {
+        MainText { 
+          text: "\{root.num+1} / \{root.out_of}";
+        }
+      }
+      // VerticalBox {
+      // }
+      w_score:= ThreeStartScore { 
+        score_changed(score) => {prep_next(score)}
+      }
+
+    }
+    Rectangle {
+      height: 20px;
+    }
+    flag := Image {
+      height: 33%;
+      source: root.flag;
+      // rotation-angle:root.photo_rotation*1deg ;  // doesn't rescale so meh
+    }
+    w_country_name := HiddenText {
+      type: "Country: ";
+      text: root.country_name;
+      show: root.info_level >0;
+      clicked => {if root.info_level<1 {root.info_level=1}}
+    }
+    w_capital := HiddenText {
+      type: "Capital: ";
+      text: root.capital;
+      show: root.info_level >1;
+      clicked => {if root.info_level<2 {root.info_level=2}}
+    }
+    w_other_info := HiddenText {
+      type: "Currency: ";
+      text: root.other_info;
+      show: root.info_level >2;
+      clicked => {if root.info_level<3 {root.info_level=3}}
+    }
+    Rectangle {}
+  }
+
+
+}

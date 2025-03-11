@@ -14,5 +14,3 @@ rand = "0.8"
 
 [build-dependencies]
 slint-build = "1.10.0" 
-
-# cca3 needs lower, 

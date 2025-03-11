@@ -69,10 +69,14 @@ component ThreeStartScore {
 }
 
 component HiddenText inherits TouchArea {
-  in property<string> text; 
+  in property<string> name; 
+  in property<string> first_letter; 
   in property<string> type; 
   in property<bool> show;
-  
+  in property<bool> show_first_letter;
+  in property <bool> with_hint : true;
+  in-out property <length> size_hint : 40pt;
+  callback hint();
   Rectangle {
     background: grey;
     border-radius: 10px;
@@ -82,25 +86,53 @@ component HiddenText inherits TouchArea {
       VerticalBox {
         alignment: center;
         MainText {
-          width:33%;
-          
+          width:120pt;
           horizontal-alignment: right;
           text: root.type;
         }
       }
+      Rectangle {
+        padding: 0;
+        VerticalBox {
+          alignment: center;
+          height: 70pt;
+          MainText {
+          horizontal-alignment: left;
+            text: root.first_letter;
+            visible: root.show_first_letter && !root.show;
+          }
+        }
+        VerticalBox {
+          alignment: center;
+          height: 70pt;
+          MainText {
+          horizontal-alignment: left;
+            text: root.name;
+            visible: root.show;
+            wrap:word-wrap;
+          }
+        }
+      }
+      Rectangle {}
       VerticalBox {
         alignment: center;
+        padding: 0;
         height: 70pt;
-        MainText {
-        horizontal-alignment: left;
-          text: root.text;
-          visible: root.show;
-          wrap:word-wrap;
+        TouchArea {
+          height:root.size_hint;
+          width: root.size_hint;
+          clicked => {hint(); root.size_hint = 0;}
+
+          Image {
+            source: @image-url("hint.svg");
+            visible: root.with_hint && !root.show_first_letter && !root.show;
+            height: root.size_hint;
+            width: root.size_hint;
+          }
         }
       }
     }
   }
-
 }
 
 
@@ -110,14 +142,12 @@ export component AppWindow inherits Window {
   //                            PROPERTIES
   // ***************************************************************** //
   in property <image> flag: @image-url("../data/flags/jam.svg");
-  in property <string> country_name : "Jamaica";
-  in property <string> capital: "Kingston";
   in property <string> other_info: "Jamaican dollar (JMD, $)";
-  in-out property <int> info_level: 2;
+  in-out property <int> info_level:0;
   in property <int> num: 0;
   in property <int> out_of: 110;
   property <int> score_delayed: 0;
-  // **************************z*************************************** //
+  // ***************************************************************** //
   //                            CALLBACKS
   // ***************************************************************** //
   callback close();
@@ -130,6 +160,28 @@ export component AppWindow inherits Window {
   // ***************************************************************** //
   public function set_score(score:int) {
     w_score.set_score(score)
+  }
+
+  public function set_capital(name:string, first_letter:string, show_first:bool){
+    w_capital.name = name;
+    w_capital.first_letter = first_letter;
+    w_capital.show_first_letter = show-first;
+    if show_first {
+      w_capital.size_hint = 0pt;
+    } else {
+      w_capital.size_hint = 40pt;
+    } 
+  }
+  public function set_country_name(name:string, first_letter:string, show_first:bool){
+    w_country_name.name = name;
+    w_country_name.first_letter = first_letter;
+    w_country_name.show_first_letter = show-first;
+    if show_first {
+      w_country_name.size_hint = 0pt;
+    } else {
+      w_country_name.size_hint = 40pt;
+
+    } 
   }
 
   function prep_next(score:int) {
@@ -221,21 +273,27 @@ export component AppWindow inherits Window {
     }
     w_country_name := HiddenText {
       type: "Country: ";
-      text: root.country_name;
-      show: root.info_level >0;
+      name: "Jamaica";
+      first_letter: "J";
+      show: root.info_level >=1;
       clicked => {if root.info_level<1 {root.info_level=1}}
+      hint => {self.show_first_letter=true}
     }
     w_capital := HiddenText {
       type: "Capital: ";
-      text: root.capital;
-      show: root.info_level >1;
+      name: "Kingston";
+      first_letter: "K";
+      show: root.info_level >=2;
       clicked => {if root.info_level<2 {root.info_level=2}}
+      hint => {self.show_first_letter=true}
     }
     w_other_info := HiddenText {
       type: "Currency: ";
-      text: root.other_info;
+      name: root.other_info;
       show: root.info_level >2;
+      with_hint: false; 
       clicked => {if root.info_level<3 {root.info_level=3}}
+
     }
     Rectangle {}
   }

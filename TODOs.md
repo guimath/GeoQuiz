@@ -19,5 +19,6 @@
 ## Bonus
 - [ ] Animate (WIP)
 - [ ] Way to change infos displayed (maybe precompute once depending)
+- [ ] Score specific
 - [ ] Add a previous score / score animation on hover
 - [ ] Make android app

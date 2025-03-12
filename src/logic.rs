@@ -11,6 +11,31 @@ use crate::info_parse::{self, CountryStat, Score};
 
 slint::include_modules!();
 
+
+pub enum InfoType {
+    COUNTRY,
+    CAPITAL,
+    LANGUAGES,
+    CURRENCIES,
+    LATLON,
+    BORDERS,
+    REGION
+}
+
+impl InfoType {
+    pub fn to_str(&self) -> &str{
+        match self {
+            InfoType::COUNTRY => "Country:",
+            InfoType::CAPITAL => "Capital:",
+            InfoType::LANGUAGES => "Languages:",
+            InfoType::CURRENCIES => "Currencies:",
+            InfoType::LATLON => "LatLon:",
+            InfoType::BORDERS => "Borders:",
+            InfoType::REGION => "Region:",
+        }
+    }
+}
+
 pub struct StatDisplay {
     pub name: String,
     pub capital: String,
@@ -25,8 +50,9 @@ pub struct AppLogic {
     results: Vec<u32>,
     scores: HashMap<String, Score>,
     all_countries: Vec<CountryStat>,
-    categories: [CatInfo; 3],
-    learn_mode: bool,
+    pub learn_mode: bool,
+    pub initials_on: bool,
+    infos: [Vec<CatInfo>; 3],
 }
 impl AppLogic {
     pub fn new(easy_first: bool, learn_mode: bool, initials_on: bool) -> Self {
@@ -56,23 +82,77 @@ impl AppLogic {
         }
         let len = all_countries.len();
 
-        let mut categories = [CatInfo::default(), CatInfo::default(), CatInfo::default()];
-        categories[0].category = "Country".into();
-        categories[1].category = "Capital".into();
-        categories[2].category = "Languages".into();
-        categories[0].show_first = initials_on;
-        categories[1].show_first = initials_on;
-        categories[2].show_first = initials_on;
-
         Self {
             all_countries,
             current: 0,
             results: vec![0; len],
             scores,
-            categories,
             learn_mode,
+            infos:Default::default(),
+            initials_on,
         }
     }
+
+    pub fn prep_categories(&mut self, info_types: [InfoType; 3]){
+        for i in 0..3 {
+            let cat_str = info_types[i].to_str();
+            self.infos[i] = match info_types[i] {
+                InfoType::COUNTRY => {
+                    self.all_countries.iter().map(|x| {
+                        let data = x.name.common.clone();
+                        CatInfo{
+                            category: cat_str.into(), 
+                            full: data.clone().into(),
+                            first: data.chars().nth(0).unwrap_or(' ').into(),
+                            show_first: self.learn_mode,
+                        }
+                    }).collect()
+                }
+                InfoType::CAPITAL => {
+                    self.all_countries.iter().map(|x| {
+                        let data = x.capital.join(", ");
+                        CatInfo{
+                            category: cat_str.into(), 
+                            full: data.clone().into(),
+                            first: data.chars().nth(0).unwrap_or(' ').into(),
+                            show_first: self.learn_mode,
+                        }
+                    }).collect()
+                }
+                InfoType::LANGUAGES => {
+                    self.all_countries.iter().map(|x| {
+                        let lang_vec: Vec<String> = x.languages.values().map(|v| v.to_string()).collect();
+                        let data = lang_vec.join(", ");
+                        CatInfo{
+                            category: cat_str.into(), 
+                            full: data.clone().into(),
+                            first: data.chars().nth(0).unwrap_or(' ').into(),
+                            show_first: self.learn_mode,
+                        }
+                    }).collect()
+                }
+                InfoType::CURRENCIES => {
+                    panic!("Currencies info not done yet")
+                }
+                InfoType::LATLON => {
+                    panic!("Latlon info not done yet")
+                }
+                InfoType::REGION => {
+                    self.all_countries.iter().map(|x| {
+                        let data = format!("{} ({})", x.subregion, x.region);
+                        CatInfo{
+                            category: cat_str.into(), 
+                            full: data.clone().into(),
+                            first: data.chars().nth(0).unwrap_or(' ').into(),
+                            show_first: self.learn_mode,
+                        }
+                    }).collect()
+                }
+                InfoType::BORDERS=> panic!("Border info not done yet"),
+            }
+        }
+    }
+
 
     pub fn next(&mut self, result: u32) -> Option<(FullUpdate, [CatInfo; 3])> {
         if result != 0 {
@@ -115,18 +195,9 @@ impl AppLogic {
             score,
             info_level: if score != 0 || self.learn_mode { 3 } else { 0 },
         };
-        let country_name = country.name.common;
-        self.categories[0].full = country_name.clone().into();
-        self.categories[0].first = country_name.chars().nth(0).unwrap_or(' ').into();
-        let capital = country.capital.join(", ");
-        self.categories[1].full = capital.clone().into();
-        self.categories[1].first = capital.chars().nth(0).unwrap_or(' ').into();
-        // let languages_vec: Vec<String> = country.languages.values().map(|v| v.to_string()).collect();
-        // let languages = languages_vec.join(", ");
-        // self.categories[2].full = languages.into();
-        self.categories[2].full = format!("{} ({})", country.subregion, country.region).into();
+        
 
-        (update, self.categories.clone())
+        (update, [self.infos[0][self.current].clone(), self.infos[1][self.current].clone(), self.infos[2][self.current].clone()])
     }
 
     pub fn save_scores(&self) {

@@ -6,7 +6,7 @@ use std::{
 
 use slint::ComponentHandle;
 
-use geo_quiz::logic::{AppLogic, AppWindow};
+use geo_quiz::logic::{AppLogic, AppWindow, InfoType};
 
 /// args
 #[derive(Parser)]
@@ -29,6 +29,11 @@ fn main() -> Result<(), Box<dyn Error>> {
         args.learn_mode,
         args.initials_on,
     )));
+    logic.lock().unwrap().prep_categories([
+        InfoType::COUNTRY,
+        InfoType::CAPITAL,
+        InfoType::LANGUAGES,
+    ]);
     let ui = AppWindow::new()?;
     let (update, cat) = logic.lock().unwrap().get_stat();
     ui.invoke_update_screen(update, cat.into());

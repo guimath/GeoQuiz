@@ -31,6 +31,9 @@ pub struct CountryStat {
     pub independent: Option<bool>,
     pub capital: Vec<String>,
     pub currencies: Option<CurrencyType>,
+    pub languages: HashMap<String, String>,
+    pub region: String,
+    pub subregion: String,
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone)]

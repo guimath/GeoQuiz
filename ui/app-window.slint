@@ -4,6 +4,20 @@ import { Button, VerticalBox, HorizontalBox, TextEdit} from "std-widgets.slint";
 // ***************************************************************** //
 //                            External Elements
 // ***************************************************************** //
+export struct CatInfo {
+  category: string,
+  full: string,
+  first: string,
+  show_first: bool,
+}
+
+export struct FullUpdate  {
+  num: int,
+  out_of: int,
+  score: int,
+  flag: image,
+  info_level:int, 
+}
 
 
 // ***************************************************************** //
@@ -69,14 +83,26 @@ component ThreeStartScore {
 }
 
 component HiddenText inherits TouchArea {
-  in property<string> name; 
-  in property<string> first_letter; 
-  in property<string> type; 
+  in-out property<string> name; 
+  in-out property<string> first_letter; 
+  in-out property<string> type; 
   in property<bool> show;
-  in property<bool> show_first_letter;
+  in-out property<bool> show_first_letter;
   in property <bool> with_hint : true;
   in-out property <length> size_hint : 40pt;
   callback hint();
+
+  public function update_cat(cat: CatInfo){
+    self.type = cat.category;
+    self.name = cat.full;
+    self.first_letter = cat.first;
+    self.show_first_letter = cat.show_first;
+    if cat.show_first {
+      self.size_hint = 0pt;
+    } else {
+      self.size_hint = 40pt;
+    } 
+  }
   Rectangle {
     background: grey;
     border-radius: 10px;
@@ -113,7 +139,7 @@ component HiddenText inherits TouchArea {
           }
         }
       }
-      Rectangle {}
+      Rectangle {} // spacing
       VerticalBox {
         alignment: center;
         padding: 0;
@@ -122,12 +148,19 @@ component HiddenText inherits TouchArea {
           height:root.size_hint;
           width: root.size_hint;
           clicked => {hint(); root.size_hint = 0;}
-
+          animate height, width {
+            duration: 300ms;
+            easing: ease-in-out;
+          }
           Image {
             source: @image-url("hint.svg");
-            visible: root.with_hint && !root.show_first_letter && !root.show;
+            visible: root.with_hint;
             height: root.size_hint;
             width: root.size_hint;
+            animate height, width {
+              duration: 300ms;
+              easing: ease-in-out;
+            }
           }
         }
       }
@@ -144,8 +177,8 @@ export component AppWindow inherits Window {
   in property <image> flag: @image-url("../data/flags/jam.svg");
   in property <string> other_info: "Jamaican dollar (JMD, $)";
   in-out property <int> info_level:0;
-  in property <int> num: 0;
-  in property <int> out_of: 110;
+  property <int> num: 0;
+  property <int> out_of: 110;
   property <int> score_delayed: 0;
   // ***************************************************************** //
   //                            CALLBACKS
@@ -158,30 +191,15 @@ export component AppWindow inherits Window {
   // ***************************************************************** //
   //                            UI LOGIC
   // ***************************************************************** //
-  public function set_score(score:int) {
-    w_score.set_score(score)
-  }
-
-  public function set_capital(name:string, first_letter:string, show_first:bool){
-    w_capital.name = name;
-    w_capital.first_letter = first_letter;
-    w_capital.show_first_letter = show-first;
-    if show_first {
-      w_capital.size_hint = 0pt;
-    } else {
-      w_capital.size_hint = 40pt;
-    } 
-  }
-  public function set_country_name(name:string, first_letter:string, show_first:bool){
-    w_country_name.name = name;
-    w_country_name.first_letter = first_letter;
-    w_country_name.show_first_letter = show-first;
-    if show_first {
-      w_country_name.size_hint = 0pt;
-    } else {
-      w_country_name.size_hint = 40pt;
-
-    } 
+  public function update_screen(info:FullUpdate, cat:[CatInfo]) {
+    w_score.set_score(info.score);
+    w_cat1.update_cat(cat[0]);
+    w_cat2.update_cat(cat[1]);
+    w_cat3.update_cat(cat[2]);
+    root.info_level = info.info_level;
+    root.num = info.num;
+    root.out_of = info.out_of;
+    flag.source = info.flag;
   }
 
   function prep_next(score:int) {
@@ -271,7 +289,7 @@ export component AppWindow inherits Window {
       source: root.flag;
       // rotation-angle:root.photo_rotation*1deg ;  // doesn't rescale so meh
     }
-    w_country_name := HiddenText {
+    w_cat1 := HiddenText {
       type: "Country: ";
       name: "Jamaica";
       first_letter: "J";
@@ -279,7 +297,7 @@ export component AppWindow inherits Window {
       clicked => {if root.info_level<1 {root.info_level=1}}
       hint => {self.show_first_letter=true}
     }
-    w_capital := HiddenText {
+    w_cat2 := HiddenText {
       type: "Capital: ";
       name: "Kingston";
       first_letter: "K";
@@ -287,7 +305,7 @@ export component AppWindow inherits Window {
       clicked => {if root.info_level<2 {root.info_level=2}}
       hint => {self.show_first_letter=true}
     }
-    w_other_info := HiddenText {
+    w_cat3 := HiddenText {
       type: "Currency: ";
       name: root.other_info;
       show: root.info_level >2;

@@ -10,13 +10,14 @@
 - [x] Add a first letter hint on ui (for country and capital)
   - kinda dumb because as of yet no string manipulation possible on slint so have to do it from rust...
 - [x] More of the load and save on info_parse
+- [x] Using slint struct to simplify updating ?
+- [x] Make order parameterized to chose what you first see
 
 ## Priority 
 - [ ] Make more info actually take more info
 
 ## Bonus
-- [ ] Animate
-- [ ] More Guess Types
+- [ ] Animate (WIP)
+- [ ] Way to change infos displayed (maybe precompute once depending)
 - [ ] Add a previous score / score animation on hover
 - [ ] Make android app
-- [ ] Make order parameterized to chose what you first see

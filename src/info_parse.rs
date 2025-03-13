@@ -34,6 +34,7 @@ pub struct CountryStat {
     pub languages: HashMap<String, String>,
     pub region: String,
     pub subregion: String,
+    pub borders: Vec<String>,
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone)]

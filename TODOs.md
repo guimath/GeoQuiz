@@ -12,13 +12,19 @@
 - [x] More of the load and save on info_parse
 - [x] Using slint struct to simplify updating ?
 - [x] Make order parameterized to chose what you first see
+- [x] Make more info actually take more info
+- [x] Way to change infos displayed (maybe precompute once depending)
 
 ## Priority 
-- [ ] Make more info actually take more info
+
+- [ ] Improve Hints for multi possibilities (Y..., X...)
+- [ ] Add a hard mode with all flags + level?
+- [ ] Improve UI on Settings screen
 
 ## Bonus
+- [ ] Make a way to return to main menu ? (saves ?)
+- [ ] Add a way to add more infos ?
 - [ ] Animate (WIP)
-- [ ] Way to change infos displayed (maybe precompute once depending)
 - [ ] Score specific
 - [ ] Add a previous score / score animation on hover
 - [ ] Make android app

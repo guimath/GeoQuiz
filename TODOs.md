@@ -16,16 +16,19 @@
 - [x] Way to change infos displayed (maybe precompute once depending)
 - [x] Improve Hints for multi possibilities (Y..., X...)
 - [x] Add a hard mode with all flags?
+- [x] Make a way to return to main menu
 
 ## Priority 
 
 - [ ] Improve UI on Settings screen
 
 ## Bonus
-- [ ] Add a Disabled hint ?
-- [ ] Make a way to return to main menu ? (saves ?)
-- [ ] Add a way to add more infos ?
 - [ ] Animate (WIP)
-- [ ] Score specific
 - [ ] Add a previous score / score animation on hover
 - [ ] Make android app
+
+## Ideas to discuss
+- [ ] Should the return to menu save ?
+- [ ] Score specific for categories chosen ?
+- [ ] Add a way to add more infos ?
+- [ ] Add a Disabled hint ?

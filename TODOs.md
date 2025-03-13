@@ -14,10 +14,10 @@
 - [x] Make order parameterized to chose what you first see
 - [x] Make more info actually take more info
 - [x] Way to change infos displayed (maybe precompute once depending)
+- [x] Improve Hints for multi possibilities (Y..., X...)
 
 ## Priority 
 
-- [ ] Improve Hints for multi possibilities (Y..., X...)
 - [ ] Add a hard mode with all flags + level?
 - [ ] Improve UI on Settings screen
 

@@ -7,7 +7,7 @@ use std::collections::HashMap;
 use std::path::PathBuf;
 use std::str::FromStr;
 
-use crate::info_parse::{self, CountryStat, Score};
+use crate::info_parse::{self, CountryStat, CurrencyType, Score};
 
 slint::include_modules!();
 
@@ -21,6 +21,16 @@ pub enum InfoType {
     REGION,
 }
 
+macro_rules! map_all_countries {
+    ($all_countries:ident, $country:ident, $code:block) => {
+        $all_countries.iter().map(|$country| $code).collect()
+    };
+}
+fn hint_from_name(s: String) -> String {
+    let mut s = s.chars().nth(0).unwrap_or(' ').to_string();
+    s.push_str("...");
+    s
+}
 impl InfoType {
     pub fn to_str(&self) -> &str {
         match self {
@@ -67,6 +77,7 @@ pub struct AppLogic {
     scores: HashMap<String, Score>,
     all_countries: Vec<CountryStat>,
     infos: [Vec<CatInfo>; 3],
+    cca3_to_name: HashMap<String, String>,
 }
 impl AppLogic {
     pub fn new(easy_first: bool) -> Self {
@@ -74,6 +85,10 @@ impl AppLogic {
         // let mut file_content = String::new();
         // file.read_to_string(&mut file_content).expect("File read failed");
         let all_countries_no_filter = info_parse::get_data();
+        let mut cca3_to_name = HashMap::new();
+        for country in all_countries_no_filter.clone() {
+            cca3_to_name.insert(country.cca3, country.name.common);
+        }
         let mut all_countries: Vec<CountryStat> = all_countries_no_filter
             .into_iter()
             .filter(|country| country.independent.unwrap_or(false))
@@ -102,74 +117,104 @@ impl AppLogic {
             results: vec![0; len],
             scores,
             infos: Default::default(),
+            cca3_to_name,
         }
     }
 
     pub fn prep_categories(&mut self, info_types: [InfoType; 3]) {
+        let all_countries = self.all_countries.clone();
         for i in 0..3 {
             let cat_str = info_types[i].to_str();
             self.infos[i] = match info_types[i] {
-                InfoType::COUNTRY => self
-                    .all_countries
-                    .iter()
-                    .map(|x| {
-                        let data = x.name.common.clone();
-                        CatInfo {
-                            category: cat_str.into(),
-                            full: data.clone().into(),
-                            first: data.chars().nth(0).unwrap_or(' ').into(),
-                            with_hint: true,
+                InfoType::COUNTRY => map_all_countries!(all_countries, x, {
+                    let data = x.name.common.clone();
+                    CatInfo {
+                        category: cat_str.into(),
+                        full: data.clone().into(),
+                        first: hint_from_name(data).into(),
+                        with_hint: true,
+                    }
+                }),
+
+                InfoType::CAPITAL => map_all_countries!(all_countries, x, {
+                    let first: Vec<String> = x
+                        .capital
+                        .iter()
+                        .map(|s| hint_from_name(s.clone()))
+                        .collect();
+                    CatInfo {
+                        category: cat_str.into(),
+                        full: x.capital.join(", ").into(),
+                        first: first.join(", ").into(),
+                        with_hint: true,
+                    }
+                }),
+
+                InfoType::LANGUAGES => map_all_countries!(all_countries, x, {
+                    let lang_vec: Vec<String> =
+                        x.languages.values().map(|v| v.to_string()).collect();
+                    let first: Vec<String> =
+                        lang_vec.iter().map(|s| hint_from_name(s.clone())).collect();
+                    CatInfo {
+                        category: cat_str.into(),
+                        full: lang_vec.join(", ").into(),
+                        first: first.join(", ").into(),
+                        with_hint: true,
+                    }
+                }),
+
+                InfoType::CURRENCIES => map_all_countries!(all_countries, x, {
+                    let mut v = Vec::new();
+                    if let Some(c) = x.currencies.clone() {
+                        if let CurrencyType::PRESENT(currencies) = c {
+                            for (code, currency) in currencies {
+                                v.push(format!(
+                                    "{} ({}, {})",
+                                    currency.name, code, currency.symbol
+                                ));
+                                // Euro (EUR, €)
+                            }
                         }
-                    })
-                    .collect(),
-                InfoType::CAPITAL => self
-                    .all_countries
-                    .iter()
-                    .map(|x| {
-                        let data = x.capital.join(", ");
-                        CatInfo {
-                            category: cat_str.into(),
-                            full: data.clone().into(),
-                            first: data.chars().nth(0).unwrap_or(' ').into(),
-                            with_hint: true,
-                        }
-                    })
-                    .collect(),
-                InfoType::LANGUAGES => self
-                    .all_countries
-                    .iter()
-                    .map(|x| {
-                        let lang_vec: Vec<String> =
-                            x.languages.values().map(|v| v.to_string()).collect();
-                        let data = lang_vec.join(", ");
-                        CatInfo {
-                            category: cat_str.into(),
-                            full: data.clone().into(),
-                            first: data.chars().nth(0).unwrap_or(' ').into(),
-                            with_hint: true,
-                        }
-                    })
-                    .collect(),
-                InfoType::CURRENCIES => {
-                    panic!("Currencies info not done yet")
-                }
+                    }
+                    CatInfo {
+                        category: cat_str.into(),
+                        full: v.join(", ").into(),
+                        first: ' '.into(),
+                        with_hint: false,
+                    }
+                }),
+
                 InfoType::LATLON => {
                     panic!("Latlon info not done yet")
                 }
-                InfoType::REGION => self
-                    .all_countries
-                    .iter()
-                    .map(|x| {
-                        let data = format!("{} ({})", x.subregion, x.region);
-                        CatInfo {
-                            category: cat_str.into(),
-                            full: data.clone().into(),
-                            first: data.chars().nth(0).unwrap_or(' ').into(),
-                            with_hint: true,
-                        }
-                    })
-                    .collect(),
-                InfoType::BORDERS => panic!("Border info not done yet"),
+
+                InfoType::REGION => map_all_countries!(all_countries, x, {
+                    let data = format!("{} ({})", x.subregion, x.region);
+                    CatInfo {
+                        category: cat_str.into(),
+                        full: data.clone().into(),
+                        first: hint_from_name(data).into(),
+                        with_hint: true,
+                    }
+                }),
+
+                InfoType::BORDERS => map_all_countries!(all_countries, x, {
+                    let border_vec: Vec<String> = x
+                        .borders
+                        .iter()
+                        .map(|s| self.cca3_to_name.get_key_value(s).unwrap().1.to_string())
+                        .collect();
+                    let first: Vec<String> = border_vec
+                        .iter()
+                        .map(|s| hint_from_name(s.clone()))
+                        .collect();
+                    CatInfo {
+                        category: cat_str.into(),
+                        full: border_vec.join(", ").into(),
+                        first: first.join(", ").into(),
+                        with_hint: true,
+                    }
+                }),
             }
         }
     }

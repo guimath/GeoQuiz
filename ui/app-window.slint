@@ -211,7 +211,7 @@ export component AppWindow inherits Window {
   in-out property <bool> initials_on: false;
   in-out property <bool> learn_mode: false;
   in-out property <bool> playing: false;
-  in property <[string]> info_types: ["Country", "Capital", "Languages", "Currencies", "LatLon", "Borders", "Region"];
+  in property <[string]> info_types: ["Country", "Capital", "Languages", "Borders", "Region", "Currencies"];//, "LatLon"
   property <int> num: 0;
   property <int> out_of: 110;
   property <int> score_delayed: 0;
@@ -416,8 +416,8 @@ export component AppWindow inherits Window {
       initials_on: root.initials_on;
       learn_mode: root.learn_mode;
       type: "Language: ";
-      name: "Jamaican, English";
-      first_letter: "J, E";
+      name: "English, Jamaican Patois";
+      first_letter: "E..., J...";
       show: root.info_level >2;
       clicked => {
         if root.info_level<3 {

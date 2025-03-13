@@ -1,5 +1,4 @@
-import { Button, VerticalBox, HorizontalBox, TextEdit} from "std-widgets.slint";
-
+import { Button, VerticalBox, HorizontalBox, TextEdit, CheckBox, ComboBox} from "std-widgets.slint";
 
 // ***************************************************************** //
 //                            External Elements
@@ -8,7 +7,7 @@ export struct CatInfo {
   category: string,
   full: string,
   first: string,
-  show_first: bool,
+  with_hint: bool,
 }
 
 export struct FullUpdate  {
@@ -16,7 +15,7 @@ export struct FullUpdate  {
   out_of: int,
   score: int,
   flag: image,
-  info_level:int, 
+  seen: bool, 
 }
 
 
@@ -29,6 +28,33 @@ component MainText inherits Text {
   // color: white;
 }
 
+component CatChoose inherits HorizontalBox {
+  in property <string> text;
+  in property <[string]> model;
+  in property <int> index;
+  in-out property <string> selected;
+  VerticalBox {
+    alignment: center;
+    padding: 0;
+    Text {
+      text: root.text;
+      width: 80pt;
+    }
+  }
+  VerticalBox {
+    alignment: center;
+    height: 25pt;
+    padding: 0;
+    num := ComboBox {
+      width: 50%;
+      height: 25pt;
+      model: root.model;
+      current_index: root.index;
+      selected(current-value) => {root.selected = current-value;}
+    }
+    
+  }
+}
 component ToggleStar inherits TouchArea {
   in property <bool> on;
   property <image> off_img: @image-url("star_off.svg");
@@ -88,18 +114,24 @@ component HiddenText inherits TouchArea {
   in-out property<string> type; 
   in property<bool> show;
   in-out property<bool> show_first_letter;
-  in property <bool> with_hint : true;
-  in-out property <length> size_hint : 40pt;
+  in-out property <length> size_hint : 0pt;
+  in property <bool> initials_on;
+  in property <bool> learn_mode;
   callback hint();
 
   public function update_cat(cat: CatInfo){
     self.type = cat.category;
     self.name = cat.full;
     self.first_letter = cat.first;
-    self.show_first_letter = cat.show_first;
-    if cat.show_first {
+    if root.initials_on {
+      self.show_first_letter = true;
       self.size_hint = 0pt;
-    } else {
+    }
+    else if root.learn_mode || !cat.with_hint {
+      self.size_hint = 0pt;
+    }
+    else  {
+      self.show_first_letter = false;
       self.size_hint = 40pt;
     } 
   }
@@ -112,7 +144,7 @@ component HiddenText inherits TouchArea {
       VerticalBox {
         alignment: center;
         MainText {
-          width:120pt;
+          width:150pt;
           horizontal-alignment: right;
           text: root.type;
         }
@@ -147,14 +179,13 @@ component HiddenText inherits TouchArea {
         TouchArea {
           height:root.size_hint;
           width: root.size_hint;
-          clicked => {hint(); root.size_hint = 0;}
+          clicked => {hint(); root.size_hint = 0; root.show_first_letter=true}
           animate height, width {
             duration: 300ms;
             easing: ease-in-out;
           }
           Image {
             source: @image-url("hint.svg");
-            visible: root.with_hint;
             height: root.size_hint;
             width: root.size_hint;
             animate height, width {
@@ -177,6 +208,10 @@ export component AppWindow inherits Window {
   in property <image> flag: @image-url("../data/flags/jam.svg");
   in property <string> other_info: "Jamaican dollar (JMD, $)";
   in-out property <int> info_level:0;
+  in-out property <bool> initials_on: false;
+  in-out property <bool> learn_mode: false;
+  in-out property <bool> playing: false;
+  in property <[string]> info_types: ["Country", "Capital", "Languages", "Currencies", "LatLon", "Borders", "Region"];
   property <int> num: 0;
   property <int> out_of: 110;
   property <int> score_delayed: 0;
@@ -186,17 +221,25 @@ export component AppWindow inherits Window {
   callback close();
   callback next(int);
   callback prev();
-  
+  callback start_play([string], bool);
 
   // ***************************************************************** //
   //                            UI LOGIC
   // ***************************************************************** //
+  function prep_start_play(){
+    root.start_play([cat1.selected, cat2.selected, cat3.selected], false); 
+    root.playing = true;
+  }
   public function update_screen(info:FullUpdate, cat:[CatInfo]) {
     w_score.set_score(info.score);
     w_cat1.update_cat(cat[0]);
     w_cat2.update_cat(cat[1]);
     w_cat3.update_cat(cat[2]);
-    root.info_level = info.info_level;
+    if root.learn_mode || info.seen {
+      root.info_level = 3 
+    } else { 
+      root.info_level = 0 
+    }
     root.num = info.num;
     root.out_of = info.out_of;
     flag.source = info.flag;
@@ -260,8 +303,59 @@ export component AppWindow inherits Window {
   // ***************************************************************** //
   //                            WIDGETS
   // ***************************************************************** //
-  // main box, always shown
-  
+  // init screen
+  Rectangle {
+    visible:!root.playing;
+    padding: 0;
+    VerticalBox {
+      HorizontalBox {
+        alignment: center;
+        padding: 40pt;
+        Button {
+          height: 70pt;  
+          width: 100pt;  
+          text: "Play";
+          clicked => {prep_start_play()}
+        }
+      }
+
+
+      CheckBox {
+        text: "Show hints by default";
+        checked: root.initials_on;
+        enabled: !root.learn_mode;
+        toggled => {root.initials_on = self.checked}
+      }
+      CheckBox {
+        text: "Learning mode (show all by default)";
+        checked: root.learn_mode;
+        toggled => {root.learn_mode = self.checked}
+      }
+      cat1 := CatChoose{
+        text:"Category 1:";
+        model: root.info_types;
+        selected: root.info_types[0];
+        index: 0;
+      }
+      cat2 := CatChoose{
+        text:"Category 2:";
+        model: root.info_types;
+        selected: root.info_types[1];
+        index: 1;
+      }
+      cat3 := CatChoose{
+        text:"Category 3:";
+        model: root.info_types;
+        selected: root.info_types[2];
+        index: 2;
+      }
+      Rectangle {}
+    }
+  }
+  // Playing screen
+  Rectangle {
+    visible:root.playing;
+    padding: 0;
   VerticalBox {
     height: 100%;
     Rectangle {
@@ -290,31 +384,53 @@ export component AppWindow inherits Window {
       // rotation-angle:root.photo_rotation*1deg ;  // doesn't rescale so meh
     }
     w_cat1 := HiddenText {
+      initials_on: root.initials_on;
+      learn_mode: root.learn_mode;
       type: "Country: ";
       name: "Jamaica";
       first_letter: "J";
       show: root.info_level >=1;
-      clicked => {if root.info_level<1 {root.info_level=1}}
-      hint => {self.show_first_letter=true}
+      clicked => {
+        if root.info_level<1 {
+          root.info_level=1;
+          self.size_hint = 0;
+        }
+      }
     }
     w_cat2 := HiddenText {
+      initials_on: root.initials_on;
+      learn_mode: root.learn_mode;
       type: "Capital: ";
       name: "Kingston";
       first_letter: "K";
       show: root.info_level >=2;
-      clicked => {if root.info_level<2 {root.info_level=2}}
-      hint => {self.show_first_letter=true}
+      clicked => {
+        if root.info_level<2 {
+          root.info_level=2;
+          self.size_hint = 0;
+          w_cat1.size_hint = 0;
+        }
+      }
     }
     w_cat3 := HiddenText {
-      type: "Currency: ";
-      name: root.other_info;
+      initials_on: root.initials_on;
+      learn_mode: root.learn_mode;
+      type: "Language: ";
+      name: "Jamaican, English";
+      first_letter: "J, E";
       show: root.info_level >2;
-      with_hint: false; 
-      clicked => {if root.info_level<3 {root.info_level=3}}
-
+      clicked => {
+        if root.info_level<3 {
+          root.info_level=3;
+          self.size_hint = 0;
+          w_cat1.size_hint = 0;
+          w_cat2.size_hint = 0;
+        }
+      }
     }
     Rectangle {}
   }
+}
 
 
 }

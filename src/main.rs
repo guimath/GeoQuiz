@@ -4,7 +4,7 @@ use std::{
     sync::{Arc, Mutex},
 };
 
-use slint::ComponentHandle;
+use slint::{ComponentHandle, LogicalSize, Model, SharedString, VecModel};
 
 use geo_quiz::logic::{AppLogic, AppWindow, InfoType};
 
@@ -24,19 +24,34 @@ struct Cli {
 fn main() -> Result<(), Box<dyn Error>> {
     slint::init_translations!(concat!(env!("CARGO_MANIFEST_DIR"), "/lang/"));
     let args = Cli::parse();
-    let logic = Arc::new(Mutex::new(AppLogic::new(
-        args.easy_first,
-        args.learn_mode,
-        args.initials_on,
-    )));
-    logic.lock().unwrap().prep_categories([
-        InfoType::COUNTRY,
-        InfoType::CAPITAL,
-        InfoType::LANGUAGES,
-    ]);
+    let logic = Arc::new(Mutex::new(AppLogic::new(args.easy_first)));
+
     let ui = AppWindow::new()?;
-    let (update, cat) = logic.lock().unwrap().get_stat();
-    ui.invoke_update_screen(update, cat.into());
+    ui.window().set_size(LogicalSize {
+        width: 1000.0,
+        height: 1000.0,
+    });
+    ui.set_learn_mode(args.learn_mode);
+    ui.set_initials_on(args.initials_on);
+    ui.on_start_play({
+        let ui_handle = ui.as_weak();
+        let logic_ref = logic.clone();
+        move |selected, _easy_first| {
+            let ui = ui_handle.unwrap();
+            let mut logic = logic_ref.lock().unwrap();
+
+            let s: &VecModel<SharedString> = selected.as_any().downcast_ref().unwrap();
+            let selected: Vec<String> = s.iter().map(|x| x.into()).collect();
+            let cat: [InfoType; 3] = [
+                selected[0].parse::<InfoType>().unwrap(),
+                selected[1].parse::<InfoType>().unwrap(),
+                selected[2].parse::<InfoType>().unwrap(),
+            ];
+            logic.prep_categories(cat);
+            let (update, cat) = logic.get_stat();
+            ui.invoke_update_screen(update, cat.into());
+        }
+    });
     ui.on_next({
         let ui_handle = ui.as_weak();
         let logic_ref = logic.clone();

@@ -210,6 +210,8 @@ export component AppWindow inherits Window {
   in-out property <int> info_level:0;
   in-out property <bool> initials_on: false;
   in-out property <bool> learn_mode: false;
+  in-out property <bool> hard_mode: false;
+  in-out property <bool> easy_first: false;
   in-out property <bool> playing: false;
   in property <[string]> info_types: ["Country", "Capital", "Languages", "Borders", "Region", "Currencies"];//, "LatLon"
   property <int> num: 0;
@@ -221,13 +223,13 @@ export component AppWindow inherits Window {
   callback close();
   callback next(int);
   callback prev();
-  callback start_play([string], bool);
+  callback start_play([string], bool, bool);
 
   // ***************************************************************** //
   //                            UI LOGIC
   // ***************************************************************** //
   function prep_start_play(){
-    root.start_play([cat1.selected, cat2.selected, cat3.selected], false); 
+    root.start_play([cat1.selected, cat2.selected, cat3.selected], root.easy_first, root.hard_mode); 
     root.playing = true;
   }
   public function update_screen(info:FullUpdate, cat:[CatInfo]) {
@@ -294,6 +296,9 @@ export component AppWindow inherits Window {
       if event.text == Key.Space && event.modifiers.control {
         root.info_level = 3;
       }
+      if event.text == "b" {
+        root.playing = false;
+      }
         // else if event.text == "d" && event.modifiers.alt {
        
       accept
@@ -330,6 +335,16 @@ export component AppWindow inherits Window {
         text: "Learning mode (show all by default)";
         checked: root.learn_mode;
         toggled => {root.learn_mode = self.checked}
+      }
+      CheckBox {
+        text: "Hard mode (show countries / territories that are not independent)";
+        checked: root.hard_mode;
+        toggled => {root.hard_mode = self.checked}
+      }
+      CheckBox {
+        text: "Start with more known flag (according to own score)";
+        checked: root.easy_first;
+        toggled => {root.easy_first = self.checked}
       }
       cat1 := CatChoose{
         text:"Category 1:";

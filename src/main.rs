@@ -24,7 +24,7 @@ struct Cli {
 fn main() -> Result<(), Box<dyn Error>> {
     slint::init_translations!(concat!(env!("CARGO_MANIFEST_DIR"), "/lang/"));
     let args = Cli::parse();
-    let logic = Arc::new(Mutex::new(AppLogic::new(args.easy_first)));
+    let logic = Arc::new(Mutex::new(AppLogic::default()));
 
     let ui = AppWindow::new()?;
     ui.window().set_size(LogicalSize {
@@ -36,7 +36,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     ui.on_start_play({
         let ui_handle = ui.as_weak();
         let logic_ref = logic.clone();
-        move |selected, _easy_first| {
+        move |selected, easy_first, hard_mode| {
             let ui = ui_handle.unwrap();
             let mut logic = logic_ref.lock().unwrap();
 
@@ -47,7 +47,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                 selected[1].parse::<InfoType>().unwrap(),
                 selected[2].parse::<InfoType>().unwrap(),
             ];
-            logic.prep_categories(cat);
+            logic.prepare_infos(easy_first, hard_mode, cat);
             let (update, cat) = logic.get_stat();
             ui.invoke_update_screen(update, cat.into());
         }

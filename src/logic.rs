@@ -71,6 +71,8 @@ pub struct StatDisplay {
     pub out_of: usize,
     pub score: u32,
 }
+
+#[derive(Default)]
 pub struct AppLogic {
     current: usize,
     results: Vec<u32>,
@@ -80,23 +82,23 @@ pub struct AppLogic {
     cca3_to_name: HashMap<String, String>,
 }
 impl AppLogic {
-    pub fn new(easy_first: bool) -> Self {
-        // let mut file = File::open("data/countries.json").expect("File data/countries.json not found");
-        // let mut file_content = String::new();
-        // file.read_to_string(&mut file_content).expect("File read failed");
-        let all_countries_no_filter = info_parse::get_data();
+    pub fn prepare_infos(&mut self, easy_first: bool, hard_mode: bool, info_types: [InfoType; 3]) {
+        let mut all_countries = info_parse::get_data();
         let mut cca3_to_name = HashMap::new();
-        for country in all_countries_no_filter.clone() {
+        let scores = info_parse::read(&all_countries);
+
+        for country in all_countries.clone() {
             cca3_to_name.insert(country.cca3, country.name.common);
         }
-        let mut all_countries: Vec<CountryStat> = all_countries_no_filter
-            .into_iter()
-            .filter(|country| country.independent.unwrap_or(false))
-            .collect();
+        if !hard_mode {
+            all_countries = all_countries
+                .into_iter()
+                .filter(|country| country.independent.unwrap_or(false))
+                .collect();
+        }
 
         let mut rng = thread_rng();
         all_countries.shuffle(&mut rng);
-        let scores = info_parse::read(&all_countries);
         let compare = |a: &CountryStat, b: &CountryStat| -> Ordering {
             scores
                 .get(&b.cca3.clone())
@@ -111,17 +113,15 @@ impl AppLogic {
         }
         let len = all_countries.len();
 
-        Self {
-            all_countries,
-            current: 0,
-            results: vec![0; len],
-            scores,
-            infos: Default::default(),
-            cca3_to_name,
-        }
+        self.all_countries = all_countries;
+        self.current = 0;
+        self.results = vec![0; len];
+        self.scores = scores;
+        self.cca3_to_name = cca3_to_name;
+        self.prep_categories(info_types);
     }
 
-    pub fn prep_categories(&mut self, info_types: [InfoType; 3]) {
+    fn prep_categories(&mut self, info_types: [InfoType; 3]) {
         let all_countries = self.all_countries.clone();
         for i in 0..3 {
             let cat_str = info_types[i].to_str();

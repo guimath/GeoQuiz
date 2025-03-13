@@ -15,13 +15,14 @@
 - [x] Make more info actually take more info
 - [x] Way to change infos displayed (maybe precompute once depending)
 - [x] Improve Hints for multi possibilities (Y..., X...)
+- [x] Add a hard mode with all flags?
 
 ## Priority 
 
-- [ ] Add a hard mode with all flags + level?
 - [ ] Improve UI on Settings screen
 
 ## Bonus
+- [ ] Add a Disabled hint ?
 - [ ] Make a way to return to main menu ? (saves ?)
 - [ ] Add a way to add more infos ?
 - [ ] Animate (WIP)

@@ -6,7 +6,7 @@ use std::{
 
 use slint::{ComponentHandle, LogicalSize, Model, SharedString, VecModel};
 
-use geo_quiz::logic::{AppLogic, AppWindow, InfoType};
+use geo_quiz::logic::{AppLogic, AppWindow, ImageType, InfoType};
 
 /// args
 #[derive(Parser)]
@@ -36,18 +36,19 @@ fn main() -> Result<(), Box<dyn Error>> {
     ui.on_start_play({
         let ui_handle = ui.as_weak();
         let logic_ref = logic.clone();
-        move |selected, easy_first, hard_mode| {
+        move |selected, easy_first, hard_mode, image| {
             let ui = ui_handle.unwrap();
             let mut logic = logic_ref.lock().unwrap();
 
             let s: &VecModel<SharedString> = selected.as_any().downcast_ref().unwrap();
             let selected: Vec<String> = s.iter().map(|x| x.into()).collect();
-            let cat: [InfoType; 3] = [
+            let info_types: [InfoType; 3] = [
                 selected[0].parse::<InfoType>().unwrap(),
                 selected[1].parse::<InfoType>().unwrap(),
                 selected[2].parse::<InfoType>().unwrap(),
             ];
-            logic.prepare_infos(easy_first, hard_mode, cat);
+            let img = image.parse::<ImageType>().unwrap();
+            logic.prepare_infos(easy_first, hard_mode, info_types, img);
             let (update, cat) = logic.get_stat();
             ui.invoke_update_screen(update, cat.into());
         }

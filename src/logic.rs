@@ -11,6 +11,30 @@ use crate::info_parse::{self, CountryStat, CurrencyType, Score};
 
 slint::include_modules!();
 
+pub enum ImageType {
+    FLAG,
+    OUTLINE,
+}
+impl ImageType {
+    pub fn to_folder(&self) -> &str {
+        match self {
+            ImageType::FLAG => "flags",
+            ImageType::OUTLINE => "outlines",
+        }
+    }
+}
+impl FromStr for ImageType {
+    type Err = ();
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s.trim() {
+            "Flags" => Ok(ImageType::FLAG),
+            "Outlines" => Ok(ImageType::OUTLINE),
+            _ => Err(()),
+        }
+    }
+}
+
 pub enum InfoType {
     COUNTRY,
     CAPITAL,
@@ -80,9 +104,16 @@ pub struct AppLogic {
     all_countries: Vec<CountryStat>,
     infos: [Vec<CatInfo>; 3],
     cca3_to_name: HashMap<String, String>,
+    image_folder: String,
 }
 impl AppLogic {
-    pub fn prepare_infos(&mut self, easy_first: bool, hard_mode: bool, info_types: [InfoType; 3]) {
+    pub fn prepare_infos(
+        &mut self,
+        easy_first: bool,
+        hard_mode: bool,
+        info_types: [InfoType; 3],
+        img: ImageType,
+    ) {
         let mut all_countries = info_parse::get_data();
         let mut cca3_to_name = HashMap::new();
         let scores = info_parse::read(&all_countries);
@@ -119,6 +150,7 @@ impl AppLogic {
         self.scores = scores;
         self.cca3_to_name = cca3_to_name;
         self.prep_categories(info_types);
+        self.image_folder = img.to_folder().to_string();
     }
 
     fn prep_categories(&mut self, info_types: [InfoType; 3]) {
@@ -249,9 +281,15 @@ impl AppLogic {
     pub fn get_stat(&mut self) -> (FullUpdate, [CatInfo; 3]) {
         let country = self.all_countries[self.current].clone();
 
-        let svg_path =
-            PathBuf::from_str(format!("data/flags/{}.svg", country.cca3.to_lowercase()).as_str())
-                .unwrap();
+        let svg_path = PathBuf::from_str(
+            format!(
+                "data/{}/{}.svg",
+                self.image_folder,
+                country.cca3.to_lowercase()
+            )
+            .as_str(),
+        )
+        .unwrap();
         let score = self.results[self.current] as i32;
         let update = FullUpdate {
             flag: Image::load_from_path(&svg_path).unwrap(),

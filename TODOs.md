@@ -17,10 +17,13 @@
 - [x] Improve Hints for multi possibilities (Y..., X...)
 - [x] Add a hard mode with all flags?
 - [x] Make a way to return to main menu
+- [x] Make a mode for country outline ?
 
 ## Priority 
 
 - [ ] Improve UI on Settings screen
+  - [ ] Make a dedicated widget with animation to make it flashy
+- Make everything with chosen colors ? 
 
 ## Bonus
 - [ ] Animate (WIP)

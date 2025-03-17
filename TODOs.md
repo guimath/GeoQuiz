@@ -18,17 +18,18 @@
 - [x] Add a hard mode with all flags?
 - [x] Make a way to return to main menu
 - [x] Make a mode for country outline ?
+- [x] Improve UI on Settings screen
+  - [x] Make a dedicated widget with animation to make it flashy
 
 ## Priority 
 
-- [ ] Improve UI on Settings screen
-  - [ ] Make a dedicated widget with animation to make it flashy
-- Make everything with chosen colors ? 
+- [ ] Harmonize Theme & fonts
+  - [ ] Dedicated button for play
+- [ ] Make android app
 
 ## Bonus
 - [ ] Animate (WIP)
 - [ ] Add a previous score / score animation on hover
-- [ ] Make android app
 
 ## Ideas to discuss
 - [ ] Should the return to menu save ?

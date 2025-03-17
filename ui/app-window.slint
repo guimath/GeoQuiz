@@ -1,258 +1,49 @@
 import { Button, VerticalBox, HorizontalBox, TextEdit, CheckBox, ComboBox} from "std-widgets.slint";
-
-// ***************************************************************** //
-//                            External Elements
-// ***************************************************************** //
-export struct CatInfo {
-  category: string,
-  full: string,
-  first: string,
-  with_hint: bool,
-}
-
-export struct FullUpdate  {
-  num: int,
-  out_of: int,
-  score: int,
-  flag: image,
-  seen: bool, 
-}
-
-
-// ***************************************************************** //
-//                            Default Widgets
-// ***************************************************************** //
-component MainText inherits Text {
-  // font-family: 
-  font-size: 25pt;
-  // color: white;
-}
-
-component CatChoose inherits HorizontalBox {
-    in property <string> text;
-    in property <[string]> model;
-    in property <int> index;
-    in-out property <string> selected;
-    VerticalBox {
-        alignment: center;
-        padding: 0;
-        Text {
-            text: root.text;
-            width: 80pt;
-        }
-    }
-
-    VerticalBox {
-        alignment: center;
-        height: 25pt;
-        padding: 0;
-        num := ComboBox {
-            width: 50%;
-            height: 25pt;
-            model: root.model;
-            current_index: root.index;
-            selected(current-value) => {
-                root.selected = current-value;
-            }
-        }
-    }
-}
-
-component ToggleStar inherits TouchArea {
-    in property <bool> on;
-    property <image> off_img: @image-url("star_off.svg");
-    property <image> on_img: @image-url("star_on.svg");
-    height: 75px;
-    width: 75px;
-    im := Image {
-        height: 75px;
-        width: 75px;
-        source: root.off_img;
-    }
-
-    public function set_status(on: bool) {
-        if on {
-            im.source = root.on_img;
-        } else {
-            im.source = root.off_img;
-        }
-    }
-}
-
-component ThreeStartScore {
-    in property <int> score;
-    callback score_changed(score: int);
-    VerticalBox {
-        padding: 0;
-        HorizontalBox {
-            padding: 0;
-
-            star1 := ToggleStar {
-                clicked => {
-                    internal_score_change(1)
-                }
-            }
-
-            star2 := ToggleStar {
-                clicked => {
-                    internal_score_change(2)
-                }
-            }
-
-            star3 := ToggleStar {
-                clicked => {
-                    internal_score_change(3)
-                }
-            }
-        }
-    }
-
-    function internal_score_change(score: int) {
-        set_score(score);
-        score_changed(score);
-    }
-    public function set_score(score: int) {
-        star1.set_status(score > 0);
-        star2.set_status(score > 1);
-        star3.set_status(score > 2);
-    }
-}
-
-component HiddenText inherits TouchArea {
-    in-out property <string> name;
-    in-out property <string> first_letter;
-    in-out property <string> type;
-    in property <bool> show;
-    in-out property <bool> show_first_letter;
-    in-out property <length> size_hint: 0pt;
-    in property <bool> initials_on;
-    in property <bool> learn_mode;
-    callback hint();
-
-    public function update_cat(cat: CatInfo) {
-        self.type = cat.category;
-        self.name = cat.full;
-        self.first_letter = cat.first;
-        if root.initials_on {
-            self.show_first_letter = true;
-            self.size_hint = 0pt;
-        } else if root.learn_mode || !cat.with_hint {
-            self.size_hint = 0pt;
-        } else {
-            self.show_first_letter = false;
-            self.size_hint = 40pt;
-        }
-    }
-    Rectangle {
-        background: grey;
-        border-radius: 10px;
-        width: 90%;
-        HorizontalBox {
-      // vertical-stretch: center;
-      VerticalBox {
-                alignment: center;
-                MainText {
-                    width: 150pt;
-                    horizontal-alignment: right;
-                    text: root.type;
-                }
-            }
-
-            Rectangle {
-                padding: 0;
-                VerticalBox {
-                    alignment: center;
-                    height: 70pt;
-                    MainText {
-                        horizontal-alignment: left;
-                        text: root.first_letter;
-                        visible: root.show_first_letter && !root.show;
-                    }
-                }
-
-                VerticalBox {
-                    alignment: center;
-                    height: 70pt;
-                    MainText {
-                        horizontal-alignment: left;
-                        text: root.name;
-                        visible: root.show;
-                        wrap: word-wrap;
-                    }
-                }
-            }
-
-            Rectangle { } // spacing
-      VerticalBox {
-                alignment: center;
-                padding: 0;
-                height: 70pt;
-                TouchArea {
-                    height: root.size_hint;
-                    width: root.size_hint;
-                    clicked => {
-                        hint();
-                        root.size_hint = 0;
-                        root.show_first_letter = true
-                    }
-                    animate height, width {
-                        duration: 300ms;
-                        easing: ease-in-out;
-                    }
-                    Image {
-                        source: @image-url("hint.svg");
-                        height: root.size_hint;
-                        width: root.size_hint;
-                        animate height, width {
-                            duration: 300ms;
-                            easing: ease-in-out;
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
+import {MultiChoice, ThreeStartScore, MainText, HiddenText} from "widgets.slint";
+import {CatInfo, FullUpdate} from "structs.slint";
 
 export component AppWindow inherits Window {
     title: "Geo quiz";
-  // ***************************************************************** //
-  //                            PROPERTIES
-  // ***************************************************************** //
-  in property <image> flag: @image-url("../data/flags/jam.svg");
+    // ***************************************************************** //
+    //                            PROPERTIES
+    // ***************************************************************** //
+    in property <image> flag: @image-url("../data/flags/jam.svg");
     in property <string> other_info: "Jamaican dollar (JMD, $)";
     in-out property <int> info_level:0;
-    in-out property <bool> initials_on: false;
-    in-out property <bool> learn_mode: false;
-    in-out property <bool> hard_mode: false;
-    in-out property <bool> easy_first: false;
+    in-out property <int> play_mode: 1;
     in-out property <bool> playing: false;
     in property <[string]> info_types: ["Country", "Capital", "Languages", "Borders", "Region", "Currencies"];
     //, "LatLon"
-  property <int> num: 0;
+    property <int> num: 0;
     property <int> out_of: 110;
     property <int> score_delayed: 0;
-  // ***************************************************************** //
-  //                            CALLBACKS
-  // ***************************************************************** //
-  callback close();
+    // ***************************************************************** //
+    //                            CALLBACKS
+    // ***************************************************************** //
+    callback close();
     callback next(int);
     callback prev();
-    callback start_play([string], bool, bool, string);
+    callback start_play([int], bool, bool, int);
 
-  // ***************************************************************** //
-  //                            UI LOGIC
-  // ***************************************************************** //
-  function prep_start_play() {
-        root.start_play([cat1.selected, cat2.selected, cat3.selected], root.easy_first, root.hard_mode, cat_im.selected);
+    // ***************************************************************** //
+    //                            UI LOGIC
+    // ***************************************************************** //
+    function prep_start_play() {
+        root.play_mode = w_play_mode.choice_num;
+        root.start_play(
+            [cat1.choice_num, cat2.choice_num, cat3.choice_num], 
+            w_order.not_default, 
+            w_hard.not_default, 
+            cat_im.choice_num);
         root.playing = true;
     }
+
     public function update_screen(info: FullUpdate, cat: [CatInfo]) {
         w_score.set_score(info.score);
         w_cat1.update_cat(cat[0]);
         w_cat2.update_cat(cat[1]);
         w_cat3.update_cat(cat[2]);
-        if root.learn_mode || info.seen {
+        if root.play_mode == 3 || info.seen {
             root.info_level = 3
         } else {
             root.info_level = 0
@@ -317,17 +108,14 @@ export component AppWindow inherits Window {
             if event.text == "b" {
                 root.playing = false;
             }
-        // else if event.text == "d" && event.modifiers.alt {
-       
-      accept
+        accept
         }
     }
 
-  // ***************************************************************** //
-  //                            WIDGETS
-  // ***************************************************************** //
-  // init screen
-  Rectangle {
+    // ***************************************************************** //
+    //                            INIT SCREEN
+    // ***************************************************************** //
+    Rectangle {
         visible: !root.playing;
         padding: 0;
         VerticalBox {
@@ -344,49 +132,81 @@ export component AppWindow inherits Window {
                 }
             }
 
-            HorizontalBox {
-                alignment: center;
-                padding: 0pt;
+            Rectangle {
+                background: #4a4458ff;
+                border-radius: 10px;
                 VerticalBox {
-                    padding: 0pt;
-                    CheckBox {
-                        text: "Show hints by default";
-                        checked: root.initials_on;
-                        enabled: !root.learn_mode;
-                        toggled => {
-                            root.initials_on = self.checked
-                        }
-                    }
-                    /// TODO move to mode : but need cool ui element
-                    /// 1) No hints available 
-                    /// 2) Hints available on click
-                    /// 3) Hints always shown
-                    /// 4) All info shown  
-
-                    CheckBox {
-                        text: "Learning mode (show all by default)";
-                        checked: root.learn_mode;
-                        toggled => {
-                            root.learn_mode = self.checked
-                        }
+                    padding: 10px;
+                    Text {
+                        text: "Play mode";
+                        horizontal-alignment: center;
                     }
 
-                    CheckBox {
-                        text: "Include territories that are not independent)";
-                        checked: root.hard_mode;
-                        toggled => {
-                            root.hard_mode = self.checked
-                        }
-                    }
-
-                    CheckBox {
-                        text: "Start with more known flag (according to own score)";
-                        checked: root.easy_first;
-                        toggled => {
-                            root.easy_first = self.checked
-                        }
+                    w_play_mode := MultiChoice {
+                        choices: ["No hints", "Clickable hints", "Always on hints", "Full info on"];
+                        choices_len: 4;
+                        choice_num: 1;
+                        spacing: 10pt;
                     }
                 }
+            }
+
+            Rectangle {
+                background: #4a4458ff;
+                border-radius: 10px;
+                HorizontalBox {
+                    padding: 10px;
+                    Text {
+                        text: "Country list includes:";
+                        vertical-alignment: center;
+                        horizontal-alignment: right;
+                        wrap: word-wrap;
+                    }
+
+                    w_hard := MultiChoice {
+                        width: 70%;
+                        choices: ["Independent countries only", "All territories"];
+                        choices_len: 2;
+                        width_per_elem: 40%;
+                        spacing: 20pt;
+                    }
+                }
+            }
+
+            Rectangle {
+                width: 60%;
+                background: #4a4458ff;
+                border-radius: 10px;
+                HorizontalBox {
+                    padding: 10px;
+                    Text {
+                        text: "Start with:";
+                        horizontal-alignment: right;
+                        vertical-alignment: center;
+                        wrap: word-wrap;
+                    }
+
+                    w_order := MultiChoice {
+                        width: 70%;
+                        choices: ["Less known countries", "More known countries"];
+                        choices_len: 2;
+                        width_per_elem: 40%;
+                        spacing: 20pt;
+                    }
+                }
+            }
+
+            Rectangle {
+                width: 100%;
+                height: 2px;
+                background: white;
+            }
+
+            Text {
+                text: "Infos";
+                horizontal-alignment: center;
+                vertical-alignment: center;
+                font-size: 16pt;
             }
 
             HorizontalBox {
@@ -394,32 +214,42 @@ export component AppWindow inherits Window {
                 padding: 0pt;
                 VerticalBox {
                     padding: 0pt;
-                    cat_im := CatChoose {
-                        text: "Image:";
-                        model: ["Flags", "Outlines"];
-                        selected: "Flags";
-                        index: 0;
+                    cat_im := MultiChoice {
+                        width: 100%;
+                        choices: ["Flags", "Outlines"];
+                        choices_len: 2;
+                        width_per_elem: 30%;
+                        background_elem: #00000000;
+                        spacing: 10pt;
                     }
 
-                    cat1 := CatChoose {
-                        text: "Category 1:";
-                        model: root.info_types;
-                        selected: root.info_types[0];
-                        index: 0;
+                    cat1 := MultiChoice {
+                        width: 100%;
+                        choices: root.info_types;
+                        choices_len: 6;
+                        width_per_elem: 15%;
+                        background_elem: #00000000;
+                        spacing: 5pt;
                     }
 
-                    cat2 := CatChoose {
-                        text: "Category 2:";
-                        model: root.info_types;
-                        selected: root.info_types[1];
-                        index: 1;
+                    cat2 := MultiChoice {
+                        width: 100%;
+                        choices: root.info_types;
+                        choices_len: 6;
+                        width_per_elem: 15%;
+                        background_elem: #00000000;
+                        choice_num: 1;
+                        spacing: 5pt;
                     }
 
-                    cat3 := CatChoose {
-                        text: "Category 3:";
-                        model: root.info_types;
-                        selected: root.info_types[2];
-                        index: 2;
+                    cat3 := MultiChoice {
+                        width: 100%;
+                        choices: root.info_types;
+                        choices_len: 6;
+                        width_per_elem: 15%;
+                        background_elem: #00000000;
+                        choice_num: 2;
+                        spacing: 5pt;
                     }
                 }
             }
@@ -427,8 +257,12 @@ export component AppWindow inherits Window {
             Rectangle { }
         }
     }
-  // Playing screen
-  Rectangle {
+
+
+    // ***************************************************************** //
+    //                            PLAYING SCREEN
+    // ***************************************************************** //
+    Rectangle {
         visible: root.playing;
         padding: 0;
         VerticalBox {
@@ -444,9 +278,7 @@ export component AppWindow inherits Window {
                         text: "\{root.num + 1} / \{root.out_of}";
                     }
                 }
-      // VerticalBox {
-      // }
-      w_score := ThreeStartScore {
+                w_score := ThreeStartScore {
                     score_changed(score) => {
                         prep_next(score)
                     }
@@ -460,12 +292,10 @@ export component AppWindow inherits Window {
             flag := Image {
                 height: 33%;
                 source: root.flag;
-      // rotation-angle:root.photo_rotation*1deg ;  // doesn't rescale so meh
-    }
+            }
 
             w_cat1 := HiddenText {
-                initials_on: root.initials_on;
-                learn_mode: root.learn_mode;
+                play_mode: root.play_mode;
                 type: "Country: ";
                 name: "Jamaica";
                 first_letter: "J";
@@ -479,8 +309,7 @@ export component AppWindow inherits Window {
             }
 
             w_cat2 := HiddenText {
-                initials_on: root.initials_on;
-                learn_mode: root.learn_mode;
+                play_mode: root.play_mode;
                 type: "Capital: ";
                 name: "Kingston";
                 first_letter: "K";
@@ -495,8 +324,7 @@ export component AppWindow inherits Window {
             }
 
             w_cat3 := HiddenText {
-                initials_on: root.initials_on;
-                learn_mode: root.learn_mode;
+                play_mode: root.play_mode;
                 type: "Language: ";
                 name: "English, Jamaican Patois";
                 first_letter: "E..., J...";
@@ -510,8 +338,7 @@ export component AppWindow inherits Window {
                     }
                 }
             }
-
-            Rectangle { }
+            Rectangle { } // spacing
         }
     }
 }

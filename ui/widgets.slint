@@ -1,0 +1,231 @@
+import { Button, VerticalBox, HorizontalBox, TextEdit, CheckBox, ComboBox} from "std-widgets.slint";
+import {CatInfo} from "structs.slint";
+
+
+component ChoiceElem inherits TouchArea {
+    in property <string> text;
+    in property <color> background_elem: #ffffff3c;
+    public function click() {
+        root.clicked();
+    } 
+    width: 20%;
+    height: 30pt;
+    Rectangle {
+        width: 100%;
+        border-radius: 10px;
+        background: root.background_elem;
+    }
+    VerticalBox {
+        padding: 0;
+        Text {
+            height: 30pt;
+            width:100%;
+            horizontal-alignment: center;
+            vertical-alignment: center;
+            wrap: word-wrap;
+            text: root.text;
+        }
+    }
+}
+export component MultiChoice {
+    in property <[string]> choices;
+    in property <float> choices_len;
+    in property <percent> width_per_elem: 20%;
+    in property <length> spacing : 10pt;
+    in property <color> background_elem : #ffffff3c;
+    in-out property <int> choice_num : 0;
+    out property <bool> not_default : root.choice_num != 0;
+  
+    HorizontalBox {
+        padding: 0;
+        spacing: root.spacing;
+        alignment: center;
+        for text[index] in root.choices : ChoiceElem {
+            text: text;
+            width: width_per_elem;
+            background_elem: root.background_elem;
+            clicked => {root.choice_num = index}
+        }
+            
+        
+    }
+    e := Rectangle {
+        width: root.width_per_elem;
+    }
+    highlight := Rectangle{
+        x: (root.width - e.width*root.choices_len - root.spacing*(root.choices_len - 1))/2 + (e.width+root.spacing)*root.choice_num;
+        background: #ffffff3c;
+        height: 30pt;
+        width:root.width_per_elem;
+        border-radius: 10px;
+        animate x {
+            duration: 300ms;
+            easing: ease-in-out;
+        }
+    }
+}
+
+
+component ToggleStar inherits TouchArea {
+    in property <bool> on;
+    property <image> off_img: @image-url("star_off.svg");
+    property <image> on_img: @image-url("star_on.svg");
+    height: 75px;
+    width: 75px;
+    im := Image {
+        height: 75px;
+        width: 75px;
+        source: root.off_img;
+    }
+
+    public function set_status(on: bool) {
+        if on {
+            im.source = root.on_img;
+        } else {
+            im.source = root.off_img;
+        }
+    }
+}
+
+export component ThreeStartScore {
+    in property <int> score;
+    callback score_changed(score: int);
+    VerticalBox {
+        padding: 0;
+        HorizontalBox {
+            padding: 0;
+
+            star1 := ToggleStar {
+                clicked => {
+                    internal_score_change(1)
+                }
+            }
+
+            star2 := ToggleStar {
+                clicked => {
+                    internal_score_change(2)
+                }
+            }
+
+            star3 := ToggleStar {
+                clicked => {
+                    internal_score_change(3)
+                }
+            }
+        }
+    }
+    function internal_score_change(score: int) {
+        set_score(score);
+        score_changed(score);
+    }
+    public function set_score(score: int) {
+        star1.set_status(score > 0);
+        star2.set_status(score > 1);
+        star3.set_status(score > 2);
+    }
+}
+export component MainText inherits Text {
+    // font-family: 
+    font-size: 20pt;
+    // color: white;
+}
+
+export component HiddenText inherits TouchArea {
+    in-out property <string> name;
+    in-out property <string> first_letter;
+    in-out property <string> type;
+    in property <bool> show;
+    in-out property <bool> show_first_letter;
+    in-out property <length> size_hint: 0pt;
+    in property <int> play_mode; 
+    callback hint();
+
+    public function update_cat(cat: CatInfo) {
+        self.type = cat.category;
+        self.name = cat.full;
+        self.first_letter = cat.first;
+
+        if root.play_mode == 1 && cat.with_hint { 
+            self.size_hint = 40pt;
+        }
+        else {
+            self.size_hint = 0pt;
+        }
+
+        if root.play_mode == 2 && cat.with_hint {
+            self.show_first_letter = true;
+        }
+        else {
+            self.show_first_letter = false;
+        }
+
+    }
+    Rectangle {
+        background: grey;
+        border-radius: 10px;
+        width: 90%;
+        HorizontalBox {
+            VerticalBox {
+                alignment: center;
+                MainText {
+                    width: 150pt;
+                    horizontal-alignment: right;
+                    text: root.type;
+                }
+            }
+
+            Rectangle {
+                padding: 0;
+                VerticalBox {
+                    alignment: center;
+                    height: 70pt;
+                    MainText {
+                        horizontal-alignment: left;
+                        text: root.first_letter;
+                        visible: root.show_first_letter && !root.show;
+                    }
+                }
+
+                VerticalBox {
+                    alignment: center;
+                    height: 70pt;
+                    MainText {
+                        horizontal-alignment: left;
+                        text: root.name;
+                        visible: root.show;
+                        wrap: word-wrap;
+                    }
+                }
+            }
+
+            Rectangle { } // spacing
+            VerticalBox {
+                alignment: center;
+                padding: 0;
+                height: 70pt;
+                TouchArea {
+                    height: root.size_hint;
+                    width: root.size_hint;
+                    clicked => {
+                        hint();
+                        root.size_hint = 0;
+                        root.show_first_letter = true
+                    }
+                    animate height, width {
+                        duration: 300ms;
+                        easing: ease-in-out;
+                    }
+                    Image {
+                        source: @image-url("hint.svg");
+                        height: root.size_hint;
+                        width: root.size_hint;
+                        animate height, width {
+                            duration: 300ms;
+                            easing: ease-in-out;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1,29 +1,15 @@
-use clap::Parser;
 use std::{
     error::Error,
     sync::{Arc, Mutex},
 };
 
-use slint::{ComponentHandle, LogicalSize, Model, SharedString, VecModel};
+use slint::{ComponentHandle, LogicalSize, Model, VecModel};
 
 use geo_quiz::logic::{AppLogic, AppWindow, ImageType, InfoType};
 
-/// args
-#[derive(Parser)]
-struct Cli {
-    /// show well know flags first (according to own score)
-    #[clap(long, short)]
-    easy_first: bool,
-    /// enable learn mode : all info is displayed by default
-    #[clap(long, short)]
-    learn_mode: bool,
-    /// show initials by default
-    #[clap(long, short)]
-    initials_on: bool,
-}
+
 fn main() -> Result<(), Box<dyn Error>> {
     slint::init_translations!(concat!(env!("CARGO_MANIFEST_DIR"), "/lang/"));
-    let args = Cli::parse();
     let logic = Arc::new(Mutex::new(AppLogic::default()));
 
     let ui = AppWindow::new()?;
@@ -31,8 +17,6 @@ fn main() -> Result<(), Box<dyn Error>> {
         width: 1000.0,
         height: 1000.0,
     });
-    ui.set_learn_mode(args.learn_mode);
-    ui.set_initials_on(args.initials_on);
     ui.on_start_play({
         let ui_handle = ui.as_weak();
         let logic_ref = logic.clone();
@@ -40,14 +24,14 @@ fn main() -> Result<(), Box<dyn Error>> {
             let ui = ui_handle.unwrap();
             let mut logic = logic_ref.lock().unwrap();
 
-            let s: &VecModel<SharedString> = selected.as_any().downcast_ref().unwrap();
-            let selected: Vec<String> = s.iter().map(|x| x.into()).collect();
+            let s: &VecModel<i32> = selected.as_any().downcast_ref().unwrap();
+            let selected: Vec<i32> = s.iter().collect();
             let info_types: [InfoType; 3] = [
-                selected[0].parse::<InfoType>().unwrap(),
-                selected[1].parse::<InfoType>().unwrap(),
-                selected[2].parse::<InfoType>().unwrap(),
+                InfoType::from_int(selected[0]),
+                InfoType::from_int(selected[1]),
+                InfoType::from_int(selected[2]),
             ];
-            let img = image.parse::<ImageType>().unwrap();
+            let img = ImageType::from_int(image);
             logic.prepare_infos(easy_first, hard_mode, info_types, img);
             let (update, cat) = logic.get_stat();
             ui.invoke_update_screen(update, cat.into());

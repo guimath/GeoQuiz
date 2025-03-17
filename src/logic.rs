@@ -22,6 +22,13 @@ impl ImageType {
             ImageType::OUTLINE => "outlines",
         }
     }
+    pub fn from_int(i:i32) -> Self {
+        match i {
+            0 => ImageType::FLAG,
+            1 => ImageType::OUTLINE,
+            _ => panic!("Not in image type")
+        }
+    }
 }
 impl FromStr for ImageType {
     type Err = ();
@@ -45,16 +52,6 @@ pub enum InfoType {
     REGION,
 }
 
-macro_rules! map_all_countries {
-    ($all_countries:ident, $country:ident, $code:block) => {
-        $all_countries.iter().map(|$country| $code).collect()
-    };
-}
-fn hint_from_name(s: String) -> String {
-    let mut s = s.chars().nth(0).unwrap_or(' ').to_string();
-    s.push_str("...");
-    s
-}
 impl InfoType {
     pub fn to_str(&self) -> &str {
         match self {
@@ -67,7 +64,20 @@ impl InfoType {
             InfoType::REGION => "Region:",
         }
     }
+    pub fn from_int(i:i32) -> Self {
+        match i {
+            0 => InfoType::COUNTRY,
+            1 => InfoType::CAPITAL,
+            2 => InfoType::LANGUAGES,
+            3 => InfoType::BORDERS,
+            4 => InfoType::REGION,
+            5 => InfoType::CURRENCIES,
+            6 => InfoType::LATLON,
+            _ => panic!("Not in info type")
+        }
+    }
 }
+
 
 impl FromStr for InfoType {
     type Err = ();
@@ -84,6 +94,17 @@ impl FromStr for InfoType {
             _ => Err(()), // Return an error if the string doesn't match
         }
     }
+}
+
+macro_rules! map_all_countries {
+    ($all_countries:ident, $country:ident, $code:block) => {
+        $all_countries.iter().map(|$country| $code).collect()
+    };
+}
+fn hint_from_name(s: String) -> String {
+    let mut s = s.chars().nth(0).unwrap_or(' ').to_string();
+    s.push_str("...");
+    s
 }
 
 pub struct StatDisplay {

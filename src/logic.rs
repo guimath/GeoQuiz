@@ -55,13 +55,13 @@ pub enum InfoType {
 impl InfoType {
     pub fn to_str(&self) -> &str {
         match self {
-            InfoType::COUNTRY => "Country:",
-            InfoType::CAPITAL => "Capital:",
-            InfoType::LANGUAGES => "Languages:",
-            InfoType::CURRENCIES => "Currencies:",
-            InfoType::LATLON => "LatLon:",
-            InfoType::BORDERS => "Borders:",
-            InfoType::REGION => "Region:",
+            InfoType::COUNTRY => "Country: ",
+            InfoType::CAPITAL => "Capital: ",
+            InfoType::LANGUAGES => "Languages: ",
+            InfoType::CURRENCIES => "Currencies: ",
+            InfoType::LATLON => "LatLon: ",
+            InfoType::BORDERS => "Borders: ",
+            InfoType::REGION => "Region: ",
         }
     }
     pub fn from_int(i:i32) -> Self {

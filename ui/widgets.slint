@@ -161,14 +161,19 @@ export component HiddenText inherits TouchArea {
 
     }
     Rectangle {
-        background: grey;
+        background: #4a4458ff;
         border-radius: 10px;
         width: 90%;
         HorizontalBox {
+            padding: 0;
+            padding-left: 10px;
+            padding-right: 10px;
+            spacing: 0;
             VerticalBox {
+                padding: 0;
                 alignment: center;
                 MainText {
-                    width: 150pt;
+                    width: 150px;
                     horizontal-alignment: right;
                     text: root.type;
                 }
@@ -177,6 +182,7 @@ export component HiddenText inherits TouchArea {
             Rectangle {
                 padding: 0;
                 VerticalBox {
+                    padding: 0;
                     alignment: center;
                     height: 70pt;
                     MainText {
@@ -187,6 +193,7 @@ export component HiddenText inherits TouchArea {
                 }
 
                 VerticalBox {
+                    padding: 0;
                     alignment: center;
                     height: 70pt;
                     MainText {
@@ -216,7 +223,7 @@ export component HiddenText inherits TouchArea {
                         easing: ease-in-out;
                     }
                     Image {
-                        source: @image-url("hint.svg");
+                        source: @image-url("hint2.svg");
                         height: root.size_hint;
                         width: root.size_hint;
                         animate height, width {

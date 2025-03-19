@@ -4,6 +4,7 @@ import {CatInfo, FullUpdate} from "structs.slint";
 
 export component AppWindow inherits Window {
     title: "Geo quiz";
+    icon: @image-url("icon.svg");
     // ***************************************************************** //
     //                            PROPERTIES
     // ***************************************************************** //
@@ -288,10 +289,25 @@ export component AppWindow inherits Window {
             Rectangle {
                 height: 20px;
             }
+            SwipeGestureHandler {
+                handle-swipe-right: root.num > 0;
+                handle-swipe-left: root.num < root.out_of - 1;
+                swiped => {
+                    if self.current-position.x > self.pressed-position.x + self.width / 4 {
+                        prev();
+                    } else if self.current-position.x < self.pressed-position.x - self.width / 4 {
+                        next(0);
+                    }
+                }
+                HorizontalBox {
+                    padding: 0;
+                    flag := Image {
+                        height: root.height/4; 
+                        max-width: root.width;
+                        source: root.flag;
+                    }
+                }
 
-            flag := Image {
-                height: 33%;
-                source: root.flag;
             }
 
             w_cat1 := HiddenText {

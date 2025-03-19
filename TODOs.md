@@ -28,19 +28,20 @@
   - [x] Include Files 
     - Using single precomputed json and include str 
   - [x] blocked orientation using manifest.yaml
+  - [x] Add AppIcon (-> via manifest.yaml)
+  - [x] See how to detect swipes (-> basic impl with SwipeGestureHandler)
 
 ## Priority 
 - [ ] Make custom combobox (more straight forward for categories)
 - [ ] Make android app
   - [ ] Optimize size
   - [ ] See how to catch back button
-  - [ ] See how to detect swipes
   - [ ] Re organize 
-  - [ ] Add AppIcon
   - [ ] See how to have score: https://docs.rs/android-activity/latest/android_activity/struct.AndroidApp.html#method.internal_data_path
 
 ## Bonus
 - [ ] Dedicated button for play
+- [ ] Make proper icon
 - [ ] Animate (WIP)
 - [ ] Add a previous score / score animation on hover
 

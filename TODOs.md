@@ -20,14 +20,26 @@
 - [x] Make a mode for country outline ?
 - [x] Improve UI on Settings screen
   - [x] Make a dedicated widget with animation to make it flashy
+- [x] Harmonize Theme & fonts
+- [ ] Android
+  - [x] Install Android NDK & SDK 
+  - [x] building with x build 
+  - [x] See how to use release and not debug 
+  - [x] Include Files 
+    - Using single precomputed json and include str 
 
 ## Priority 
-
-- [ ] Harmonize Theme & fonts
-  - [ ] Dedicated button for play
+- [ ] Make custom combobox (more straight forward for categories)
 - [ ] Make android app
+  - [ ] Optimize size
+  - [ ] See how to block orientation and catch back button
+  - [ ] See how to detect swipes
+  - [ ] Re organize 
+  - [ ] Add AppIcon
+  - [ ] See how to have score: https://docs.rs/android-activity/latest/android_activity/struct.AndroidApp.html#method.internal_data_path
 
 ## Bonus
+- [ ] Dedicated button for play
 - [ ] Animate (WIP)
 - [ ] Add a previous score / score animation on hover
 

@@ -4,8 +4,18 @@ version = "0.1.0"
 edition = "2024"
 authors = ["Guilhem <guilhem.mathieux.pro@gmail.com>"]
 
+[lib]
+crate-type = ["lib", "cdylib"]
+path = "src/lib.rs"
+name = "geo_quiz"
+
+[[bin]]
+path = "src/main.rs"
+name = "geo_quiz"
+
+
 [dependencies]
-slint = {version = "1.10.0", features = ["gettext"]}
+slint = {version = "1.10.0", features = ["backend-android-activity-06"]}
 clap = { version = "4.5.13", features = ["derive"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"

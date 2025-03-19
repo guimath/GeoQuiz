@@ -11,7 +11,7 @@ export component AppWindow inherits Window {
     in property <string> other_info: "Jamaican dollar (JMD, $)";
     in-out property <int> info_level:0;
     in-out property <int> play_mode: 1;
-    in-out property <bool> playing: true;
+    in-out property <bool> playing: false;
     in property <[string]> info_types: ["Country", "Capital", "Languages", "Borders", "Region", "Currencies"];
     //, "LatLon"
     property <int> num: 0;
@@ -105,7 +105,7 @@ export component AppWindow inherits Window {
             if event.text == Key.Space && event.modifiers.control {
                 root.info_level = 3;
             }
-            if event.text == "b" {
+            if event.text == "b" || event.text == Key.Return {
                 root.playing = false;
             }
         accept

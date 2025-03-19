@@ -6,35 +6,25 @@ use std::io::{Read, Write};
 use std::path::{Path, PathBuf};
 use std::str::FromStr;
 
-#[derive(Deserialize, Debug, Clone)]
-pub struct CountryName {
-    pub common: String,
-    // official: String,
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct Category {
+    pub full:String,
+    pub hint: Option<String>
 }
 
-#[derive(Deserialize, Debug, Clone)]
-pub struct Currency {
-    pub name: String,
-    pub symbol: String,
-}
-#[derive(Deserialize, Debug, Clone)]
-#[serde(untagged)]
-pub enum CurrencyType {
-    PRESENT(HashMap<String, Currency>),
-    #[allow(dead_code)]
-    EMPTY(Vec<String>),
-}
-#[derive(Deserialize, Debug, Clone)]
-pub struct CountryStat {
-    pub name: CountryName,
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct CountryInfos {
     pub cca3: String,
-    pub independent: Option<bool>,
-    pub capital: Vec<String>,
-    pub currencies: Option<CurrencyType>,
-    pub languages: HashMap<String, String>,
-    pub region: String,
-    pub subregion: String,
-    pub borders: Vec<String>,
+    pub independent: bool,
+    pub name: Category,
+    pub capitals: Category,
+    pub currencies: Category,
+    pub languages: Category,
+    pub region: Category,
+    pub borders: Category,
+    pub svg_flag: String,
+    pub svg_outline: String,
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
@@ -43,12 +33,12 @@ pub struct Score {
     pub score: u32,
 }
 
-const JSON_DATA: &str = include_str!("../data/countries.json"); // Embed the JSON file
-pub fn get_data() -> Vec<CountryStat> {
+const JSON_DATA: &str = include_str!("../data/infos.json"); // Embed the JSON file
+pub fn get_data() -> Vec<CountryInfos> {
     serde_json::from_str(JSON_DATA).unwrap()
 }
 
-pub fn read(all_countries: &Vec<CountryStat>) -> HashMap<String, Score> {
+pub fn read(all_countries: &Vec<CountryInfos>) -> HashMap<String, Score> {
     let score_path = PathBuf::from_str("score.json").unwrap();
     if Path::exists(&score_path) {
         let mut file = File::open(score_path).unwrap();

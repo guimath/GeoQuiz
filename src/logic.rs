@@ -4,24 +4,19 @@ use slint::Image;
 
 use std::cmp::Ordering;
 use std::collections::HashMap;
-use std::path::PathBuf;
 use std::str::FromStr;
 
-use crate::info_parse::{self, CountryStat, CurrencyType, Score};
+use crate::info_parse::{self, CountryInfos, Score};
 
 slint::include_modules!();
 
+#[derive(Default)]
 pub enum ImageType {
+    #[default]
     FLAG,
     OUTLINE,
 }
 impl ImageType {
-    pub fn to_folder(&self) -> &str {
-        match self {
-            ImageType::FLAG => "flags",
-            ImageType::OUTLINE => "outlines",
-        }
-    }
     pub fn from_int(i:i32) -> Self {
         match i {
             0 => ImageType::FLAG,
@@ -42,7 +37,9 @@ impl FromStr for ImageType {
     }
 }
 
+#[derive(Default)]
 pub enum InfoType {
+    #[default]
     COUNTRY,
     CAPITAL,
     LANGUAGES,
@@ -96,36 +93,16 @@ impl FromStr for InfoType {
     }
 }
 
-macro_rules! map_all_countries {
-    ($all_countries:ident, $country:ident, $code:block) => {
-        $all_countries.iter().map(|$country| $code).collect()
-    };
-}
-fn hint_from_name(s: String) -> String {
-    let mut s = s.chars().nth(0).unwrap_or(' ').to_string();
-    s.push_str("...");
-    s
-}
 
-pub struct StatDisplay {
-    pub name: String,
-    pub capital: String,
-    pub other_info: String,
-    pub svg_path: PathBuf,
-    pub num: usize,
-    pub out_of: usize,
-    pub score: u32,
-}
 
 #[derive(Default)]
 pub struct AppLogic {
     current: usize,
     results: Vec<u32>,
     scores: HashMap<String, Score>,
-    all_countries: Vec<CountryStat>,
-    infos: [Vec<CatInfo>; 3],
-    cca3_to_name: HashMap<String, String>,
-    image_folder: String,
+    all_countries: Vec<CountryInfos>,
+    info_types: [InfoType; 3],
+    image_type: ImageType,
 }
 impl AppLogic {
     pub fn prepare_infos(
@@ -136,22 +113,18 @@ impl AppLogic {
         img: ImageType,
     ) {
         let mut all_countries = info_parse::get_data();
-        let mut cca3_to_name = HashMap::new();
         let scores = info_parse::read(&all_countries);
 
-        for country in all_countries.clone() {
-            cca3_to_name.insert(country.cca3, country.name.common);
-        }
         if !hard_mode {
             all_countries = all_countries
                 .into_iter()
-                .filter(|country| country.independent.unwrap_or(false))
+                .filter(|country| country.independent)
                 .collect();
         }
 
         let mut rng = thread_rng();
         all_countries.shuffle(&mut rng);
-        let compare = |a: &CountryStat, b: &CountryStat| -> Ordering {
+        let compare = |a: &CountryInfos, b: &CountryInfos| -> Ordering {
             scores
                 .get(&b.cca3.clone())
                 .unwrap()
@@ -169,107 +142,8 @@ impl AppLogic {
         self.current = 0;
         self.results = vec![0; len];
         self.scores = scores;
-        self.cca3_to_name = cca3_to_name;
-        self.prep_categories(info_types);
-        self.image_folder = img.to_folder().to_string();
-    }
-
-    fn prep_categories(&mut self, info_types: [InfoType; 3]) {
-        let all_countries = self.all_countries.clone();
-        for i in 0..3 {
-            let cat_str = info_types[i].to_str();
-            self.infos[i] = match info_types[i] {
-                InfoType::COUNTRY => map_all_countries!(all_countries, x, {
-                    let data = x.name.common.clone();
-                    CatInfo {
-                        category: cat_str.into(),
-                        full: data.clone().into(),
-                        first: hint_from_name(data).into(),
-                        with_hint: true,
-                    }
-                }),
-
-                InfoType::CAPITAL => map_all_countries!(all_countries, x, {
-                    let first: Vec<String> = x
-                        .capital
-                        .iter()
-                        .map(|s| hint_from_name(s.clone()))
-                        .collect();
-                    CatInfo {
-                        category: cat_str.into(),
-                        full: x.capital.join(", ").into(),
-                        first: first.join(", ").into(),
-                        with_hint: true,
-                    }
-                }),
-
-                InfoType::LANGUAGES => map_all_countries!(all_countries, x, {
-                    let lang_vec: Vec<String> =
-                        x.languages.values().map(|v| v.to_string()).collect();
-                    let first: Vec<String> =
-                        lang_vec.iter().map(|s| hint_from_name(s.clone())).collect();
-                    CatInfo {
-                        category: cat_str.into(),
-                        full: lang_vec.join(", ").into(),
-                        first: first.join(", ").into(),
-                        with_hint: true,
-                    }
-                }),
-
-                InfoType::CURRENCIES => map_all_countries!(all_countries, x, {
-                    let mut v = Vec::new();
-                    if let Some(c) = x.currencies.clone() {
-                        if let CurrencyType::PRESENT(currencies) = c {
-                            for (code, currency) in currencies {
-                                v.push(format!(
-                                    "{} ({}, {})",
-                                    currency.name, code, currency.symbol
-                                ));
-                                // Euro (EUR, €)
-                            }
-                        }
-                    }
-                    CatInfo {
-                        category: cat_str.into(),
-                        full: v.join(", ").into(),
-                        first: ' '.into(),
-                        with_hint: false,
-                    }
-                }),
-
-                InfoType::LATLON => {
-                    panic!("Latlon info not done yet")
-                }
-
-                InfoType::REGION => map_all_countries!(all_countries, x, {
-                    let data = format!("{} ({})", x.subregion, x.region);
-                    CatInfo {
-                        category: cat_str.into(),
-                        full: data.clone().into(),
-                        first: hint_from_name(data).into(),
-                        with_hint: true,
-                    }
-                }),
-
-                InfoType::BORDERS => map_all_countries!(all_countries, x, {
-                    let border_vec: Vec<String> = x
-                        .borders
-                        .iter()
-                        .map(|s| self.cca3_to_name.get_key_value(s).unwrap().1.to_string())
-                        .collect();
-                    let first: Vec<String> = border_vec
-                        .iter()
-                        .map(|s| hint_from_name(s.clone()))
-                        .collect();
-                    CatInfo {
-                        category: cat_str.into(),
-                        full: border_vec.join(", ").into(),
-                        first: first.join(", ").into(),
-                        with_hint: true,
-                    }
-                }),
-            }
-        }
+        self.image_type = img;
+        self.info_types = info_types;
     }
 
     pub fn next(&mut self, result: u32) -> Option<(FullUpdate, [CatInfo; 3])> {
@@ -301,33 +175,37 @@ impl AppLogic {
 
     pub fn get_stat(&mut self) -> (FullUpdate, [CatInfo; 3]) {
         let country = self.all_countries[self.current].clone();
-
-        let svg_path = PathBuf::from_str(
-            format!(
-                "data/{}/{}.svg",
-                self.image_folder,
-                country.cca3.to_lowercase()
-            )
-            .as_str(),
-        )
-        .unwrap();
         let score = self.results[self.current] as i32;
+        let raw_svg = match self.image_type {
+            ImageType::FLAG => country.svg_flag,
+            ImageType::OUTLINE => country.svg_outline,
+        };
         let update = FullUpdate {
-            flag: Image::load_from_path(&svg_path).unwrap(),
+            flag: Image::load_from_svg_data(raw_svg.as_bytes()).unwrap(),
             num: self.current as i32,
             out_of: self.all_countries.len() as i32,
             score,
             seen: score != 0,
         };
+        let infos :[CatInfo;3] = (0..3).map(|i| {
 
-        (
-            update,
-            [
-                self.infos[0][self.current].clone(),
-                self.infos[1][self.current].clone(),
-                self.infos[2][self.current].clone(),
-            ],
-        )
+            let cat = match self.info_types[i] {
+                InfoType::COUNTRY => country.name.clone(),
+                InfoType::CAPITAL => country.capitals.clone(),
+                InfoType::CURRENCIES => country.currencies.clone(),
+                InfoType::LANGUAGES => country.languages.clone(),
+                InfoType::REGION => country.region.clone(),
+                InfoType::BORDERS => country.borders.clone(),
+                InfoType::LATLON => panic!("NOT DONE"),
+            };
+            CatInfo {
+                full: cat.full.into(),
+                category:self.info_types[i].to_str().into(),
+                first:cat.hint.clone().unwrap_or(" ".to_string()).into(),
+                with_hint: cat.hint.is_some(),
+            }
+        }).collect::<Vec<CatInfo>>().try_into().unwrap();
+        ( update, infos)
     }
 
     pub fn save_scores(&self) {

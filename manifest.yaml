@@ -1,0 +1,5 @@
+android:
+  manifest:
+    application:
+      activities:
+        [orientation: portrait]

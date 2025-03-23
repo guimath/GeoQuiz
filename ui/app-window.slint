@@ -40,7 +40,8 @@ export component AppWindow inherits Window {
     }
 
     public function update_screen(info: FullUpdate, cat: [CatInfo]) {
-        w_score.set_score(info.score);
+        w_score.score = info.score;
+        w_score.prev_score = 0; 
         w_cat1.update_cat(cat[0]);
         w_cat2.update_cat(cat[1]);
         w_cat3.update_cat(cat[2]);
@@ -58,7 +59,7 @@ export component AppWindow inherits Window {
         if score == 0 {
             root.next(score);
         } else {
-            w_score.set_score(score);
+            w_score.score = score;
             root.score_delayed = score;
             root.info_level = 3;
             timer.running = true;

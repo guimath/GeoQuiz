@@ -64,61 +64,38 @@ export component MultiChoice {
 
 
 component ToggleStar inherits TouchArea {
-    in property <bool> on;
-    property <image> off_img: @image-url("star_off.svg");
-    property <image> on_img: @image-url("star_on.svg");
+    in property <bool> on: false;
+    in property <bool> semi: true;
     height: 40px;
     width: 40px;
     im := Image {
         height: 40px;
         width: 40px;
-        source: root.off_img;
-    }
-
-    public function set_status(on: bool) {
-        if on {
-            im.source = root.on_img;
-        } else {
-            im.source = root.off_img;
-        }
+        source: @image-url("star.svg");
+        colorize: on? #e2cb00:
+            root.semi? #f2edbc: 
+            white;
     }
 }
 
 export component ThreeStartScore {
-    in property <int> score;
+    in-out property <int> score:0;
+    in property <int> prev_score:2;
     callback score_changed(score: int);
     VerticalBox {
         padding: 0;
         HorizontalBox {
             padding: 0;
-
-            star1 := ToggleStar {
+            for i in [0, 1, 2] : ToggleStar {
                 clicked => {
-                    internal_score_change(1)
+                    root.score = i+1;
+                    score_changed(i+1);
                 }
+                on: root.score>i;
+                semi: root.prev_score>i;
             }
-
-            star2 := ToggleStar {
-                clicked => {
-                    internal_score_change(2)
-                }
-            }
-
-            star3 := ToggleStar {
-                clicked => {
-                    internal_score_change(3)
-                }
-            }
+           
         }
-    }
-    function internal_score_change(score: int) {
-        set_score(score);
-        score_changed(score);
-    }
-    public function set_score(score: int) {
-        star1.set_status(score > 0);
-        star2.set_status(score > 1);
-        star3.set_status(score > 2);
     }
 }
 export component MainText inherits Text {
@@ -208,7 +185,7 @@ export component HiddenText inherits TouchArea {
     }
     Image {
         x : root.width - root.size_hint  - 10px;
-        source: @image-url("hint2.svg");
+        source: @image-url("hint.svg");
         height: root.size_hint;
         width: root.size_hint;
         animate height, width, x {

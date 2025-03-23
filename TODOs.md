@@ -22,6 +22,7 @@
   - [x] Make a dedicated widget with animation to make it flashy
 - [x] Harmonize Theme & fonts
 - [x] Make custom combobox (more straight forward for categories)
+- [x] Simplify score icon by using colorize
 - [ ] Android
   - [x] Install Android NDK & SDK 
   - [x] building with x build 
@@ -40,7 +41,6 @@
 - [ ] Make android app
   - [ ] See how to have score: https://docs.rs/android-activity/latest/android_activity/struct.AndroidApp.html#method.internal_data_path
   - [ ] See how to catch back button
-- [ ] Simplify start icon by using colorize
 
 ## Bonus
 - [ ] Dedicated button for play

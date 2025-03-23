@@ -73,22 +73,23 @@ component ToggleStar inherits TouchArea {
         width: 40px;
         source: @image-url("star.svg");
         colorize: on? #e2cb00:
-            root.semi? #f2edbc: 
+            root.semi? @radial-gradient(circle, white 0%, #e2cb00 100%)://#f2edbc: 
             white;
     }
 }
 
 export component ThreeStartScore {
     in-out property <int> score:0;
-    in property <int> prev_score:2;
+    in-out property <int> prev_score:2;
     callback score_changed(score: int);
     VerticalBox {
         padding: 0;
         HorizontalBox {
             padding: 0;
-            for i in [0, 1, 2] : ToggleStar {
+            for i in [0, 1, 2, 4, 5] : ToggleStar {
                 clicked => {
                     root.score = i+1;
+                    root.prev_score = i+1;
                     score_changed(i+1);
                 }
                 on: root.score>i;

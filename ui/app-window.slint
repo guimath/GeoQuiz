@@ -41,7 +41,7 @@ export component AppWindow inherits Window {
 
     public function update_screen(info: FullUpdate, cat: [CatInfo]) {
         w_score.score = info.score;
-        w_score.prev_score = 0; 
+        w_score.prev_score = info.last-score; 
         w_cat1.update_cat(cat[0]);
         w_cat2.update_cat(cat[1]);
         w_cat3.update_cat(cat[2]);

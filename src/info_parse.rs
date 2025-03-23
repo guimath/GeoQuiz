@@ -6,11 +6,10 @@ use std::io::{Read, Write};
 use std::path::{Path, PathBuf};
 use std::str::FromStr;
 
-
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Category {
-    pub full:String,
-    pub hint: Option<String>
+    pub full: String,
+    pub hint: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -26,11 +25,14 @@ pub struct CountryInfos {
     pub svg_flag: String,
     pub svg_outline: String,
 }
-
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct Score {
+    #[serde(rename = "tp")]
     pub time_played: u32,
-    pub score: u32,
+    #[serde(rename = "st")]
+    pub total_score: u32,
+    #[serde(rename = "sl")]
+    pub last_score: u32,
 }
 
 const JSON_DATA: &str = include_str!("../data/infos.json"); // Embed the JSON file
@@ -53,7 +55,8 @@ pub fn read(all_countries: &Vec<CountryInfos>) -> HashMap<String, Score> {
                 (
                     country.cca3.clone(),
                     Score {
-                        score: 0,
+                        total_score: 0,
+                        last_score: 0,
                         time_played: 0,
                     },
                 )

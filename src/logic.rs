@@ -17,11 +17,11 @@ pub enum ImageType {
     OUTLINE,
 }
 impl ImageType {
-    pub fn from_int(i:i32) -> Self {
+    pub fn from_int(i: i32) -> Self {
         match i {
             0 => ImageType::FLAG,
             1 => ImageType::OUTLINE,
-            _ => panic!("Not in image type")
+            _ => panic!("Not in image type"),
         }
     }
 }
@@ -52,16 +52,16 @@ pub enum InfoType {
 impl InfoType {
     pub fn to_str(&self) -> &str {
         match self {
-            InfoType::COUNTRY => "Country: ",
-            InfoType::CAPITAL => "Capital: ",
-            InfoType::LANGUAGES => "Languages: ",
-            InfoType::CURRENCIES => "Currencies: ",
-            InfoType::LATLON => "LatLon: ",
-            InfoType::BORDERS => "Borders: ",
-            InfoType::REGION => "Region: ",
+            InfoType::COUNTRY => "Country:",
+            InfoType::CAPITAL => "Capital:",
+            InfoType::LANGUAGES => "Languages:",
+            InfoType::CURRENCIES => "Currencies:",
+            InfoType::LATLON => "LatLon:",
+            InfoType::BORDERS => "Borders:",
+            InfoType::REGION => "Region:",
         }
     }
-    pub fn from_int(i:i32) -> Self {
+    pub fn from_int(i: i32) -> Self {
         match i {
             0 => InfoType::COUNTRY,
             1 => InfoType::CAPITAL,
@@ -70,11 +70,10 @@ impl InfoType {
             4 => InfoType::REGION,
             5 => InfoType::CURRENCIES,
             6 => InfoType::LATLON,
-            _ => panic!("Not in info type")
+            _ => panic!("Not in info type"),
         }
     }
 }
-
 
 impl FromStr for InfoType {
     type Err = ();
@@ -92,8 +91,6 @@ impl FromStr for InfoType {
         }
     }
 }
-
-
 
 #[derive(Default)]
 pub struct AppLogic {
@@ -128,13 +125,13 @@ impl AppLogic {
             scores
                 .get(&b.cca3.clone())
                 .unwrap()
-                .score
-                .cmp(&scores.get(&a.cca3.clone()).unwrap().score)
+                .total_score
+                .cmp(&scores.get(&a.cca3.clone()).unwrap().total_score)
         };
         if easy_first {
             all_countries.sort_by(|a, b| compare(a, b));
         } else {
-            all_countries.sort_by(|a, b| compare(b, a));
+            all_countries.sort_by(|b, a| compare(a, b));
         }
         let len = all_countries.len();
 
@@ -155,7 +152,8 @@ impl AppLogic {
             if self.results[self.current] == 0 {
                 score.time_played += 1;
             }
-            score.score = (score.score + result) - self.results[self.current];
+            score.total_score = (score.total_score + result) - self.results[self.current];
+            score.last_score = result;
             self.results[self.current] = result;
         }
         if self.current < self.all_countries.len() {
@@ -176,6 +174,11 @@ impl AppLogic {
     pub fn get_stat(&mut self) -> (FullUpdate, [CatInfo; 3]) {
         let country = self.all_countries[self.current].clone();
         let score = self.results[self.current] as i32;
+        let last_score = self
+            .scores
+            .get(&self.all_countries[self.current].cca3.clone())
+            .unwrap()
+            .last_score as i32;
         let raw_svg = match self.image_type {
             ImageType::FLAG => country.svg_flag,
             ImageType::OUTLINE => country.svg_outline,
@@ -185,27 +188,31 @@ impl AppLogic {
             num: self.current as i32,
             out_of: self.all_countries.len() as i32,
             score,
+            last_score,
             seen: score != 0,
         };
-        let infos :[CatInfo;3] = (0..3).map(|i| {
-
-            let cat = match self.info_types[i] {
-                InfoType::COUNTRY => country.name.clone(),
-                InfoType::CAPITAL => country.capitals.clone(),
-                InfoType::CURRENCIES => country.currencies.clone(),
-                InfoType::LANGUAGES => country.languages.clone(),
-                InfoType::REGION => country.region.clone(),
-                InfoType::BORDERS => country.borders.clone(),
-                InfoType::LATLON => panic!("NOT DONE"),
-            };
-            CatInfo {
-                full: cat.full.into(),
-                category:self.info_types[i].to_str().into(),
-                first:cat.hint.clone().unwrap_or(" ".to_string()).into(),
-                with_hint: cat.hint.is_some(),
-            }
-        }).collect::<Vec<CatInfo>>().try_into().unwrap();
-        ( update, infos)
+        let infos: [CatInfo; 3] = (0..3)
+            .map(|i| {
+                let cat = match self.info_types[i] {
+                    InfoType::COUNTRY => country.name.clone(),
+                    InfoType::CAPITAL => country.capitals.clone(),
+                    InfoType::CURRENCIES => country.currencies.clone(),
+                    InfoType::LANGUAGES => country.languages.clone(),
+                    InfoType::REGION => country.region.clone(),
+                    InfoType::BORDERS => country.borders.clone(),
+                    InfoType::LATLON => panic!("NOT DONE"),
+                };
+                CatInfo {
+                    full: cat.full.into(),
+                    category: self.info_types[i].to_str().into(),
+                    first: cat.hint.clone().unwrap_or(" ".to_string()).into(),
+                    with_hint: cat.hint.is_some(),
+                }
+            })
+            .collect::<Vec<CatInfo>>()
+            .try_into()
+            .unwrap();
+        (update, infos)
     }
 
     pub fn save_scores(&self) {

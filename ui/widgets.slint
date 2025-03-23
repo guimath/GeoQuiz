@@ -160,60 +160,63 @@ export component HiddenText inherits TouchArea {
         }
 
     }
+    
+
     VerticalBox {
         padding: 0;
-    Rectangle {
-        background: #4a4458ff;
-        border-radius: 10px;
-        preferred-height: 70pt;
-        HorizontalLayout {
-            padding: 0;
-            padding-left: 10px;
-            padding-right: 10px;
-            w_type := MainText {
-                horizontal-alignment: right;
-                vertical-alignment: center;
-                text: root.type;
-            }
-            Rectangle {width: 10px;}
-            MainText {
-                horizontal-stretch: 1;
-                vertical-stretch: 1;
-                height: 100%;
-                horizontal-alignment: left;
-                vertical-alignment: center;
-                text: show ? root.name: root.first_letter;
-                visible: root.show || root.show_first_letter;
-                wrap: word-wrap;
-            }
-            
-            VerticalBox {
-                alignment: center;
+        Rectangle {
+            background: #4a4458ff;
+            border-radius: 10px;
+            preferred-height: 70pt;
+            HorizontalLayout {
                 padding: 0;
-                TouchArea {
-                    height: root.size_hint;
-                    width: root.size_hint;
-                    clicked => {
-                        hint();
-                        root.size_hint = 0;
-                        root.show_first_letter = true
-                    }
-                    animate height, width {
-                        duration: 300ms;
-                        easing: ease-in-out;
-                    }
-                    Image {
-                        source: @image-url("hint2.svg");
-                        height: root.size_hint;
-                        width: root.size_hint;
-                        animate height, width {
-                            duration: 300ms;
-                            easing: ease-in-out;
-                        }
-                    }
+                padding-left: 10px;
+                padding-right: 10px;
+                w_type := MainText {
+                    horizontal-alignment: right;
+                    vertical-alignment: center;
+                    text: root.type;
                 }
-            }
+                Rectangle {width: 10px;}
+                MainText { 
+                    horizontal-stretch: 1;
+                    vertical-stretch: 1;
+                    height: 100%;
+                    horizontal-alignment: left;
+                    vertical-alignment: center;
+                    text: show ? root.name: root.first_letter;
+                    visible: root.show || root.show_first_letter;
+                    wrap: word-wrap;
+                }
+                
+                
+            }   
+        }
+        
     }
-}
+    
+    TouchArea {
+        x : root.width - root.size_hint - 10px;
+        height: root.size_hint;
+        width: root.size_hint;
+        clicked => {
+            hint();
+            root.size_hint = 0;
+            root.show_first_letter = true
+        }
+        animate height, width {
+            duration: 300ms;
+            easing: ease-in-out;
+        }
+    }
+    Image {
+        x : root.width - root.size_hint  - 10px;
+        source: @image-url("hint2.svg");
+        height: root.size_hint;
+        width: root.size_hint;
+        animate height, width, x {
+            duration: 400ms;
+            easing: ease-in-out;
+        }
     }
 }

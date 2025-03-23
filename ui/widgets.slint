@@ -1,4 +1,4 @@
-import { Button, VerticalBox, HorizontalBox, TextEdit, CheckBox, ComboBox} from "std-widgets.slint";
+import { Button, VerticalBox, HorizontalBox, TextEdit, CheckBox, ComboBox, ScrollView} from "std-widgets.slint";
 import {CatInfo} from "structs.slint";
 
 
@@ -15,16 +15,13 @@ component ChoiceElem inherits TouchArea {
         border-radius: 10px;
         background: root.background_elem;
     }
-    VerticalBox {
-        padding: 0;
-        Text {
-            height: 30pt;
-            width:100%;
-            horizontal-alignment: center;
-            vertical-alignment: center;
-            wrap: word-wrap;
-            text: root.text;
-        }
+    Text {
+        height: 30pt;
+        width:100%;
+        horizontal-alignment: center;
+        vertical-alignment: center;
+        wrap: word-wrap;
+        text: root.text;
     }
 }
 export component MultiChoice {
@@ -218,5 +215,68 @@ export component HiddenText inherits TouchArea {
             duration: 400ms;
             easing: ease-in-out;
         }
+    }
+}
+
+export component ScrollChoice inherits HorizontalLayout {
+    in property <[string]> choices: ["Country", "Capital", "Languages", "Borders", "Region", "Currencies"];
+    in property <length> width_per_elem: 100px;
+    in-out property <int> choice_num:0;
+    in property <length> spacing_i: 20px;
+    property <length> size_bar: 12px; // bar is showing on modern-black
+    function set_x() -> length {
+        return - (root.choice_num* (root.width_per_elem+ root.spacing_i));
+    }
+    alignment: center;
+    padding: 0;
+    spacing: 0;
+    Image {
+        source: @image-url("arrow_left.svg");
+        height: 30pt;
+        width: 6pt;
+        colorize: root.choice_num == 0 ? #ffffff55: white;
+    }
+    Rectangle {
+        width: root.size_bar;
+    }
+    scroll := ScrollView {
+
+        height: 30pt +root.size_bar;
+        viewport-height: 30pt;
+        horizontal-scrollbar-policy: always-off;
+        // viewport-width: (num_choice+1)*width_per_elem;
+        width: 3*width_per_elem+ 2*root.spacing_i + root.size_bar;
+        viewport-x: set_x();
+        HorizontalLayout {
+            padding: 0;
+            spacing: root.spacing_i;
+            Rectangle {width: root.width_per_elem;}
+            for text[index] in root.choices : ChoiceElem {
+                
+                text: text;
+                width: width_per_elem;
+                background_elem: index==root.choice_num ? #ffffff62 : #ffffff3c;
+                // horizontal-alignment: center;
+                // vertical-alignment: center;
+                clicked => {root.choice_num = index; scroll.viewport-x= set_x();}
+            }
+            Rectangle {width: width_per_elem;}
+        }
+        scrolled() => {
+            if scroll.viewport-x >= set_x() + root.spacing_i + root.width_per_elem/2 {
+                root.choice_num -= 1;
+            } 
+            else if scroll.viewport-x <= set_x() - root.spacing_i - root.width_per_elem/2 {
+                root.choice_num += 1;
+            }
+        }
+        
+    }
+    Image {
+        source: @image-url("arrow_left.svg");
+        height: 30pt;
+        width: 6pt;
+        rotation-angle: -180deg;
+        colorize: root.choice_num == 5 ? #ffffff55: white;
     }
 }

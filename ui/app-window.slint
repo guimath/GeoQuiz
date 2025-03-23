@@ -1,18 +1,18 @@
 import { Button, VerticalBox, HorizontalBox, TextEdit, CheckBox, ComboBox} from "std-widgets.slint";
-import {MultiChoice, ThreeStartScore, MainText, HiddenText} from "widgets.slint";
+import {MultiChoice, ThreeStartScore, MainText, HiddenText, ScrollChoice} from "widgets.slint";
 import {CatInfo, FullUpdate} from "structs.slint";
 
 export component AppWindow inherits Window {
     title: "Geo quiz";
     icon: @image-url("icon.svg");
-    width: 500px;
+    // width: 500px;
     // ***************************************************************** //
     //                            PROPERTIES
     // ***************************************************************** //
     in property <image> flag: @image-url("../data/flags/jam.svg");
     in-out property <int> info_level:0;
     in-out property <int> play_mode: 1;
-    in-out property <bool> playing: true;
+    in-out property <bool> playing: false;
     in property <[string]> info_types: ["Country", "Capital", "Languages", "Borders", "Region", "Currencies"];
     //, "LatLon"
     property <int> num: 0;
@@ -220,43 +220,43 @@ export component AppWindow inherits Window {
                         choices: ["Flags", "Outlines"];
                         choices_len: 2;
                         width_per_elem: 30%;
-                        background_elem: #00000000;
-                        spacing: 10pt;
+                        spacing: 20px;
                     }
 
-                    cat1 := MultiChoice {
-                        width: 100%;
-                        choices: root.info_types;
-                        choices_len: 6;
-                        width_per_elem: 15%;
-                        background_elem: #00000000;
-                        spacing: 5pt;
-                    }
+                    Rectangle {
 
-                    cat2 := MultiChoice {
-                        width: 100%;
-                        choices: root.info_types;
-                        choices_len: 6;
-                        width_per_elem: 15%;
-                        background_elem: #00000000;
-                        choice_num: 1;
-                        spacing: 5pt;
-                    }
+                        cat1 := ScrollChoice {
+                            y: 0;
+                            width: 100%;
+                            choices: root.info_types;
+                            width_per_elem: w_30w.width;
+                            spacing: 5pt;
+                        }
+                        
+                        cat2 := ScrollChoice {
+                            y: 30pt+20px;
+                            width: 100%;
+                            choices: root.info_types;
+                            width_per_elem: w_30w.width;
+                            choice_num: 1;
+                            spacing: 5pt;
+                        }
 
-                    cat3 := MultiChoice {
-                        width: 100%;
-                        choices: root.info_types;
-                        choices_len: 6;
-                        width_per_elem: 15%;
-                        background_elem: #00000000;
-                        choice_num: 2;
-                        spacing: 5pt;
+                        cat3 := ScrollChoice {
+                            y: 2*30pt+2*20px;
+                            width: 100%;
+
+                            choices: root.info_types;
+                            width_per_elem: w_30w.width;
+                            choice_num: 2;
+                            spacing: 5pt;
+                        }
                     }
                 }
             }
 
-            Rectangle { }
         }
+        w_30w := Text {width: 20%;height: 10px;}
     }
 
 
@@ -308,7 +308,7 @@ export component AppWindow inherits Window {
                 }
 
             }
-
+            
             w_cat1 := HiddenText {
                 play_mode: root.play_mode;
                 type: "Country:";

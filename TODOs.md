@@ -21,6 +21,7 @@
 - [x] Improve UI on Settings screen
   - [x] Make a dedicated widget with animation to make it flashy
 - [x] Harmonize Theme & fonts
+- [x] Make custom combobox (more straight forward for categories)
 - [ ] Android
   - [x] Install Android NDK & SDK 
   - [x] building with x build 
@@ -36,15 +37,17 @@
   - [x] Reposition score just below image (easier to use)
 
 ## Priority 
-- [ ] Make custom combobox (more straight forward for categories)
 - [ ] Make android app
   - [ ] See how to have score: https://docs.rs/android-activity/latest/android_activity/struct.AndroidApp.html#method.internal_data_path
   - [ ] See how to catch back button
+- [ ] Simplify start icon by using colorize
 
 ## Bonus
 - [ ] Dedicated button for play
 - [ ] Make proper icon
 - [ ] Animate (WIP)
+  - [ ] Better scrolling on categories : maybe use timer to snap to center? 
+  - [ ] Animate between screens? 
 - [ ] Add a previous score / score animation on hover
 - [ ] Add a Reset score button
 - [ ] Add a 4 choice game mode

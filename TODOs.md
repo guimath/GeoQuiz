@@ -30,20 +30,25 @@
   - [x] blocked orientation using manifest.yaml
   - [x] Add AppIcon (-> via manifest.yaml)
   - [x] See how to detect swipes (-> basic impl with SwipeGestureHandler)
+  - [x] Optimize size (-> should be ok with --release)
+  - [x] Large text (EG on many languages) is not handled (-> now just one text element so will take more space if needed)
 
 ## Priority 
 - [ ] Make custom combobox (more straight forward for categories)
 - [ ] Make android app
-  - [ ] Optimize size
-  - [ ] See how to catch back button
-  - [ ] Re organize 
   - [ ] See how to have score: https://docs.rs/android-activity/latest/android_activity/struct.AndroidApp.html#method.internal_data_path
+  - [ ] Reposition score just below image (easier to use)
+  - [ ] Hint resizing makes text wrapping not great, should have hint outside of Horizontal box to avoid
+  - [ ] See how to catch back button
 
 ## Bonus
 - [ ] Dedicated button for play
 - [ ] Make proper icon
 - [ ] Animate (WIP)
 - [ ] Add a previous score / score animation on hover
+- [ ] Add a Reset score button
+- [ ] Add a 4 choice game mode
+- [ ] Add a look up info (where all the info for a country is displayed)
 
 ## Ideas to discuss
 - [ ] Should the return to menu save ?

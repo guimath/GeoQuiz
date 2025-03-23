@@ -9,7 +9,6 @@ export component AppWindow inherits Window {
     //                            PROPERTIES
     // ***************************************************************** //
     in property <image> flag: @image-url("../data/flags/jam.svg");
-    in property <string> other_info: "Jamaican dollar (JMD, $)";
     in-out property <int> info_level:0;
     in-out property <int> play_mode: 1;
     in-out property <bool> playing: false;
@@ -189,7 +188,7 @@ export component AppWindow inherits Window {
 
                     w_order := MultiChoice {
                         width: 70%;
-                        choices: ["Less known countries", "More known countries"];
+                        choices: ["Lesser known countries", "More known countries"];
                         choices_len: 2;
                         width_per_elem: 40%;
                         spacing: 20pt;
@@ -266,7 +265,9 @@ export component AppWindow inherits Window {
     Rectangle {
         visible: root.playing;
         padding: 0;
-        VerticalBox {
+        VerticalLayout {
+            padding: 10px;
+            spacing: 10px;
             height: 100%;
             Rectangle {
                 height: 20px;
@@ -312,7 +313,7 @@ export component AppWindow inherits Window {
 
             w_cat1 := HiddenText {
                 play_mode: root.play_mode;
-                type: "Country: ";
+                type: "Country:";
                 name: "Jamaica";
                 first_letter: "J";
                 show: root.info_level >= 1;
@@ -326,7 +327,7 @@ export component AppWindow inherits Window {
 
             w_cat2 := HiddenText {
                 play_mode: root.play_mode;
-                type: "Capital: ";
+                type: "Capital:";
                 name: "Kingston";
                 first_letter: "K";
                 show: root.info_level >= 2;
@@ -341,7 +342,7 @@ export component AppWindow inherits Window {
 
             w_cat3 := HiddenText {
                 play_mode: root.play_mode;
-                type: "Language: ";
+                type: "Language:";
                 name: "English, Jamaican Patois";
                 first_letter: "E..., J...";
                 show: root.info_level > 2;

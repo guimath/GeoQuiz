@@ -136,7 +136,7 @@ export component HiddenText inherits TouchArea {
     in-out property <string> type;
     in property <bool> show;
     in-out property <bool> show_first_letter;
-    in-out property <length> size_hint: 0pt;
+    in-out property <length> size_hint: 40pt;
     in property <int> play_mode; 
     callback hint();
 
@@ -160,56 +160,36 @@ export component HiddenText inherits TouchArea {
         }
 
     }
+    VerticalBox {
+        padding: 0;
     Rectangle {
         background: #4a4458ff;
         border-radius: 10px;
-        width: 90%;
-        HorizontalBox {
+        preferred-height: 70pt;
+        HorizontalLayout {
             padding: 0;
             padding-left: 10px;
             padding-right: 10px;
-            spacing: 10px;
-            VerticalBox {
-                padding: 0;
-                alignment: center;
-                MainText {
-                    // width: 100px;
-                    horizontal-alignment: right;
-                    text: root.type;
-                }
+            w_type := MainText {
+                horizontal-alignment: right;
+                vertical-alignment: center;
+                text: root.type;
             }
-
-            Rectangle {
-                padding: 0;
-                VerticalBox {
-                    padding: 0;
-                    alignment: center;
-                    height: 70pt;
-                    MainText {
-                        horizontal-alignment: left;
-                        text: root.first_letter;
-                        visible: root.show_first_letter && !root.show;
-                    }
-                }
-
-                VerticalBox {
-                    padding: 0;
-                    alignment: center;
-                    height: 70pt;
-                    MainText {
-                        horizontal-alignment: left;
-                        text: root.name;
-                        visible: root.show;
-                        wrap: word-wrap;
-                    }
-                }
+            Rectangle {width: 10px;}
+            MainText {
+                horizontal-stretch: 1;
+                vertical-stretch: 1;
+                height: 100%;
+                horizontal-alignment: left;
+                vertical-alignment: center;
+                text: show ? root.name: root.first_letter;
+                visible: root.show || root.show_first_letter;
+                wrap: word-wrap;
             }
-
-            Rectangle { } // spacing
+            
             VerticalBox {
                 alignment: center;
                 padding: 0;
-                height: 70pt;
                 TouchArea {
                     height: root.size_hint;
                     width: root.size_hint;
@@ -233,6 +213,7 @@ export component HiddenText inherits TouchArea {
                     }
                 }
             }
-        }
+    }
+}
     }
 }

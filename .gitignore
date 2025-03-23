@@ -3,3 +3,7 @@
 data/
 score.json
 .vscode/
+
+# TEMP
+ui/icon.png
+ui/icon.svg

@@ -5,13 +5,14 @@ import {CatInfo, FullUpdate} from "structs.slint";
 export component AppWindow inherits Window {
     title: "Geo quiz";
     icon: @image-url("icon.svg");
+    width: 500px;
     // ***************************************************************** //
     //                            PROPERTIES
     // ***************************************************************** //
     in property <image> flag: @image-url("../data/flags/jam.svg");
     in-out property <int> info_level:0;
     in-out property <int> play_mode: 1;
-    in-out property <bool> playing: false;
+    in-out property <bool> playing: true;
     in property <[string]> info_types: ["Country", "Capital", "Languages", "Borders", "Region", "Currencies"];
     //, "LatLon"
     property <int> num: 0;
@@ -273,22 +274,9 @@ export component AppWindow inherits Window {
                 height: 20px;
             }
 
-            HorizontalBox {
-                padding: 0;
-                VerticalBox {
-                    MainText {
-                        text: "\{root.num + 1} / \{root.out_of}";
-                    }
-                }
-                w_score := ThreeStartScore {
-                    score_changed(score) => {
-                        prep_next(score)
-                    }
-                }
-            }
-
-            Rectangle {
-                height: 20px;
+            MainText {
+                horizontal-alignment: center;
+                text: "\{root.num + 1} / \{root.out_of}";
             }
             SwipeGestureHandler {
                 handle-swipe-right: root.num > 0;
@@ -306,6 +294,16 @@ export component AppWindow inherits Window {
                         height: root.height/4; 
                         max-width: root.width;
                         source: root.flag;
+                    }
+                }
+
+            }
+            HorizontalBox {
+                padding: 10px;
+                alignment: center;
+                w_score := ThreeStartScore {
+                    score_changed(score) => {
+                        prep_next(score)
                     }
                 }
 

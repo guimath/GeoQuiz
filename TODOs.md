@@ -33,12 +33,12 @@
   - [x] Optimize size (-> should be ok with --release)
   - [x] Large text (EG on many languages) is not handled (-> now just one text element so will take more space if needed)
   - [x] Hint resizing makes text wrapping not great, should have hint outside of Horizontal box to avoid
+  - [x] Reposition score just below image (easier to use)
 
 ## Priority 
 - [ ] Make custom combobox (more straight forward for categories)
 - [ ] Make android app
   - [ ] See how to have score: https://docs.rs/android-activity/latest/android_activity/struct.AndroidApp.html#method.internal_data_path
-  - [ ] Reposition score just below image (easier to use)
   - [ ] See how to catch back button
 
 ## Bonus

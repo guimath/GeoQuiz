@@ -40,8 +40,8 @@ pub fn get_data() -> Vec<CountryInfos> {
     serde_json::from_str(JSON_DATA).unwrap()
 }
 
-pub fn read(all_countries: &Vec<CountryInfos>) -> HashMap<String, Score> {
-    let score_path = PathBuf::from_str("score.json").unwrap();
+pub fn read(all_countries: &Vec<CountryInfos>, score_path: PathBuf) -> HashMap<String, Score> {
+    let score_path = score_path.join("score.json");
     if Path::exists(&score_path) {
         let mut file = File::open(score_path).unwrap();
         let mut file_content = String::new();
@@ -64,8 +64,9 @@ pub fn read(all_countries: &Vec<CountryInfos>) -> HashMap<String, Score> {
             .collect()
     }
 }
-pub fn save(scores: &HashMap<String, Score>) {
+pub fn save(scores: &HashMap<String, Score>, score_path: PathBuf) {
+    let score_path = score_path.join("score.json");
     let json_data = serde_json::to_string(scores).unwrap();
-    let mut file = File::create("score.json").unwrap();
+    let mut file = File::create(score_path).unwrap();
     file.write_all(json_data.as_bytes()).unwrap();
 }

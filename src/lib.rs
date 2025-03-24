@@ -1,8 +1,7 @@
 mod logic;
 pub mod info_parse;
 use std::{
-    error::Error,
-    sync::{Arc, Mutex},
+    error::Error, path::PathBuf, str::FromStr, sync::{Arc, Mutex}
 };
 
 use slint::{ComponentHandle, LogicalSize, Model, VecModel};
@@ -10,21 +9,26 @@ use slint::{ComponentHandle, LogicalSize, Model, VecModel};
 use logic::{AppLogic, AppWindow, ImageType, InfoType};
 
 pub fn main() {
-    init().unwrap();
+    let path = PathBuf::from_str(env!("CARGO_MANIFEST_DIR")).unwrap();
+    init(path).unwrap();
 }
 
 #[cfg(target_os = "android")]
 #[unsafe(no_mangle)]
 pub fn android_main(app: slint::android::AndroidApp) {
-    app.disable_motion_axis(slint::android::android_activity::input::Axis::Y);
-    slint::android::init(app).unwrap();
-    init().unwrap()
+    let path = app.external_data_path().unwrap();
+    slint::android::init_with_event_listener(
+       app,
+       |event| { eprintln!("got event {event:?}") }
+    ).unwrap();
+    eprintln!("{:?}", path.clone());
+    init(path).unwrap()
 }
 
-fn init() -> Result<(), Box<dyn Error>> {
+fn init(path: PathBuf) -> Result<(), Box<dyn Error>> {
     // slint::init_translations!(concat!(env!("CARGO_MANIFEST_DIR"), "/lang/"));
     let logic = Arc::new(Mutex::new(AppLogic::default()));
-
+    logic.lock().unwrap().set_score_path(path);
     let ui = AppWindow::new()?;
     ui.window().set_size(LogicalSize {
         width: 1000.0,
@@ -78,6 +82,15 @@ fn init() -> Result<(), Box<dyn Error>> {
             let logic = logic_ref.lock().unwrap();
             logic.save_scores();
             slint::quit_event_loop().unwrap();
+        }
+    });
+    
+    ui.window().on_close_requested({
+        let logic_ref = logic.clone();
+        move || {
+            let logic = logic_ref.lock().unwrap();
+            logic.save_scores();
+            slint::CloseRequestResponse::HideWindow
         }
     });
     ui.run()?;

@@ -1,6 +1,10 @@
 icon: "ui/icon.png"
 android:
   manifest:
+    # uses_permission:
+    #   - 
+    #     name: android.permission.WRITE_EXTERNAL_STORAGE
+    #     max_sdk_version: 28
     application:
       activities:
         [orientation: portrait]

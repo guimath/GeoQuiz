@@ -2,7 +2,7 @@ use rand::seq::SliceRandom;
 use rand::thread_rng;
 use slint::Image;
 
-use std::cmp::Ordering;
+use std::{cmp::Ordering, path::PathBuf};
 use std::collections::HashMap;
 use std::str::FromStr;
 
@@ -100,8 +100,12 @@ pub struct AppLogic {
     all_countries: Vec<CountryInfos>,
     info_types: [InfoType; 3],
     image_type: ImageType,
+    score_path: PathBuf,
 }
 impl AppLogic {
+    pub fn set_score_path(&mut self, score_path: PathBuf){
+        self.score_path = score_path;
+    }
     pub fn prepare_infos(
         &mut self,
         easy_first: bool,
@@ -110,7 +114,7 @@ impl AppLogic {
         img: ImageType,
     ) {
         let mut all_countries = info_parse::get_data();
-        let scores = info_parse::read(&all_countries);
+        let scores = info_parse::read(&all_countries, self.score_path.clone());
 
         if !hard_mode {
             all_countries = all_countries
@@ -155,6 +159,7 @@ impl AppLogic {
             score.total_score = (score.total_score + result) - self.results[self.current];
             score.last_score = result;
             self.results[self.current] = result;
+            self.save_scores(); // TODO ONLY SAVE WHEN LEAVING APP OR BACK TO MENU
         }
         if self.current < self.all_countries.len() {
             self.current += 1;
@@ -216,6 +221,6 @@ impl AppLogic {
     }
 
     pub fn save_scores(&self) {
-        info_parse::save(&self.scores);
+        info_parse::save(&self.scores, self.score_path.clone());
     }
 }

@@ -37,11 +37,11 @@
   - [x] Large text (EG on many languages) is not handled (-> now just one text element so will take more space if needed)
   - [x] Hint resizing makes text wrapping not great, should have hint outside of Horizontal box to avoid
   - [x] Reposition score just below image (easier to use)
+  - [x] See how to have score: https://docs.rs/android-activity/latest/android_activity/struct.AndroidApp.html#method.internal_data_path
 
 ## Priority 
 - [ ] Make android app
-  - [ ] See how to have score: https://docs.rs/android-activity/latest/android_activity/struct.AndroidApp.html#method.internal_data_path
-  - [ ] See how to catch back button
+  - [ ] See how to catch back button (https://docs.rs/android-activity/latest/android_activity/input/enum.Keycode.html#variant.TvMediaContextMenu)
 
 ## Bonus
 - [ ] Dedicated button for play

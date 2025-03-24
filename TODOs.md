@@ -24,6 +24,7 @@
 - [x] Make custom combobox (more straight forward for categories)
 - [x] Simplify score icon by using colorize
 - [x] Add a previous score / score animation on hover
+- [x] Add a Reset score button
 - [ ] Android
   - [x] Install Android NDK & SDK 
   - [x] building with x build 
@@ -44,12 +45,11 @@
   - [ ] See how to catch back button (https://docs.rs/android-activity/latest/android_activity/input/enum.Keycode.html#variant.TvMediaContextMenu)
 
 ## Bonus
-- [ ] Dedicated button for play
+- [ ] Dedicated button for more customizations
 - [ ] Make proper icon
 - [ ] Animate (WIP)
   - [ ] Better scrolling on categories : maybe use timer to snap to center? 
   - [ ] Animate between screens? 
-- [ ] Add a Reset score button
 - [ ] Add a 4 choice game mode
 - [ ] Add a look up info (where all the info for a country is displayed)
 

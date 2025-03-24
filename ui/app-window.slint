@@ -22,6 +22,7 @@ export component AppWindow inherits Window {
     //                            CALLBACKS
     // ***************************************************************** //
     callback close();
+    callback reset_score();
     callback next(int);
     callback prev();
     callback start_play([int], bool, bool, int);
@@ -123,7 +124,7 @@ export component AppWindow inherits Window {
         VerticalBox {
             HorizontalBox {
                 alignment: center;
-                padding: 40pt;
+                padding: 20pt;
                 Button {
                     height: 70pt;
                     width: 100pt;
@@ -254,6 +255,13 @@ export component AppWindow inherits Window {
                         }
                     }
                 }
+            }
+            Rectangle {
+                vertical-stretch: 1;
+            }
+            Button {
+                text: "Reset score";
+                clicked => {reset_score()}
             }
 
         }

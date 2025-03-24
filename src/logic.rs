@@ -2,9 +2,9 @@ use rand::seq::SliceRandom;
 use rand::thread_rng;
 use slint::Image;
 
-use std::{cmp::Ordering, path::PathBuf};
 use std::collections::HashMap;
 use std::str::FromStr;
+use std::{cmp::Ordering, path::PathBuf};
 
 use crate::info_parse::{self, CountryInfos, Score};
 
@@ -103,8 +103,8 @@ pub struct AppLogic {
     score_path: PathBuf,
 }
 impl AppLogic {
-    pub fn set_score_path(&mut self, score_path: PathBuf){
-        self.score_path = score_path;
+    pub fn set_score_path(&mut self, score_path: PathBuf) {
+        self.score_path = score_path.join("score.json");
     }
     pub fn prepare_infos(
         &mut self,
@@ -222,5 +222,8 @@ impl AppLogic {
 
     pub fn save_scores(&self) {
         info_parse::save(&self.scores, self.score_path.clone());
+    }
+    pub fn reset_score(&self) {
+        info_parse::reset_score(self.score_path.clone())
     }
 }

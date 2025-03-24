@@ -1,7 +1,10 @@
-mod logic;
 pub mod info_parse;
+mod logic;
 use std::{
-    error::Error, path::PathBuf, str::FromStr, sync::{Arc, Mutex}
+    error::Error,
+    path::PathBuf,
+    str::FromStr,
+    sync::{Arc, Mutex},
 };
 
 use slint::{ComponentHandle, LogicalSize, Model, VecModel};
@@ -17,10 +20,8 @@ pub fn main() {
 #[unsafe(no_mangle)]
 pub fn android_main(app: slint::android::AndroidApp) {
     let path = app.external_data_path().unwrap();
-    slint::android::init_with_event_listener(
-       app,
-       |event| { eprintln!("got event {event:?}") }
-    ).unwrap();
+    slint::android::init_with_event_listener(app, |event| eprintln!("got event {event:?}"))
+        .unwrap();
     eprintln!("{:?}", path.clone());
     init(path).unwrap()
 }
@@ -84,7 +85,21 @@ fn init(path: PathBuf) -> Result<(), Box<dyn Error>> {
             slint::quit_event_loop().unwrap();
         }
     });
-    
+    ui.on_reset_score({
+        let logic_ref = logic.clone();
+        move || {
+            let logic = logic_ref.lock().unwrap();
+            logic.reset_score();
+        }
+    });
+    ui.on_save_score({
+        let logic_ref = logic.clone();
+        move || {
+            let logic = logic_ref.lock().unwrap();
+            logic.save_scores();
+        }
+    });
+
     ui.window().on_close_requested({
         let logic_ref = logic.clone();
         move || {

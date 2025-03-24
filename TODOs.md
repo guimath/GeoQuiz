@@ -39,22 +39,23 @@
   - [x] Hint resizing makes text wrapping not great, should have hint outside of Horizontal box to avoid
   - [x] Reposition score just below image (easier to use)
   - [x] See how to have score: https://docs.rs/android-activity/latest/android_activity/struct.AndroidApp.html#method.internal_data_path
+    - Instead of back button for now using settings button.
+- [x] Should the return to menu save (-> cheap to do so why not)
 
 ## Priority 
-- [ ] Make android app
-  - [ ] See how to catch back button (https://docs.rs/android-activity/latest/android_activity/input/enum.Keycode.html#variant.TvMediaContextMenu)
+- [ ] See how to catch back button on android (https://docs.rs/android-activity/latest/android_activity/input/enum.Keycode.html#variant.TvMediaContextMenu)
+- [ ] Make current advanced config and make easy playing modes
+- [ ] Dedicated button for more customizations
+- [ ] Add a look up info (where all the info for a country is displayed)
 
 ## Bonus
-- [ ] Dedicated button for more customizations
 - [ ] Make proper icon
 - [ ] Animate (WIP)
   - [ ] Better scrolling on categories : maybe use timer to snap to center? 
   - [ ] Animate between screens? 
 - [ ] Add a 4 choice game mode
-- [ ] Add a look up info (where all the info for a country is displayed)
 
 ## Ideas to discuss
-- [ ] Should the return to menu save ?
-- [ ] Score specific for categories chosen ?
-- [ ] Add a way to add more infos ?
+- [ ] Score specific for categories chosen ? (-> maybe have a score selection ie multiple scores named by users for different infos)
+- [ ] Add a way to add more infos ? (-> three already a lot IMO)
 - [ ] Add a Disabled hint ?

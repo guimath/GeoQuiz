@@ -1,10 +1,9 @@
 use serde::{Deserialize, Serialize};
 use serde_json;
 use std::collections::HashMap;
-use std::fs::File;
+use std::fs::{self, File};
 use std::io::{Read, Write};
-use std::path::{Path, PathBuf};
-use std::str::FromStr;
+use std::path::PathBuf;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Category {
@@ -41,8 +40,7 @@ pub fn get_data() -> Vec<CountryInfos> {
 }
 
 pub fn read(all_countries: &Vec<CountryInfos>, score_path: PathBuf) -> HashMap<String, Score> {
-    let score_path = score_path.join("score.json");
-    if Path::exists(&score_path) {
+    if score_path.exists() {
         let mut file = File::open(score_path).unwrap();
         let mut file_content = String::new();
         file.read_to_string(&mut file_content)
@@ -65,8 +63,13 @@ pub fn read(all_countries: &Vec<CountryInfos>, score_path: PathBuf) -> HashMap<S
     }
 }
 pub fn save(scores: &HashMap<String, Score>, score_path: PathBuf) {
-    let score_path = score_path.join("score.json");
     let json_data = serde_json::to_string(scores).unwrap();
     let mut file = File::create(score_path).unwrap();
     file.write_all(json_data.as_bytes()).unwrap();
+}
+
+pub fn reset_score(score_path: PathBuf) {
+    if score_path.exists() {
+        fs::remove_file(score_path).unwrap();
+    }
 }

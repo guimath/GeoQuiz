@@ -1,0 +1,121 @@
+import { ScrollView, LineEdit, HorizontalBox, VerticalBox } from "std-widgets.slint";
+import { ChoiceElem, MainText } from "widgets.slint";
+import { FullInfo } from "structs.slint";
+
+export component SelectLookUpScreen inherits Rectangle {
+    callback search_changed(search: string);
+    callback selected(num: int);
+    in property <[string]> all: ["Albania", "Argentina", "Australia", "Barbados"];
+    in-out property <[bool]> on: [true, true, true, true];
+    VerticalLayout {
+        padding: 10px;
+        spacing: 10px;
+        MainText {  
+            text: "Look Up";
+            height: 40px;
+            horizontal-alignment: center;
+            vertical-alignment: center;
+        }
+        LineEdit {
+            placeholder-text: "Search";
+            edited(text) => {scroll.viewport-y=0; search_changed(text)}
+        }
+
+        scroll := ScrollView {
+            VerticalLayout {
+                padding-left:12px; 
+                for country[i] in all: VerticalBox{
+                    padding: 0;
+                    padding-bottom: root.on[i] ? 5px : 0pt;
+                    width: 100%;
+                    ChoiceElem {
+                    radius: 0;
+                    text: country;
+                    height: root.on[i] ? 30pt : 0pt;
+                    visible: root.on[i];
+                    animate height {
+                        duration: 300ms;
+                        easing: ease-in-out;
+                    }
+                    clicked => {
+                        selected(i);
+                    }
+                }
+            }
+            }
+        }
+    }
+}
+
+export component LookUpScreen inherits Rectangle {
+    public function reset() {
+        scroll.viewport-y = 0;
+    }
+    in property <FullInfo> infos: {
+        name: "Jamaica", 
+        text-infos:[
+            {title:"Capital", text:"Kingston"},
+            {title:"Languages", text:"English, Jamaican Patois"},
+            {title:"Region", text:"Caribbean (Americas)"},
+            {title:"Borders", text:""},
+            {title:"Currencies", text:"Jamaican Dollar (JMD, $)"},
+            {title:"Independent", text:"Yes"},
+        ], 
+        image-infos:[
+            {title:"Flag", image:@image-url("../data/flags/jam.svg")},
+            {title:"Outline", image:@image-url("../data/outlines/jam.svg")}
+        ]};
+    im := Image {
+        visible: false;
+        width: root.width - 40px - 12px;
+        image-fit: contain;
+        source: @image-url("../data/flags/jam.svg");
+    }
+    VerticalLayout {
+        padding: 20px;
+        spacing: 10px;
+        MainText {
+            text: infos.name;
+            horizontal-alignment: center;
+            vertical-alignment: center;
+        }
+        scroll := ScrollView {
+            VerticalLayout {
+                width: scroll.width - 12px;
+                for image_infos[i] in infos.image-infos: s :=VerticalLayout{
+                    padding: 0;
+                    spacing: 0;
+                    width: 100%;
+                    Image {
+                        width: s.width;
+                        height: s.width*(image_infos.image.height/image-infos.image.width);
+                        image-fit: contain;
+                        source: image_infos.image;
+                    }
+                    MainText {
+                        text: image_infos.title;
+                        horizontal-alignment: center;
+                        vertical-alignment: center;
+                    }
+                    
+                }
+                Rectangle {height: 10px;}
+                for text_infos[i] in infos.text-infos: Rectangle{
+                    background: Math.mod(i,2) == 0 ? grey : #00000000;
+                    HorizontalBox {
+                        MainText {
+                            text: "\{text_infos.title}:";
+                            vertical-alignment: center;
+                        }
+                        MainText {
+                            horizontal-stretch: 1;
+                            text: text_infos.text;
+                            wrap: word-wrap;
+                        }
+                    }
+                }
+                Rectangle {}
+            }
+        }
+    }
+}

@@ -2,9 +2,10 @@ import { Button, VerticalBox, HorizontalBox, TextEdit, CheckBox, ComboBox, Scrol
 import {CatInfo} from "structs.slint";
 
 
-component ChoiceElem inherits TouchArea {
+export component ChoiceElem inherits TouchArea {
     in property <string> text;
     in property <color> background_elem: #ffffff3c;
+    in property <length> radius: 10px;
     public function click() {
         root.clicked();
     } 
@@ -12,7 +13,7 @@ component ChoiceElem inherits TouchArea {
     height: 30pt;
     Rectangle {
         width: 100%;
-        border-radius: 10px;
+        border-radius: radius;
         background: root.background_elem;
     }
     Text {
@@ -56,8 +57,8 @@ export component MultiChoice {
         width:root.width_per_elem;
         border-radius: 10px;
         animate x {
-            duration: 300ms;
-            easing: ease-in-out;
+            
+            
         }
     }
 }

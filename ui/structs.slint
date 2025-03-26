@@ -13,3 +13,24 @@ export struct FullUpdate  {
     flag: image,
     seen: bool, 
 }
+
+export struct TextWithTitle {
+    text: string,
+    title: string,
+}
+export struct ImageWithTitle {
+    image: image,
+    title: string,
+}
+export struct FullInfo {
+    name: string,
+    text_infos : [TextWithTitle],
+    image_infos : [ImageWithTitle],
+}
+
+export enum Screen {
+    SelectLookUpScreen,
+    LookUpScreen,
+    Main,
+    CutomPlay,
+}

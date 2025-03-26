@@ -1,6 +1,7 @@
 import { Button, VerticalBox, HorizontalBox, TextEdit, CheckBox, ComboBox} from "std-widgets.slint";
 import {MultiChoice, ThreeStartScore, MainText, HiddenText, ScrollChoice} from "widgets.slint";
-import {CatInfo, FullUpdate} from "structs.slint";
+import {CatInfo, FullUpdate, Screen, FullInfo} from "structs.slint";
+import { SelectLookUpScreen, LookUpScreen } from "look-up-screen.slint";
 
 export component AppWindow inherits Window {
     title: "Geo quiz";
@@ -12,8 +13,10 @@ export component AppWindow inherits Window {
     in property <image> flag: @image-url("../data/flags/jam.svg");
     in-out property <int> info_level:0;
     in-out property <int> play_mode: 1;
-    in-out property <bool> playing: false;
+    in-out property <Screen> screen: Screen.Main;
     in property <[string]> info_types: ["Country", "Capital", "Languages", "Borders", "Region", "Currencies"];
+    in property <[string]> search_all_countries;
+    in property <[bool]> search_countries_mask;
     //, "LatLon"
     property <int> num: 0;
     property <int> out_of: 110;
@@ -21,10 +24,12 @@ export component AppWindow inherits Window {
     // ***************************************************************** //
     //                            CALLBACKS
     // ***************************************************************** //
+    callback look_up_search_changed(search: string);
+    callback look_up_selected(num: int);
     callback close();
     callback reset_score();
     callback save_score();
-
+    callback prep_look_up();
     callback next(int);
     callback prev();
     callback start_play([int], bool, bool, int);
@@ -39,12 +44,28 @@ export component AppWindow inherits Window {
             w_order.not_default, 
             w_hard.not_default, 
             cat_im.choice_num);
-        root.playing = true;
+        root.screen = Screen.CutomPlay;
+    }
+
+    public function back() {
+        if root.screen == Screen.CutomPlay {
+            root.screen = Screen.Main;
+        } else if root.screen == Screen.SelectLookUpScreen {
+            root.screen = Screen.Main;
+        } else if root.screen == Screen.LookUpScreen {
+            root.screen = Screen.SelectLookUpScreen;
+        }
+    }
+
+    public function update_look_up_selected(infos: FullInfo) {
+        w_look_up.infos = infos;
+        w_look_up.reset();
+        root.screen = Screen.LookUpScreen
     }
 
     public function update_screen(info: FullUpdate, cat: [CatInfo]) {
         w_score.score = info.score;
-        w_score.prev_score = info.last-score; 
+        w_score.prev_score = info.last-score;
         w_cat1.update_cat(cat[0]);
         w_cat2.update_cat(cat[1]);
         w_cat3.update_cat(cat[2]);
@@ -81,7 +102,7 @@ export component AppWindow inherits Window {
     forward-focus: my-key-handler;
     my-key-handler := FocusScope {
         key-pressed(event) => {
-            if !root.playing {
+            if root.screen == Screen.Main {
                 if event.text == Key.Space {
                     prep_start_play()
                 }
@@ -111,28 +132,89 @@ export component AppWindow inherits Window {
                 root.info_level = 3;
             }
             if event.text == "b" {
-                root.playing = false;
+                back();
             }
-        accept
+            accept
+        }
+    }
+    // ***************************************************************** //
+    //                            BACK BUTTON
+    // ***************************************************************** //
+    TouchArea {
+        visible: root.screen != Screen.Main;
+        x: 10px;
+        y: 10px;
+        width: 40px;
+        height: 40px;
+        Image {
+            source: @image-url("settings.svg");
+            height: 40px;
+        }
+
+        clicked => {
+            back();
+        }
+    }
+    // ***************************************************************** //
+    //                            LOOK UP SCREEN
+    // ***************************************************************** //
+    SelectLookUpScreen {
+        visible: root.screen == Screen.SelectLookUpScreen;
+        all: root.search_all_countries;
+        on: root.search_countries_mask;
+        search_changed(search) => {
+            look_up_search_changed(search)
+        }
+        selected(num) => {
+            look_up_selected(num)
         }
     }
 
+    w_look_up := LookUpScreen {
+        visible: root.screen == Screen.LookUpScreen;
+    }
     // ***************************************************************** //
     //                            INIT SCREEN
     // ***************************************************************** //
     Rectangle {
-        visible: !root.playing;
+        visible: root.screen == Screen.Main;
         padding: 0;
         VerticalBox {
             HorizontalBox {
                 alignment: center;
                 padding: 20pt;
+                HorizontalBox {
+                    padding-right: 0;
+                    padding-left: 0;
+                    Button {
+                        height: 40pt;
+                        width: root.width / 4;
+                        text: "Advanced settings";
+                        clicked => {
+                            // prep_start_play()
+                        }
+                    }
+                }
+
                 Button {
                     height: 70pt;
-                    width: 100pt;
+                    width: root.width / 4;
                     text: "Play";
                     clicked => {
                         prep_start_play()
+                    }
+                }
+
+                HorizontalBox {
+                    padding-right: 0;
+                    padding-left: 0;
+                    Button {
+                        height: 40pt;
+                        width: root.width / 4;
+                        text: "Look up Infos";
+                        clicked => {
+                            root.screen = Screen.SelectLookUpScreen;
+                        }
                     }
                 }
             }
@@ -219,7 +301,7 @@ export component AppWindow inherits Window {
                 padding: 0pt;
 
                 VerticalBox {
-                    height: 30pt*4 + 20px*3;
+                    height: 30pt * 4 + 20px * 3;
                     padding: 0pt;
                     cat_im := MultiChoice {
                         width: 100%;
@@ -238,9 +320,9 @@ export component AppWindow inherits Window {
                             width_per_elem: w_30w.width;
                             spacing: 5pt;
                         }
-                        
+
                         cat2 := ScrollChoice {
-                            y: 30pt+20px;
+                            y: 30pt + 20px;
                             width: 100%;
                             choices: root.info_types;
                             width_per_elem: w_30w.width;
@@ -249,7 +331,7 @@ export component AppWindow inherits Window {
                         }
 
                         cat3 := ScrollChoice {
-                            y: 2*30pt+2*20px;
+                            y: 2 * 30pt + 2 * 20px;
                             width: 100%;
 
                             choices: root.info_types;
@@ -260,16 +342,23 @@ export component AppWindow inherits Window {
                     }
                 }
             }
+
             Rectangle {
                 vertical-stretch: 1;
             }
+
             Button {
                 text: "Reset score";
-                clicked => {reset_score()}
+                clicked => {
+                    reset_score()
+                }
             }
-
         }
-        w_30w := Text {width: 20%;height: 10px;}
+
+        w_30w := Text {
+            width: 20%;
+            height: 10px;
+        }
     }
 
 
@@ -277,35 +366,20 @@ export component AppWindow inherits Window {
     //                            PLAYING SCREEN
     // ***************************************************************** //
     Rectangle {
-        visible: root.playing;
+        visible: root.screen == Screen.CutomPlay;
         padding: 0;
         VerticalLayout {
             padding: 10px;
             spacing: 10px;
             height: 100%;
 
-            HorizontalLayout {
-                padding: 0;
-                spacing: 0;
-                Rectangle {width:40px;}
-                MainText {
-                    horizontal-alignment: center;
-                    vertical-alignment: center;
-                    text: "\{root.num + 1} / \{root.out_of}";
-                }
-                TouchArea {
-                    width:40px;
-                    Image {
-                        source: @image-url("settings.svg");
-                        height: 40px;
-                    }
-                    clicked => {
-                        root.playing = false;
-                        save_score()
-
-                    }
-                }
+            MainText {
+                horizontal-alignment: center;
+                vertical-alignment: center;
+                text: "\{root.num + 1} / \{root.out_of}";
+                height: 40px;
             }
+
             SwipeGestureHandler {
                 handle-swipe-right: root.num > 0;
                 handle-swipe-left: root.num < root.out_of - 1;
@@ -319,13 +393,13 @@ export component AppWindow inherits Window {
                 HorizontalBox {
                     padding: 0;
                     flag := Image {
-                        height: root.height/4; 
+                        height: root.height / 4;
                         max-width: root.width;
                         source: root.flag;
                     }
                 }
-
             }
+
             HorizontalBox {
                 padding: 10px;
                 alignment: center;
@@ -334,9 +408,8 @@ export component AppWindow inherits Window {
                         prep_next(score)
                     }
                 }
-
             }
-            
+
             w_cat1 := HiddenText {
                 play_mode: root.play_mode;
                 type: "Country:";
@@ -381,6 +454,7 @@ export component AppWindow inherits Window {
                     }
                 }
             }
+
             Rectangle { } // spacing
         }
     }

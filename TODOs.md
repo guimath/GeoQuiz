@@ -38,24 +38,29 @@
   - [x] Large text (EG on many languages) is not handled (-> now just one text element so will take more space if needed)
   - [x] Hint resizing makes text wrapping not great, should have hint outside of Horizontal box to avoid
   - [x] Reposition score just below image (easier to use)
-  - [x] See how to have score: https://docs.rs/android-activity/latest/android_activity/struct.AndroidApp.html#method.internal_data_path
-    - Instead of back button for now using settings button.
+  - [x] See how to have score: (-> using internal_data_path)
+  - Instead of back button for now using settings button.
 - [x] Should the return to menu save (-> cheap to do so why not)
+- [x] Add a look up info (where all the info for a country is displayed)
+- [x] Prepared better multi screen
 
 ## Priority 
 - [ ] See how to catch back button on android (https://docs.rs/android-activity/latest/android_activity/input/enum.Keycode.html#variant.TvMediaContextMenu)
 - [ ] Make current advanced config and make easy playing modes
 - [ ] Dedicated button for more customizations
-- [ ] Add a look up info (where all the info for a country is displayed)
+- [ ] Remake back button
+- [x] Divide screen in different files ?
 
-## Bonus
+## Secondary
+- [ ] Add a Readme & LICENSE & Publish
 - [ ] Make proper icon
+- [ ] Add a 4 choice game mode
 - [ ] Animate (WIP)
   - [ ] Better scrolling on categories : maybe use timer to snap to center? 
   - [ ] Animate between screens? 
-- [ ] Add a 4 choice game mode
 
 ## Ideas to discuss
+- [ ] Give number of words in hints like for UK: U... ... 
 - [ ] Score specific for categories chosen ? (-> maybe have a score selection ie multiple scores named by users for different infos)
 - [ ] Add a way to add more infos ? (-> three already a lot IMO)
-- [ ] Add a Disabled hint ?
+- [ ] What other infos could be added ? (Population, Position on a map, )

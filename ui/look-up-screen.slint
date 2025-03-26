@@ -72,16 +72,20 @@ export component LookUpScreen inherits Rectangle {
         source: @image-url("../data/flags/jam.svg");
     }
     VerticalLayout {
-        padding: 20px;
+        // padding: 20px;
+        padding-top: 10px;
         spacing: 10px;
         MainText {
             text: infos.name;
             horizontal-alignment: center;
             vertical-alignment: center;
+            height: 40px;
         }
         scroll := ScrollView {
+            vertical-scrollbar-policy: always-off;
             VerticalLayout {
                 width: scroll.width - 12px;
+                padding-left: 12px;
                 for image_infos[i] in infos.image-infos: s :=VerticalLayout{
                     padding: 0;
                     spacing: 0;

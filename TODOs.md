@@ -44,6 +44,7 @@
 - [x] Add a look up info (where all the info for a country is displayed)
 - [x] Prepared better multi screen
 - [x] Correct bug with hint showing 
+- [x] keyboard staying up when pressing a look up
 
 ## Priority 
 - [ ] See how to catch back button on android (https://docs.rs/android-activity/latest/android_activity/input/enum.Keycode.html#variant.TvMediaContextMenu)

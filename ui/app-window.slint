@@ -60,6 +60,7 @@ export component AppWindow inherits Window {
     public function update_look_up_selected(infos: FullInfo) {
         w_look_up.infos = infos;
         w_look_up.reset();
+        root.focus();
         root.screen = Screen.LookUpScreen
     }
 

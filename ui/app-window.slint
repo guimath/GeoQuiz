@@ -66,14 +66,14 @@ export component AppWindow inherits Window {
     public function update_screen(info: FullUpdate, cat: [CatInfo]) {
         w_score.score = info.score;
         w_score.prev_score = info.last-score;
-        w_cat1.update_cat(cat[0]);
-        w_cat2.update_cat(cat[1]);
-        w_cat3.update_cat(cat[2]);
         if root.play_mode == 3 || info.seen {
             root.info_level = 3
         } else {
             root.info_level = 0
         }
+        w_cat1.update_cat(cat[0]);
+        w_cat2.update_cat(cat[1]);
+        w_cat3.update_cat(cat[2]);
         root.num = info.num;
         root.out_of = info.out_of;
         flag.source = info.flag;

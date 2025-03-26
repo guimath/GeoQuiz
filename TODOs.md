@@ -43,13 +43,14 @@
 - [x] Should the return to menu save (-> cheap to do so why not)
 - [x] Add a look up info (where all the info for a country is displayed)
 - [x] Prepared better multi screen
+- [x] Correct bug with hint showing 
 
 ## Priority 
 - [ ] See how to catch back button on android (https://docs.rs/android-activity/latest/android_activity/input/enum.Keycode.html#variant.TvMediaContextMenu)
 - [ ] Make current advanced config and make easy playing modes
 - [ ] Dedicated button for more customizations
 - [ ] Remake back button
-- [x] Divide screen in different files ?
+- [ ] Divide screen in different files ?
 
 ## Secondary
 - [ ] Add a Readme & LICENSE & Publish

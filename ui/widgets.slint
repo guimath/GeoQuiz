@@ -121,7 +121,7 @@ export component HiddenText inherits TouchArea {
         self.name = cat.full;
         self.first_letter = cat.first;
 
-        if root.play_mode == 1 && cat.with_hint { 
+        if root.play_mode == 1 && cat.with_hint && !root.show { 
             self.size_hint = 40pt;
         }
         else {

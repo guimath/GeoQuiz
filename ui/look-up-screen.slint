@@ -48,7 +48,6 @@ export component SelectLookUpScreen inherits Rectangle {
 }
 
 export component LookUpScreen inherits Rectangle {
-    width: 500px;
     public function reset() {
         scroll.viewport-y = 0;
     }
@@ -75,14 +74,15 @@ export component LookUpScreen inherits Rectangle {
             padding: 0;
             width: root.width;
             alignment: center;
+            Rectangle {}
             MainText {
                 text: infos.name;
                 horizontal-alignment: center;
                 vertical-alignment: center;
                 height: 50px;
-                width: root.width - 2*(10px + 40px + 10px);
                 wrap: word-wrap;
             }
+            Rectangle {}
         }
         scroll := ScrollView {
             vertical-scrollbar-policy: always-off;

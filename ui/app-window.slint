@@ -167,12 +167,11 @@ export component AppWindow inherits Window {
             look_up_search_changed(search)
         }
         selected(num) => {
-            look_up_selected(num)
+            look_up_selected(num) 
         }
     }
 
     w_look_up := LookUpScreen {
-        width: root.width;
         visible: root.screen == Screen.LookUpScreen;
     }
     // ***************************************************************** //

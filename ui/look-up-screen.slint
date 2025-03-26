@@ -48,6 +48,7 @@ export component SelectLookUpScreen inherits Rectangle {
 }
 
 export component LookUpScreen inherits Rectangle {
+    width: 500px;
     public function reset() {
         scroll.viewport-y = 0;
     }
@@ -65,21 +66,23 @@ export component LookUpScreen inherits Rectangle {
             {title:"Flag", image:@image-url("../data/flags/jam.svg")},
             {title:"Outline", image:@image-url("../data/outlines/jam.svg")}
         ]};
-    im := Image {
-        visible: false;
-        width: root.width - 40px - 12px;
-        image-fit: contain;
-        source: @image-url("../data/flags/jam.svg");
-    }
+    
     VerticalLayout {
         // padding: 20px;
         padding-top: 10px;
         spacing: 10px;
-        MainText {
-            text: infos.name;
-            horizontal-alignment: center;
-            vertical-alignment: center;
-            height: 40px;
+        HorizontalBox {
+            padding: 0;
+            width: root.width;
+            alignment: center;
+            MainText {
+                text: infos.name;
+                horizontal-alignment: center;
+                vertical-alignment: center;
+                height: 50px;
+                width: root.width - 2*(10px + 40px + 10px);
+                wrap: word-wrap;
+            }
         }
         scroll := ScrollView {
             vertical-scrollbar-policy: always-off;

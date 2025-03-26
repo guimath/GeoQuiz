@@ -1,6 +1,6 @@
 use rand::seq::SliceRandom;
 use rand::thread_rng;
-use slint::Image;
+use slint::{Image, SharedString};
 
 use std::collections::HashMap;
 use std::str::FromStr;
@@ -98,14 +98,29 @@ pub struct AppLogic {
     results: Vec<u32>,
     scores: HashMap<String, Score>,
     all_countries: Vec<CountryInfos>,
+    all_countries_order: Vec<CountryInfos>,
+    pub all_names: Vec<SharedString>,
+    search_names: Vec<String>,
     info_types: [InfoType; 3],
     image_type: ImageType,
     score_path: PathBuf,
 }
 impl AppLogic {
-    pub fn set_score_path(&mut self, score_path: PathBuf) {
-        self.score_path = score_path.join("score.json");
+    pub fn new(score_path: PathBuf) -> Self {
+        let mut s = Self::default();
+        s.all_countries_order = info_parse::get_data();
+        s.all_countries_order
+            .sort_by(|a, b| a.name.full.cmp(&b.name.full));
+        s.all_names = s
+            .all_countries_order
+            .iter()
+            .map(|x| x.name.full.clone().into())
+            .collect();
+        s.search_names = s.all_names.iter().map(|x| x.to_lowercase()).collect();
+        s.score_path = score_path.join("score.json");
+        s
     }
+
     pub fn prepare_infos(
         &mut self,
         easy_first: bool,
@@ -113,15 +128,17 @@ impl AppLogic {
         info_types: [InfoType; 3],
         img: ImageType,
     ) {
-        let mut all_countries = info_parse::get_data();
-        let scores = info_parse::read(&all_countries, self.score_path.clone());
+        let scores = info_parse::read(&self.all_countries_order, self.score_path.clone());
 
-        if !hard_mode {
-            all_countries = all_countries
+        let mut all_countries = if !hard_mode {
+            self.all_countries_order
+                .clone()
                 .into_iter()
                 .filter(|country| country.independent)
-                .collect();
-        }
+                .collect()
+        } else {
+            self.all_countries_order.clone()
+        };
 
         let mut rng = thread_rng();
         all_countries.shuffle(&mut rng);
@@ -218,6 +235,54 @@ impl AppLogic {
             .try_into()
             .unwrap();
         (update, infos)
+    }
+
+    pub fn search_changed(&self, s: String) -> Vec<bool> {
+        let s = s.to_lowercase();
+        let search = s.as_str();
+        self.search_names
+            .iter()
+            .map(|x| x.contains(search))
+            .collect()
+    }
+
+    pub fn look_up_selected(&self, num: usize) -> FullInfo {
+        let country = self.all_countries_order[num].clone();
+        let name = country.name.full;
+        let mut text_infos: Vec<TextWithTitle> = Vec::new();
+        let mut image_infos: Vec<ImageWithTitle> = Vec::new();
+
+        macro_rules! add_text_info {
+            ($title: expr, $data:expr ) => {
+                text_infos.push(TextWithTitle {
+                    title: $title.into(),
+                    text: $data.into(),
+                });
+            };
+        }
+        macro_rules! add_image_info {
+            ($title: expr, $data:expr ) => {
+                image_infos.push(ImageWithTitle {
+                    title: $title.into(),
+                    image: Image::load_from_svg_data($data.as_bytes()).unwrap(),
+                });
+            };
+        }
+        add_text_info!("Capital", country.capitals.full);
+        add_text_info!("Languages", country.languages.full);
+        add_text_info!("Region", country.region.full);
+        add_text_info!("Borders", country.borders.full);
+        add_text_info!("Currencies", country.currencies.full);
+        let is_independant = if country.independent { "Yes" } else { "No" };
+        add_text_info!("Independant", is_independant);
+        add_image_info!("Flag", country.svg_flag);
+        add_image_info!("Outline", country.svg_outline);
+
+        FullInfo {
+            name: name.into(),
+            text_infos: text_infos.as_slice().into(),
+            image_infos: image_infos.as_slice().into(),
+        }
     }
 
     pub fn save_scores(&self) {

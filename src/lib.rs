@@ -28,12 +28,35 @@ pub fn android_main(app: slint::android::AndroidApp) {
 
 fn init(path: PathBuf) -> Result<(), Box<dyn Error>> {
     // slint::init_translations!(concat!(env!("CARGO_MANIFEST_DIR"), "/lang/"));
-    let logic = Arc::new(Mutex::new(AppLogic::default()));
-    logic.lock().unwrap().set_score_path(path);
+    let logic = Arc::new(Mutex::new(AppLogic::new(path)));
     let ui = AppWindow::new()?;
     ui.window().set_size(LogicalSize {
         width: 1000.0,
         height: 1000.0,
+    });
+    {
+        let logic_lock = logic.lock().unwrap();
+        ui.set_search_countries_mask(logic_lock.search_changed("".into()).as_slice().into());
+        ui.set_search_all_countries(logic_lock.all_names.as_slice().into());
+    }
+
+    ui.on_look_up_search_changed({
+        let ui_handle = ui.as_weak();
+        let logic_ref = logic.clone();
+        move |search| {
+            let ui = ui_handle.unwrap();
+            let logic = logic_ref.lock().unwrap();
+            ui.set_search_countries_mask(logic.search_changed(search.into()).as_slice().into());
+        }
+    });
+    ui.on_look_up_selected({
+        let ui_handle = ui.as_weak();
+        let logic_ref = logic.clone();
+        move |search| {
+            let ui = ui_handle.unwrap();
+            let logic = logic_ref.lock().unwrap();
+            ui.invoke_update_look_up_selected(logic.look_up_selected(search as usize));
+        }
     });
     ui.on_start_play({
         let ui_handle = ui.as_weak();

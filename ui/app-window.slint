@@ -12,17 +12,11 @@ export component AppWindow inherits Window {
     // ***************************************************************** //
     //                            PROPERTIES
     // ***************************************************************** //
-    in property <image> flag: @image-url("../data/flags/jam.svg");
     in-out property <Screen> screen: Screen.Start;
-    // in-out property <int> info_level:0;
-    // in-out property <int> play_mode: 1;
-    in property <[string]> info_types: ["Country", "Capital", "Languages", "Borders", "Region", "Currencies"];
-    in property <[string]> search_all_countries;
-    in property <[bool]> search_countries_mask;
-    //, "LatLon"
-    // property <int> num: 0;
-    // property <int> out_of: 110;
-    // property <int> score_delayed: 0;
+    // for select look up 
+    in property <[string]> search_all_countries : ["Jamaica"]; 
+    in property <[bool]> search_countries_mask: [true];
+    
     // ***************************************************************** //
     //                            CALLBACKS
     // ***************************************************************** //
@@ -178,7 +172,7 @@ export component AppWindow inherits Window {
     // ***************************************************************** //
     //                            LOOK UP SCREEN
     // ***************************************************************** //
-    SelectLookUpScreen {
+    w_sel_look_up := SelectLookUpScreen {
         visible: root.screen == Screen.SelectLookUp;
         all: root.search_all_countries;
         on: root.search_countries_mask;

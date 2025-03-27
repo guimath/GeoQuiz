@@ -13,26 +13,33 @@ export component SelectMainPlayScreen inherits Rectangle {
         );
     }
     in property <[string]> info_types: ["Country", "Capital", "Languages", "Borders", "Region", "Currencies"];
+    property <bool> custom : false;
     padding: 0;
     VerticalBox {
-        HorizontalBox {
-            alignment: center;
-            padding: 20pt;
-            Button {
-                height: 70pt;
-                width: root.width / 4;
-                text: "Play";
-                clicked => {invoke_play()}
-            }
+        // HorizontalBox {
+        //     alignment: center;
+        //     padding: 20pt;
+        //     Button {
+        //         height: 70pt;
+        //         width: root.width / 4;
+        //         text: "Play";
+        //         clicked => {invoke_play()}
+        //     }
+        // }
+        Text{
+            text: "Free Play";
+            height : 40px;
+            horizontal-alignment: center;
+            vertical-alignment: center;
         }
-
+        
         Rectangle {
             background: #4a4458ff;
             border-radius: 10px;
             VerticalBox {
                 padding: 10px;
                 Text {
-                    text: "Play mode";
+                    text: "Difficulty";
                     horizontal-alignment: center;
                 }
 
@@ -82,7 +89,7 @@ export component SelectMainPlayScreen inherits Rectangle {
 
                 w_order := MultiChoice {
                     width: 70%;
-                    choices: ["Lesser known countries", "More known countries"];
+                    choices: ["Lesser known countries", "Better known countries"];
                     choices_len: 2;
                     width_per_elem: 40%;
                     spacing: 20pt;
@@ -97,66 +104,129 @@ export component SelectMainPlayScreen inherits Rectangle {
         }
 
         Text {
-            text: "Infos";
+            text: "Playing Categories";
             horizontal-alignment: center;
             vertical-alignment: center;
             font-size: 16pt;
         }
-
-        HorizontalBox {
-            alignment: center;
-            padding: 0pt;
-
-            VerticalBox {
-                height: 30pt * 4 + 20px * 3;
-                padding: 0pt;
-                cat_im := MultiChoice {
-                    width: 100%;
-                    choices: ["Flags", "Outlines"];
-                    choices_len: 2;
-                    width_per_elem: 30%;
-                    spacing: 20px;
+        Rectangle {
+            HorizontalBox {
+                visible: !root.custom;
+                alignment: center;
+                padding: 0;
+                Button {
+                    height: 40pt;
+                    width: root.width / 4;
+                    text: "Flags";
+                    clicked => {
+                        play(
+                            w_play_mode.choice_num,
+                            [0, 1, 2], 
+                            w_order.not_default, 
+                            w_hard.not_default, 
+                            0
+                        );
+                    }
                 }
-
-                Rectangle {
-
-                    cat1 := ScrollChoice {
-                        y: 0;
-                        width: 100%;
-                        choices: root.info_types;
-                        width_per_elem: w_30w.width;
-                        spacing: 5pt;
+    
+                Button {
+                    height: 40pt;
+                    width: root.width / 4;
+                    text: "Outlines";
+                    clicked => {
+                        play(
+                            w_play_mode.choice_num,
+                            [4, 3, 0], 
+                            w_order.not_default, 
+                            w_hard.not_default, 
+                            1
+                        );
                     }
-
-                    cat2 := ScrollChoice {
-                        y: 30pt + 20px;
-                        width: 100%;
-                        choices: root.info_types;
-                        width_per_elem: w_30w.width;
-                        choice_num: 1;
-                        spacing: 5pt;
-                    }
-
-                    cat3 := ScrollChoice {
-                        y: 2 * 30pt + 2 * 20px;
-                        width: 100%;
-
-                        choices: root.info_types;
-                        width_per_elem: w_30w.width;
-                        choice_num: 2;
-                        spacing: 5pt;
+                }
+                Button {
+                    height: 40pt;
+                    width: root.width / 4;
+                    text: "Custom";
+                    clicked => {
+                        root.custom = true;
                     }
                 }
             }
-        }
 
+            VerticalBox {
+                padding: 0;
+                visible: root.custom;
+                HorizontalBox {
+                    alignment: center;
+                    padding: 0;
+                    Button {
+                        height: 40pt;
+                        width: root.width / 3;
+                        text: "Back to default";
+                        clicked => {
+                            root.custom = false;
+                        }
+                    }
+        
+                    Button {
+                        height: 40pt;
+                        width: root.width / 3;
+                        text: "Play";
+                        clicked => {
+                            invoke_play()
+                        }
+                    }
+                }
+                HorizontalBox {
+                    alignment: center;
+                    padding: 0pt;
+        
+                    VerticalBox {
+                        height: 30pt * 4 + 20px * 3;
+                        padding: 0pt;
+                        cat_im := MultiChoice {
+                            width: 100%;
+                            choices: ["Flags", "Outlines"];
+                            choices_len: 2;
+                            width_per_elem: 30%;
+                            spacing: 20px;
+                        }
+        
+                        Rectangle {
+        
+                            cat1 := ScrollChoice {
+                                y: 0;
+                                width: 100%;
+                                choices: root.info_types;
+                                width_per_elem: root.width/5;
+                                spacing: 5pt;
+                            }
+        
+                            cat2 := ScrollChoice {
+                                y: 30pt + 20px;
+                                width: 100%;
+                                choices: root.info_types;
+                                width_per_elem: root.width/5;
+                                choice_num: 1;
+                                spacing: 5pt;
+                            }
+        
+                            cat3 := ScrollChoice {
+                                y: 2 * 30pt + 2 * 20px;
+                                width: 100%;
+        
+                                choices: root.info_types;
+                                width_per_elem: root.width/5;
+                                choice_num: 2;
+                                spacing: 5pt;
+                            }
+                        }
+                    }
+                }
+            }        
+        }
         Rectangle {
             vertical-stretch: 1;
         }
-    }
-
-    w_30w := Text {
-        width: 20%;
-        height: 10px;
     }
 }

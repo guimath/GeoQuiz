@@ -56,11 +56,11 @@
   - 3.2 Choice play
 - [x] Make current advanced config and make easy playing modes
 - [x] Harmonize Text
+- [x] Remake back button
 
 ## Priority 
 - [ ] See how to catch back button on android (https://docs.rs/android-activity/latest/android_activity/input/enum.Keycode.html#variant.TvMediaContextMenu)
 - [ ] Dedicated button for more customizations
-- [ ] Remake back button
 
 ## Secondary
 - [ ] Add a Readme & LICENSE & Publish
@@ -71,7 +71,7 @@
   - [ ] Animate between screens? 
 
 ## Ideas to discuss
-- [ ] Give number of words in hints like for UK: U... ... 
+- [ ] Give number of words in hints like for UK: U... ...  and better hints
 - [ ] Score specific for categories chosen ? (-> maybe have a score selection ie multiple scores named by users for different infos)
 - [ ] Add a way to add more infos ? (-> three already a lot IMO)
 - [ ] What other infos could be added ? (Population, Position on a map, )

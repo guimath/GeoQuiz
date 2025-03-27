@@ -1,7 +1,9 @@
 import { Button, VerticalBox, HorizontalBox, TextEdit, CheckBox, ComboBox} from "std-widgets.slint";
 import {MultiChoice, ThreeStartScore, MainText, HiddenText, ScrollChoice} from "widgets.slint";
 import {CatInfo, FullUpdate, Screen, FullInfo} from "structs.slint";
-import { SelectLookUpScreen, LookUpScreen } from "look-up-screen.slint";
+import { SelectLookUpScreen, LookUpScreen } from "screen-look-up.slint";
+import { SelectMainPlayScreen } from "screen-select-main-play.slint";
+import { MainPlayScreen } from "screen-main-play.slint";
 
 export component AppWindow inherits Window {
     title: "Geo quiz";
@@ -11,16 +13,16 @@ export component AppWindow inherits Window {
     //                            PROPERTIES
     // ***************************************************************** //
     in property <image> flag: @image-url("../data/flags/jam.svg");
-    in-out property <int> info_level:0;
-    in-out property <int> play_mode: 1;
-    in-out property <Screen> screen: Screen.Main;
+    in-out property <Screen> screen: Screen.Start;
+    // in-out property <int> info_level:0;
+    // in-out property <int> play_mode: 1;
     in property <[string]> info_types: ["Country", "Capital", "Languages", "Borders", "Region", "Currencies"];
     in property <[string]> search_all_countries;
     in property <[bool]> search_countries_mask;
     //, "LatLon"
-    property <int> num: 0;
-    property <int> out_of: 110;
-    property <int> score_delayed: 0;
+    // property <int> num: 0;
+    // property <int> out_of: 110;
+    // property <int> score_delayed: 0;
     // ***************************************************************** //
     //                            CALLBACKS
     // ***************************************************************** //
@@ -37,75 +39,62 @@ export component AppWindow inherits Window {
     // ***************************************************************** //
     //                            UI LOGIC
     // ***************************************************************** //
-    function prep_start_play() {
-        root.play_mode = w_play_mode.choice_num;
+    function prep_start_play(play_mode:int, cat_choices:[int], order_normal:bool, hard:bool, im_choice:int) {
+        main_play_s.play_mode = play_mode;
         root.start_play(
-            [cat1.choice_num, cat2.choice_num, cat3.choice_num], 
-            w_order.not_default, 
-            w_hard.not_default, 
-            cat_im.choice_num);
-        root.screen = Screen.CutomPlay;
+            cat_choices, 
+            order_normal, 
+            hard, 
+            im_choice
+        );
+        root.screen = Screen.MainPlay;
     }
 
+    // function prep_start_play() {
+    //     main_play_s.play_mode = w_play_mode.choice_num;
+    //     root.start_play(
+    //         [cat1.choice_num, cat2.choice_num, cat3.choice_num], 
+    //         w_order.not_default, 
+    //         w_hard.not_default, 
+    //         cat_im.choice_num);
+    //     root.screen = Screen.CutomPlay;
+    // }
+
     public function back() {
-        if root.screen == Screen.CutomPlay {
-            root.screen = Screen.Main;
-        } else if root.screen == Screen.SelectLookUpScreen {
-            root.screen = Screen.Main;
-        } else if root.screen == Screen.LookUpScreen {
-            root.screen = Screen.SelectLookUpScreen;
+        if root.screen == Screen.MainPlay {
+            root.screen = Screen.SelectMainPlay;
+        } else if root.screen == Screen.SelectMainPlay {
+            root.screen = Screen.Start
+        } else if root.screen == Screen.LookUp {
+            root.screen = Screen.SelectLookUp;
+        } else if root.screen == Screen.SelectLookUp {
+            root.screen = Screen.Start;
+        } else if root.screen == Screen.ChoicePlay {
+            root.screen = Screen.SelectChoicePlay;
+        } else if root.screen == Screen.SelectChoicePlay {
+            root.screen = Screen.Start
         }
+        
+
     }
 
     public function update_look_up_selected(infos: FullInfo) {
         w_look_up.infos = infos;
         w_look_up.reset();
         root.focus();
-        root.screen = Screen.LookUpScreen
+        root.screen = Screen.LookUp
     }
 
     public function update_screen(info: FullUpdate, cat: [CatInfo]) {
-        w_score.score = info.score;
-        w_score.prev_score = info.last-score;
-        if root.play_mode == 3 || info.seen {
-            root.info_level = 3
-        } else {
-            root.info_level = 0
-        }
-        w_cat1.update_cat(cat[0]);
-        w_cat2.update_cat(cat[1]);
-        w_cat3.update_cat(cat[2]);
-        root.num = info.num;
-        root.out_of = info.out_of;
-        flag.source = info.flag;
-    }
-
-    function prep_next(score: int) {
-        if score == 0 {
-            root.next(score);
-        } else {
-            w_score.score = score;
-            root.score_delayed = score;
-            root.info_level = 3;
-            timer.running = true;
-        }
-    }
-
-    timer := Timer {
-        interval: 200ms;
-        running: false;
-        triggered() => {
-            self.running = false;
-            root.next(root.score_delayed);
-        }
+        main_play_s.update_screen(info, cat);
     }
 
     forward-focus: my-key-handler;
     my-key-handler := FocusScope {
         key-pressed(event) => {
-            if root.screen == Screen.Main {
+            if root.screen == Screen.SelectMainPlay {
                 if event.text == Key.Space {
-                    prep_start_play()
+                    sel_main_play_s.invoke_play()
                 }
                 return accept;
             }
@@ -114,23 +103,14 @@ export component AppWindow inherits Window {
             } else if event.text == Key.LeftArrow {
                 root.prev();
             } else if event.text == Key.RightArrow {
-                prep_next(0);
+                next(0);
             }
-            if (event.text == "&" || event.text == "1") && !event.repeat {
-                prep_next(1);
-            }
-            if (event.text == "é" || event.text == "2") && !event.repeat {
-                prep_next(2);
-            }
-            if ((event.text == "\"" && "\"" != "o") || event.text == "3") && !event.repeat {
-                ;
-                prep_next(3);
-            }
+           
             if event.text == Key.Space && !event.repeat {
-                root.info_level += 1;
+                main_play_s.info_level += 1;
             }
             if event.text == Key.Space && event.modifiers.control {
-                root.info_level = 3;
+                main_play_s.info_level = 3;
             }
             if event.text == "b" {
                 back();
@@ -142,7 +122,7 @@ export component AppWindow inherits Window {
     //                            BACK BUTTON
     // ***************************************************************** //
     TouchArea {
-        visible: root.screen != Screen.Main;
+        visible: root.screen != Screen.Start;
         x: 10px;
         y: 10px;
         width: 40px;
@@ -157,10 +137,49 @@ export component AppWindow inherits Window {
         }
     }
     // ***************************************************************** //
+    //                            Start Screen
+    // ***************************************************************** //
+    Rectangle {
+        visible: root.screen == Screen.Start;
+        VerticalLayout {
+            spacing: 10px;
+            padding: 20px;
+            // padding-left : root.width/10;
+            MainText {
+                text: "Geo Quiz";
+                font-size: 20pt;
+                horizontal-alignment: center;
+                vertical-alignment: center;
+            }
+            Button{
+                height: root.height/6;
+                text: "Free Play";
+                clicked => {root.screen = Screen.SelectMainPlay}
+            }
+            Button{
+                height: root.height/6;
+                text: "Choices Play";
+                clicked => {root.screen = Screen.SelectChoicePlay}
+            }
+            Button {
+                height: root.height/6;
+                text: "Look Up Infos";
+                clicked => {root.screen = Screen.SelectLookUp}
+            }
+            Button {
+                height: root.height/6;
+                text: "Reset Score";
+                clicked => {reset_score()}
+            }
+            Rectangle {}
+        }
+        
+    }
+    // ***************************************************************** //
     //                            LOOK UP SCREEN
     // ***************************************************************** //
     SelectLookUpScreen {
-        visible: root.screen == Screen.SelectLookUpScreen;
+        visible: root.screen == Screen.SelectLookUp;
         all: root.search_all_countries;
         on: root.search_countries_mask;
         search_changed(search) => {
@@ -172,291 +191,17 @@ export component AppWindow inherits Window {
     }
 
     w_look_up := LookUpScreen {
-        visible: root.screen == Screen.LookUpScreen;
+        visible: root.screen == Screen.LookUp;
     }
-    // ***************************************************************** //
-    //                            INIT SCREEN
-    // ***************************************************************** //
-    Rectangle {
-        visible: root.screen == Screen.Main;
-        padding: 0;
-        VerticalBox {
-            HorizontalBox {
-                alignment: center;
-                padding: 20pt;
-                HorizontalBox {
-                    padding-right: 0;
-                    padding-left: 0;
-                    Button {
-                        height: 40pt;
-                        width: root.width / 4;
-                        text: "Advanced settings";
-                        clicked => {
-                            // prep_start_play()
-                        }
-                    }
-                }
-
-                Button {
-                    height: 70pt;
-                    width: root.width / 4;
-                    text: "Play";
-                    clicked => {
-                        prep_start_play()
-                    }
-                }
-
-                HorizontalBox {
-                    padding-right: 0;
-                    padding-left: 0;
-                    Button {
-                        height: 40pt;
-                        width: root.width / 4;
-                        text: "Look up Infos";
-                        clicked => {
-                            root.screen = Screen.SelectLookUpScreen;
-                        }
-                    }
-                }
-            }
-
-            Rectangle {
-                background: #4a4458ff;
-                border-radius: 10px;
-                VerticalBox {
-                    padding: 10px;
-                    Text {
-                        text: "Play mode";
-                        horizontal-alignment: center;
-                    }
-
-                    w_play_mode := MultiChoice {
-                        choices: ["No hints", "Clickable hints", "Always on hints", "Full info"];
-                        choices_len: 4;
-                        choice_num: 1;
-                        spacing: 10pt;
-                    }
-                }
-            }
-
-            Rectangle {
-                background: #4a4458ff;
-                border-radius: 10px;
-                HorizontalBox {
-                    padding: 10px;
-                    Text {
-                        text: "Country list includes:";
-                        vertical-alignment: center;
-                        horizontal-alignment: right;
-                        wrap: word-wrap;
-                    }
-
-                    w_hard := MultiChoice {
-                        width: 70%;
-                        choices: ["Independent countries only", "All territories"];
-                        choices_len: 2;
-                        width_per_elem: 40%;
-                        spacing: 20pt;
-                    }
-                }
-            }
-
-            Rectangle {
-                width: 60%;
-                background: #4a4458ff;
-                border-radius: 10px;
-                HorizontalBox {
-                    padding: 10px;
-                    Text {
-                        text: "Start with:";
-                        horizontal-alignment: right;
-                        vertical-alignment: center;
-                        wrap: word-wrap;
-                    }
-
-                    w_order := MultiChoice {
-                        width: 70%;
-                        choices: ["Lesser known countries", "More known countries"];
-                        choices_len: 2;
-                        width_per_elem: 40%;
-                        spacing: 20pt;
-                    }
-                }
-            }
-
-            Rectangle {
-                width: 100%;
-                height: 2px;
-                background: white;
-            }
-
-            Text {
-                text: "Infos";
-                horizontal-alignment: center;
-                vertical-alignment: center;
-                font-size: 16pt;
-            }
-
-            HorizontalBox {
-                alignment: center;
-                padding: 0pt;
-
-                VerticalBox {
-                    height: 30pt * 4 + 20px * 3;
-                    padding: 0pt;
-                    cat_im := MultiChoice {
-                        width: 100%;
-                        choices: ["Flags", "Outlines"];
-                        choices_len: 2;
-                        width_per_elem: 30%;
-                        spacing: 20px;
-                    }
-
-                    Rectangle {
-
-                        cat1 := ScrollChoice {
-                            y: 0;
-                            width: 100%;
-                            choices: root.info_types;
-                            width_per_elem: w_30w.width;
-                            spacing: 5pt;
-                        }
-
-                        cat2 := ScrollChoice {
-                            y: 30pt + 20px;
-                            width: 100%;
-                            choices: root.info_types;
-                            width_per_elem: w_30w.width;
-                            choice_num: 1;
-                            spacing: 5pt;
-                        }
-
-                        cat3 := ScrollChoice {
-                            y: 2 * 30pt + 2 * 20px;
-                            width: 100%;
-
-                            choices: root.info_types;
-                            width_per_elem: w_30w.width;
-                            choice_num: 2;
-                            spacing: 5pt;
-                        }
-                    }
-                }
-            }
-
-            Rectangle {
-                vertical-stretch: 1;
-            }
-
-            Button {
-                text: "Reset score";
-                clicked => {
-                    reset_score()
-                }
-            }
-        }
-
-        w_30w := Text {
-            width: 20%;
-            height: 10px;
-        }
+    
+    sel_main_play_s := SelectMainPlayScreen {
+        visible: root.screen == Screen.SelectMainPlay;
+        play(play-mode, cat-choices, order-normal, hard, im-choice) => {prep_start_play(play-mode, cat-choices, order-normal, hard, im-choice)}
     }
 
-
-    // ***************************************************************** //
-    //                            PLAYING SCREEN
-    // ***************************************************************** //
-    Rectangle {
-        visible: root.screen == Screen.CutomPlay;
-        padding: 0;
-        VerticalLayout {
-            padding: 10px;
-            spacing: 10px;
-            height: 100%;
-
-            MainText {
-                horizontal-alignment: center;
-                vertical-alignment: center;
-                text: "\{root.num + 1} / \{root.out_of}";
-                height: 40px;
-            }
-
-            SwipeGestureHandler {
-                handle-swipe-right: root.num > 0;
-                handle-swipe-left: root.num < root.out_of - 1;
-                swiped => {
-                    if self.current-position.x > self.pressed-position.x + self.width / 4 {
-                        prev();
-                    } else if self.current-position.x < self.pressed-position.x - self.width / 4 {
-                        next(0);
-                    }
-                }
-                HorizontalBox {
-                    padding: 0;
-                    flag := Image {
-                        height: root.height / 4;
-                        max-width: root.width;
-                        source: root.flag;
-                    }
-                }
-            }
-
-            HorizontalBox {
-                padding: 10px;
-                alignment: center;
-                w_score := ThreeStartScore {
-                    score_changed(score) => {
-                        prep_next(score)
-                    }
-                }
-            }
-
-            w_cat1 := HiddenText {
-                play_mode: root.play_mode;
-                type: "Country:";
-                name: "Jamaica";
-                first_letter: "J";
-                show: root.info_level >= 1;
-                clicked => {
-                    if root.info_level < 1 {
-                        root.info_level = 1;
-                        self.size_hint = 0;
-                    }
-                }
-            }
-
-            w_cat2 := HiddenText {
-                play_mode: root.play_mode;
-                type: "Capital:";
-                name: "Kingston";
-                first_letter: "K";
-                show: root.info_level >= 2;
-                clicked => {
-                    if root.info_level < 2 {
-                        root.info_level = 2;
-                        self.size_hint = 0;
-                        w_cat1.size_hint = 0;
-                    }
-                }
-            }
-
-            w_cat3 := HiddenText {
-                play_mode: root.play_mode;
-                type: "Language:";
-                name: "English, Jamaican Patois";
-                first_letter: "E..., J...";
-                show: root.info_level > 2;
-                clicked => {
-                    if root.info_level < 3 {
-                        root.info_level = 3;
-                        self.size_hint = 0;
-                        w_cat1.size_hint = 0;
-                        w_cat2.size_hint = 0;
-                    }
-                }
-            }
-
-            Rectangle { } // spacing
-        }
+    main_play_s := MainPlayScreen {
+        visible: root.screen == Screen.MainPlay;
+        next(score) => {next(score)}
+        prev() => {prev()}
     }
 }

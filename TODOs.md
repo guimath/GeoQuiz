@@ -45,13 +45,21 @@
 - [x] Prepared better multi screen
 - [x] Correct bug with hint showing 
 - [x] keyboard staying up when pressing a look up
+- [x] Divide screen in different files ?
+- [x] Re order Screen 
+  - 0 Start (Chose between game modes and possibility of LookUp)
+  - 1.1 Main play settings (with toggle able advanced custom with cat select)
+  - 1.2 Main Play 
+  - 2.1 Look up select
+  - 2.2 Look up
+  - 3.1 Choice play settings
+  - 3.2 Choice play
 
 ## Priority 
 - [ ] See how to catch back button on android (https://docs.rs/android-activity/latest/android_activity/input/enum.Keycode.html#variant.TvMediaContextMenu)
 - [ ] Make current advanced config and make easy playing modes
 - [ ] Dedicated button for more customizations
 - [ ] Remake back button
-- [ ] Divide screen in different files ?
 
 ## Secondary
 - [ ] Add a Readme & LICENSE & Publish

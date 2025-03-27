@@ -1,0 +1,140 @@
+import { Button, VerticalBox, HorizontalBox, TextEdit, CheckBox, ComboBox} from "std-widgets.slint";
+import {CatInfo, FullUpdate, Screen, FullInfo} from "structs.slint";
+import {MultiChoice, ThreeStartScore, MainText, HiddenText, ScrollChoice} from "widgets.slint";
+
+export component MainPlayScreen inherits Rectangle {
+    callback prev();
+    callback next(score:int);
+    in-out property <int> play_mode: 1;
+    in-out property <int> num:0;
+    in-out property <int> out_of:110;
+    property <int> score_delayed: 0;
+    in-out property <int> info_level: 0;
+    in property <image> flag: @image-url("../data/flags/jam.svg");
+
+    public function update_screen(info: FullUpdate, cat: [CatInfo]) {
+        w_score.score = info.score;
+        w_score.prev_score = info.last-score;
+        if root.play_mode == 3 || info.seen {
+            root.info_level = 3
+        } else {
+            root.info_level = 0
+        }
+        w_cat1.update_cat(cat[0]);
+        w_cat2.update_cat(cat[1]);
+        w_cat3.update_cat(cat[2]);
+        root.num = info.num;
+        root.out_of = info.out_of;
+        flag.source = info.flag;
+    }
+
+    function prep_next(score: int) {
+        if score == 0 {
+            root.next(score);
+        } else {
+            w_score.score = score;
+            root.score_delayed = score;
+            root.info_level = 3;
+            timer.running = true;
+        }
+    }
+    timer := Timer {
+        interval: 200ms;
+        running: false;
+        triggered() => {
+            self.running = false;
+            root.next(root.score_delayed);
+        }
+    }
+
+    padding: 0;
+    VerticalLayout {
+        padding: 10px;
+        spacing: 10px;
+        height: 100%;
+
+        MainText {
+            horizontal-alignment: center;
+            vertical-alignment: center;
+            text: "\{root.num + 1} / \{root.out_of}";
+            height: 40px;
+        }
+
+        SwipeGestureHandler {
+            handle-swipe-right: root.num > 0;
+            handle-swipe-left: root.num < root.out_of - 1;
+            swiped => {
+                if self.current-position.x > self.pressed-position.x + self.width / 4 {
+                    prev();
+                } else if self.current-position.x < self.pressed-position.x - self.width / 4 {
+                    next(0);
+                }
+            }
+            HorizontalBox {
+                padding: 0;
+                flag := Image {
+                    height: root.height / 4;
+                    max-width: root.width;
+                    source: root.flag;
+                }
+            }
+        }
+
+        HorizontalBox {
+            padding: 10px;
+            alignment: center;
+            w_score := ThreeStartScore {
+                score_changed(score) => {
+                    prep_next(score)
+                }
+            }
+        }
+
+        w_cat1 := HiddenText {
+            play_mode: root.play_mode;
+            type: "Country:";
+            name: "Jamaica";
+            first_letter: "J";
+            show: root.info_level >= 1;
+            clicked => {
+                if root.info_level < 1 {
+                    root.info_level = 1;
+                    self.size_hint = 0;
+                }
+            }
+        }
+
+        w_cat2 := HiddenText {
+            play_mode: root.play_mode;
+            type: "Capital:";
+            name: "Kingston";
+            first_letter: "K";
+            show: root.info_level >= 2;
+            clicked => {
+                if root.info_level < 2 {
+                    root.info_level = 2;
+                    self.size_hint = 0;
+                    w_cat1.size_hint = 0;
+                }
+            }
+        }
+
+        w_cat3 := HiddenText {
+            play_mode: root.play_mode;
+            type: "Language:";
+            name: "English, Jamaican Patois";
+            first_letter: "E..., J...";
+            show: root.info_level > 2;
+            clicked => {
+                if root.info_level < 3 {
+                    root.info_level = 3;
+                    self.size_hint = 0;
+                    w_cat1.size_hint = 0;
+                    w_cat2.size_hint = 0;
+                }
+            }
+        }
+
+        Rectangle { } // spacing
+    }
+}

@@ -55,11 +55,11 @@
   - 3.1 Choice play settings
   - 3.2 Choice play
 - [x] Make current advanced config and make easy playing modes
+- [x] Harmonize Text
 
 ## Priority 
 - [ ] See how to catch back button on android (https://docs.rs/android-activity/latest/android_activity/input/enum.Keycode.html#variant.TvMediaContextMenu)
 - [ ] Dedicated button for more customizations
-- [ ] Harmonize Text
 - [ ] Remake back button
 
 ## Secondary

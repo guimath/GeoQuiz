@@ -1,6 +1,6 @@
-import { Button, VerticalBox, HorizontalBox, TextEdit, CheckBox, ComboBox} from "std-widgets.slint";
-import {MultiChoice, ThreeStartScore, MainText, HiddenText, ScrollChoice} from "widgets.slint";
-import {CatInfo, FullUpdate, Screen, FullInfo} from "structs.slint";
+import { Button } from "std-widgets.slint";
+import { TitleText } from "widgets.slint";
+import { CatInfo, FullUpdate, Screen, FullInfo } from "structs.slint";
 import { SelectLookUpScreen, LookUpScreen } from "screen-look-up.slint";
 import { SelectMainPlayScreen } from "screen-select-main-play.slint";
 import { MainPlayScreen } from "screen-main-play.slint";
@@ -122,11 +122,8 @@ export component AppWindow inherits Window {
             spacing: 10px;
             padding: 20px;
             // padding-left : root.width/10;
-            MainText {
+            TitleText {
                 text: "Geo Quiz";
-                font-size: 20pt;
-                horizontal-alignment: center;
-                vertical-alignment: center;
             }
             Rectangle {}
             Button{

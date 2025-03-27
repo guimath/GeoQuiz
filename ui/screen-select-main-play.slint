@@ -1,5 +1,5 @@
-import { Button, VerticalBox, HorizontalBox, TextEdit, CheckBox, ComboBox} from "std-widgets.slint";
-import {MultiChoice, MainText, ScrollChoice} from "widgets.slint";
+import { Button, VerticalBox, HorizontalBox } from "std-widgets.slint";
+import { MultiChoice, RegularText, TitleText, ScrollChoice } from "widgets.slint";
 
 export component SelectMainPlayScreen inherits Rectangle {
     callback play(play_mode:int, cat_choices:[int], order_normal:bool, hard:bool, im_choice:int);
@@ -26,11 +26,8 @@ export component SelectMainPlayScreen inherits Rectangle {
         //         clicked => {invoke_play()}
         //     }
         // }
-        Text{
+        TitleText{
             text: "Free Play";
-            height : 40px;
-            horizontal-alignment: center;
-            vertical-alignment: center;
         }
         
         Rectangle {
@@ -38,7 +35,7 @@ export component SelectMainPlayScreen inherits Rectangle {
             border-radius: 10px;
             VerticalBox {
                 padding: 10px;
-                Text {
+                RegularText {
                     text: "Difficulty";
                     horizontal-alignment: center;
                 }
@@ -57,7 +54,7 @@ export component SelectMainPlayScreen inherits Rectangle {
             border-radius: 10px;
             HorizontalBox {
                 padding: 10px;
-                Text {
+                RegularText {
                     text: "Country list includes:";
                     vertical-alignment: center;
                     horizontal-alignment: right;
@@ -80,7 +77,7 @@ export component SelectMainPlayScreen inherits Rectangle {
             border-radius: 10px;
             HorizontalBox {
                 padding: 10px;
-                Text {
+                RegularText {
                     text: "Start with:";
                     horizontal-alignment: right;
                     vertical-alignment: center;
@@ -103,7 +100,7 @@ export component SelectMainPlayScreen inherits Rectangle {
             background: white;
         }
 
-        Text {
+        TitleText {
             text: "Playing Categories";
             horizontal-alignment: center;
             vertical-alignment: center;

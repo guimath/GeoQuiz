@@ -1,6 +1,6 @@
-import { Button, VerticalBox, HorizontalBox, TextEdit, CheckBox, ComboBox} from "std-widgets.slint";
-import {CatInfo, FullUpdate, Screen, FullInfo} from "structs.slint";
-import {MultiChoice, ThreeStartScore, MainText, HiddenText, ScrollChoice} from "widgets.slint";
+import { HorizontalBox, VerticalBox } from "std-widgets.slint";
+import { CatInfo, FullUpdate } from "structs.slint";
+import { ThreeStartScore, TitleText, HiddenText } from "widgets.slint";
 
 export component MainPlayScreen inherits Rectangle {
     callback prev();
@@ -53,11 +53,8 @@ export component MainPlayScreen inherits Rectangle {
         spacing: 10px;
         height: 100%;
 
-        MainText {
-            horizontal-alignment: center;
-            vertical-alignment: center;
+        TitleText {
             text: "\{root.num + 1} / \{root.out_of}";
-            height: 40px;
         }
 
         SwipeGestureHandler {

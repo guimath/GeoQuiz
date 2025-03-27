@@ -1,6 +1,18 @@
-import { Button, VerticalBox, HorizontalBox, TextEdit, CheckBox, ComboBox, ScrollView} from "std-widgets.slint";
-import {CatInfo} from "structs.slint";
+import { Button, VerticalBox, HorizontalBox, TextEdit, CheckBox, ComboBox, ScrollView } from "std-widgets.slint";
+import { CatInfo } from "structs.slint";
 
+
+export component RegularText inherits Text {
+    // font-family: 
+    font-size: 12pt;
+    // color: white;
+}
+export component TitleText inherits Text {
+    font-size: 20pt;
+    height : 40px;
+    horizontal-alignment: center;
+    vertical-alignment: center;
+}
 
 export component ChoiceElem inherits TouchArea {
     in property <string> text;
@@ -16,7 +28,7 @@ export component ChoiceElem inherits TouchArea {
         border-radius: radius;
         background: root.background_elem;
     }
-    Text {
+    RegularText {
         height: 30pt;
         width:100%;
         horizontal-alignment: center;
@@ -100,11 +112,7 @@ export component ThreeStartScore {
         }
     }
 }
-export component MainText inherits Text {
-    // font-family: 
-    font-size: 14pt;
-    // color: white;
-}
+
 
 export component HiddenText inherits TouchArea {
     in-out property <string> name;
@@ -148,13 +156,13 @@ export component HiddenText inherits TouchArea {
                 padding: 0;
                 padding-left: 10px;
                 padding-right: 10px;
-                w_type := MainText {
+                w_type := RegularText {
                     horizontal-alignment: right;
                     vertical-alignment: center;
                     text: root.type;
                 }
                 Rectangle {width: 10px;}
-                MainText { 
+                RegularText { 
                     horizontal-stretch: 1;
                     vertical-stretch: 1;
                     height: 100%;

@@ -1,5 +1,5 @@
 import { ScrollView, LineEdit, HorizontalBox, VerticalBox } from "std-widgets.slint";
-import { ChoiceElem, MainText } from "widgets.slint";
+import { ChoiceElem, RegularText, TitleText } from "widgets.slint";
 import { FullInfo } from "structs.slint";
 
 export component SelectLookUpScreen inherits Rectangle {
@@ -10,11 +10,8 @@ export component SelectLookUpScreen inherits Rectangle {
     VerticalLayout {
         padding: 10px;
         spacing: 10px;
-        MainText {  
+        TitleText {  
             text: "Look Up";
-            height: 40px;
-            horizontal-alignment: center;
-            vertical-alignment: center;
         }
         LineEdit {
             placeholder-text: "Search";
@@ -75,7 +72,7 @@ export component LookUpScreen inherits Rectangle {
             width: root.width;
             alignment: center;
             Rectangle {}
-            MainText {
+            RegularText {
                 text: infos.name;
                 horizontal-alignment: center;
                 vertical-alignment: center;
@@ -99,7 +96,7 @@ export component LookUpScreen inherits Rectangle {
                         image-fit: contain;
                         source: image_infos.image;
                     }
-                    MainText {
+                    RegularText {
                         text: image_infos.title;
                         horizontal-alignment: center;
                         vertical-alignment: center;
@@ -110,11 +107,11 @@ export component LookUpScreen inherits Rectangle {
                 for text_infos[i] in infos.text-infos: Rectangle{
                     background: Math.mod(i,2) == 0 ? grey : #00000000;
                     HorizontalBox {
-                        MainText {
+                        RegularText {
                             text: "\{text_infos.title}:";
                             vertical-alignment: center;
                         }
-                        MainText {
+                        RegularText {
                             horizontal-stretch: 1;
                             text: text_infos.text;
                             wrap: word-wrap;

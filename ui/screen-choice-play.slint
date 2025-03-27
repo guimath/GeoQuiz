@@ -1,0 +1,123 @@
+import { Button, VerticalBox, HorizontalBox } from "std-widgets.slint";
+import { MultiChoice, RegularText, TitleText, ScrollChoice, ChoiceElem } from "widgets.slint";
+import { TxtOrImg, ChoiceState } from "structs.slint";
+
+export component ChoicePlayScreen inherits Rectangle {
+    callback prev();
+    callback next(guess_num:int);
+    property <image> info_img: @image-url("../data/flags/jam.svg");
+    property <string> info_txt:"Kingston";
+    property <bool> info_is_txt : true;
+    property <[string]> guesses_txt : ["Singapore", "Jamaica", "France", "Brazil"];
+    property <[image]> guesses_img : [@image-url("../data/outlines/jam.svg")];
+    property <bool> guess_is_txt : true;
+    property <int> correct_guess : 1;
+    property <int> guess_num : 0;
+    property <bool> found : false;
+    property <[ChoiceState]> states : [ChoiceState.NotClicked, ChoiceState.NotClicked, ChoiceState.NotClicked, ChoiceState.NotClicked];
+
+
+    public function update_screen(info: TxtOrImg, guess: [TxtOrImg], correct_guess:int, prev_guess:[int]) {
+        root.guess_num = prev_guess.length - 1;
+        root.found = prev_guess.length != 0;
+        if root.found {
+            if prev_guess.length> 0 {
+                states[prev_guess[0]] = prev_guess[0] == correct_guess ? ChoiceState.Correct : ChoiceState.Wrong; 
+            }
+            if prev_guess.length> 1 {
+                states[prev_guess[1]] = prev_guess[1] == correct_guess ? ChoiceState.Correct : ChoiceState.Wrong; 
+            }
+            if prev_guess.length> 2 {
+                states[prev_guess[2]] = prev_guess[2] == correct_guess ? ChoiceState.Correct : ChoiceState.Wrong; 
+            }
+            if prev_guess.length> 3 {
+                states[prev_guess[3]] = prev_guess[3] == correct_guess ? ChoiceState.Correct : ChoiceState.Wrong; 
+            }
+        }
+        root.info_is_txt = info.is_txt;
+        if root.info_is_txt {
+            root.info_txt = info.txt;
+        } else {
+            root.info_img = info.img;
+        }
+        root.guess_is_txt = guess[0].is_txt;
+        if root.guess_is_txt{
+            root.guesses_txt[0] = guess[0].txt;
+            root.guesses_txt[1] = guess[1].txt;
+            root.guesses_txt[2] = guess[2].txt;
+            root.guesses_txt[3] = guess[3].txt;
+        } else {
+            root.guesses_img[0] = guess[0].img;
+            root.guesses_img[1] = guess[1].img;
+            root.guesses_img[2] = guess[2].img;
+            root.guesses_img[3] = guess[3].img;
+        }
+        root.correct_guess = correct_guess;
+    }
+
+    function prep_next() {
+        timer.running = true;
+    }
+    timer := Timer {
+        interval: 200ms;
+        running: false;
+        triggered() => {
+            self.running = false;
+            root.next(root.guess_num);
+        }
+    }
+
+    VerticalLayout {
+        padding: 10px;
+        spacing: 10px;
+        TitleText {
+            text: "Multi Choice Play";
+        }
+        Rectangle {
+            height: root.height/3;
+            
+            TitleText {
+                visible: root.info_is_txt;
+                text:root.info_txt;
+                height: 100%;
+                width: 100%;
+            }
+            Image {
+                visible: !root.info_is_txt;
+                source: root.info_img;
+                height: 100%;
+                width: 100%;
+                image-fit: contain;
+            }
+        }
+        RegularText {
+            visible: root.found;
+            text: "Guess N°\{root.guess_num}";
+            horizontal-alignment: center;
+        }
+        Rectangle {
+            VerticalLayout {
+                visible: root.guess_is_txt;
+                padding: 0;
+                spacing: 10px;
+                for text[i] in root.guesses_txt : ChoiceElem {
+                    text: root.guesses_txt[i];
+                    clicked => {
+                        if root.found {
+                            return;
+                        }
+                        root.guess_num += 1;
+                        if i == root.correct_guess {
+                            self.state = ChoiceState.Correct;
+                            root.found = true;
+                            prep_next();
+                        } else {
+                            self.state = ChoiceState.Wrong;
+                        }
+                    }
+                }
+            }
+        }
+        Rectangle{}
+    }
+}

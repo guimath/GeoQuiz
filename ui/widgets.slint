@@ -1,5 +1,5 @@
 import { Button, VerticalBox, HorizontalBox, TextEdit, CheckBox, ComboBox, ScrollView } from "std-widgets.slint";
-import { CatInfo } from "structs.slint";
+import { CatInfo, ChoiceState} from "structs.slint";
 
 
 export component RegularText inherits Text {
@@ -16,7 +16,11 @@ export component TitleText inherits Text {
 
 export component ChoiceElem inherits TouchArea {
     in property <string> text;
-    in property <color> background_elem: #ffffff3c;
+    in property <ChoiceState> state : ChoiceState.NotClicked;
+    in property <color> background_elem: 
+        root.state == ChoiceState.NotClicked?  #ffffff3c:
+        root.state == ChoiceState.Correct?  #146d00:
+        #9a0000;
     in property <length> radius: 10px;
     public function click() {
         root.clicked();

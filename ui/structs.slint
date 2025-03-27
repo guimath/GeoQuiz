@@ -37,3 +37,14 @@ export enum Screen {
     SelectChoicePlay,
     ChoicePlay,
 }
+
+export enum ChoiceState {
+    NotClicked,
+    Correct,
+    Wrong,
+}
+export struct TxtOrImg {
+    is_txt: bool,
+    txt: string,
+    img: image,
+}

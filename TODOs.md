@@ -61,17 +61,27 @@
 ## Priority 
 - [ ] See how to catch back button on android (https://docs.rs/android-activity/latest/android_activity/input/enum.Keycode.html#variant.TvMediaContextMenu)
 - [ ] Dedicated button for more customizations
+- [ ] move order and independent to start screen;
+- [ ] Add a 4 choice game mode
+  - [x] Screens
+  - [ ] memoise what has been selected (right/wrong)
+  - [ ] add swipe and hotkey
+  - [ ] add images grid
+  - [ ] code backend (hashmap for memoisation?)
+  - [ ] Add country name if not in selected infos once found
 
 ## Secondary
 - [ ] Add a Readme & LICENSE & Publish
 - [ ] Make proper icon
-- [ ] Add a 4 choice game mode
 - [ ] Animate (WIP)
   - [ ] Better scrolling on categories : maybe use timer to snap to center? 
   - [ ] Animate between screens? 
+
 
 ## Ideas to discuss
 - [ ] Give number of words in hints like for UK: U... ...  and better hints
 - [ ] Score specific for categories chosen ? (-> maybe have a score selection ie multiple scores named by users for different infos)
 - [ ] Add a way to add more infos ? (-> three already a lot IMO)
-- [ ] What other infos could be added ? (Population, Position on a map, )
+- [ ] What other infos could be added 
+  - [ ] Population
+  - [ ] Position on a map (show continent, highlight & circle if small)

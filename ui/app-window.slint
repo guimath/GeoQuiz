@@ -44,16 +44,6 @@ export component AppWindow inherits Window {
         root.screen = Screen.MainPlay;
     }
 
-    // function prep_start_play() {
-    //     main_play_s.play_mode = w_play_mode.choice_num;
-    //     root.start_play(
-    //         [cat1.choice_num, cat2.choice_num, cat3.choice_num], 
-    //         w_order.not_default, 
-    //         w_hard.not_default, 
-    //         cat_im.choice_num);
-    //     root.screen = Screen.CutomPlay;
-    // }
-
     public function back() {
         if root.screen == Screen.MainPlay {
             root.screen = Screen.SelectMainPlay;
@@ -86,28 +76,21 @@ export component AppWindow inherits Window {
     forward-focus: my-key-handler;
     my-key-handler := FocusScope {
         key-pressed(event) => {
-            if root.screen == Screen.SelectMainPlay {
-                if event.text == Key.Space {
-                    sel_main_play_s.invoke_play()
-                }
-                return accept;
-            }
             if event.text == Key.Escape && !event.repeat {
                 root.close();
-            } else if event.text == Key.LeftArrow {
-                root.prev();
-            } else if event.text == Key.RightArrow {
-                next(0);
-            }
-           
+            } 
             if event.text == Key.Space && !event.repeat {
                 main_play_s.info_level += 1;
             }
-            if event.text == Key.Space && event.modifiers.control {
-                main_play_s.info_level = 3;
-            }
             if event.text == "b" {
                 back();
+            }
+            if root.screen == Screen.MainPlay {
+                if event.text == Key.LeftArrow {
+                    root.prev();
+                } else if event.text == Key.RightArrow {
+                    next(0);
+                }
             }
             accept
         }
@@ -145,6 +128,7 @@ export component AppWindow inherits Window {
                 horizontal-alignment: center;
                 vertical-alignment: center;
             }
+            Rectangle {}
             Button{
                 height: root.height/6;
                 text: "Free Play";

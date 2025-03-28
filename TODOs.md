@@ -68,11 +68,11 @@
   - [x] add guess num count and score according
   - [x] Add country name if not in selected infos once found
 - [x] Re shuffle between attempts
+- [x] Catch score parse error and use reset score instead;
 
 ## Priority 
 - [ ] See how to catch back button on android (https://docs.rs/android-activity/latest/android_activity/input/enum.Keycode.html#variant.TvMediaContextMenu)
 - [ ] Dedicated button for more customizations
-- [ ] Catch score parse error and use reset score instead;
 
 ## Secondary
 - [ ] Add a Readme & LICENSE & Publish

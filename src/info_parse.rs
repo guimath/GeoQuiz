@@ -37,21 +37,23 @@ pub fn read(all_countries: &Vec<CountryInfos>, score_path: PathBuf) -> HashMap<S
     if score_path.exists() {
         let mut file = File::open(score_path).unwrap();
         let mut file_content = String::new();
-        file.read_to_string(&mut file_content)
-            .expect("File read failed");
-        serde_json::from_str(&file_content).unwrap()
-    } else {
-        all_countries
-            .iter()
-            .map(|country| {
-                (
-                    country.cca3.clone(),
-                    Score::default(),
-                )
-            })
-            .collect()
+        file.read_to_string(&mut file_content).unwrap();
+        
+        if let Ok(score) = serde_json::from_str(&file_content){
+            return score;
+        }
     }
+    all_countries
+        .iter()
+        .map(|country| {
+            (
+                country.cca3.clone(),
+                Score::default(),
+            )
+        })
+        .collect()
 }
+
 pub fn save(scores: &HashMap<String, Score>, score_path: PathBuf) {
     let json_data = serde_json::to_string(scores).unwrap();
     let mut file = File::create(score_path).unwrap();

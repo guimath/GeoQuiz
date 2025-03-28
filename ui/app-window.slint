@@ -1,6 +1,6 @@
 import { Button, HorizontalBox } from "std-widgets.slint";
 import { TitleText, RegularText, MultiChoice } from "widgets.slint";
-import { CatInfo, MainPlayUpdate, Screen, FullInfo } from "structs.slint";
+import { CatInfo, MainPlayUpdate, Screen, FullInfo, ChoicePlayUpdate } from "structs.slint";
 import { SelectLookUpScreen, LookUpScreen } from "screen-look-up.slint";
 import { SelectMainPlayScreen } from "screen-select-main-play.slint";
 import { MainPlayScreen } from "screen-main-play.slint";
@@ -72,6 +72,10 @@ export component AppWindow inherits Window {
         main_play_s.update_screen(info, cat);
     }
 
+    public function update_choice(info : ChoicePlayUpdate) {
+        choice_play_s.update_screen(info);
+    }
+
     forward-focus: my-key-handler;
     my-key-handler := FocusScope {
         key-pressed(event) => {
@@ -93,9 +97,9 @@ export component AppWindow inherits Window {
             }
             if root.screen == Screen.ChoicePlay {
                 if event.text == Key.LeftArrow {
-                    root.prev();
+                    choice_play_s.collect_changed(false);
                 } else if event.text == Key.RightArrow {
-                    next(0);
+                    choice_play_s.collect_changed(true);
                 }
             }
             accept
@@ -253,7 +257,7 @@ export component AppWindow inherits Window {
                 info_type, 
                 guess_type
             );
-            root.screen = Screen.MainPlay;
+            root.screen = Screen.ChoicePlay;
         }
         
     }

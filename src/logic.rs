@@ -1,6 +1,7 @@
 use rand::seq::SliceRandom;
 use rand::thread_rng;
-use slint::{Image, Model, ModelRc, SharedString, VecModel};
+use rand::prelude::IteratorRandom;
+use slint::{Image, ModelRc, SharedString, VecModel};
 
 use std::collections::HashMap;
 use std::{cmp::Ordering, path::PathBuf};
@@ -38,6 +39,10 @@ fn to_txt_idx(i: usize) -> usize {
     i - NUM_IMG_TYPE
 }
 
+fn load_img(raw_data: &String) -> Image {
+    Image::load_from_svg_data(raw_data.as_bytes()).unwrap()
+}
+
 #[derive(Default)]
 pub struct AppLogic {
     current: usize,
@@ -49,9 +54,12 @@ pub struct AppLogic {
     search_names: Vec<String>,
     main_info_type: usize,
     main_guess_types: [usize; 3],
+    choice_prev_guesses: HashMap<usize,ModelRc<bool>>,
+    choice_index_guesses: HashMap<usize, [usize;4]>,
     choice_info_type: usize,
     choice_guess_type: usize,
     score_path: PathBuf,
+    
 }
 
 impl AppLogic {
@@ -113,11 +121,6 @@ impl AppLogic {
         self.main_info_type = info_type;
     }
 
-    pub fn prepare_choice_play(&mut self, info_type: usize, guess_type: usize) {
-        self.choice_guess_type = guess_type;
-        self.choice_info_type = info_type;
-    }
-
     pub fn next(&mut self, result: u32) -> Option<(MainPlayUpdate, [CatInfo; 3])> {
         if result != 0 {
             let score = self
@@ -168,8 +171,7 @@ impl AppLogic {
                 .clone()
                 .into();
         } else {
-            info.img =
-                Image::load_from_svg_data(country.images[self.main_info_type].as_bytes()).unwrap();
+            info.img = load_img(&country.images[self.main_info_type]);
         }
 
         let update = MainPlayUpdate {
@@ -196,6 +198,95 @@ impl AppLogic {
         (update, infos)
     }
 
+
+    pub fn prepare_choice_play(&mut self, info_type: usize, guess_type: usize) {
+        self.choice_guess_type = guess_type;
+        self.choice_info_type = info_type;
+
+    }
+
+    pub fn choice_changed(&mut self, was_guessed: ModelRc<bool>, next:bool) -> Option<ChoicePlayUpdate> {
+        self.choice_prev_guesses.insert(self.current, was_guessed);
+        if next {
+            if self.current < self.all_countries.len() {
+                self.current += 1;
+            } else {
+                return None;
+            }
+        } else {
+            if self.current > 0 {
+                self.current -= 1;
+            } else {
+                return None;
+            }
+        }
+        Some(self.get_choices())
+    }
+    
+    pub fn get_choices(&mut self) -> ChoicePlayUpdate {
+        let mut info = TxtOrImg { img: Image::default(), is_txt: is_info_txt(self.choice_info_type), txt: SharedString::default()};
+        let mut guesses = vec![
+            TxtOrImg { img: Image::default(), is_txt: is_info_txt(self.choice_guess_type), txt: SharedString::default()},
+            TxtOrImg { img: Image::default(), is_txt: is_info_txt(self.choice_guess_type), txt: SharedString::default()},
+            TxtOrImg { img: Image::default(), is_txt: is_info_txt(self.choice_guess_type), txt: SharedString::default()},
+            TxtOrImg { img: Image::default(), is_txt: is_info_txt(self.choice_guess_type), txt: SharedString::default()},
+        ];
+        let prev_guess = match self.choice_prev_guesses.get(&self.current) {
+            Some(v) => v.clone(),
+            None => {
+                let d: [bool; 4]=  [false; 4];
+                VecModel::from_slice(&d)
+            }
+        };
+        let guess_idx = match self.choice_index_guesses.get(&self.current) {
+            Some(v) => v.clone(),
+            None => {
+                let mut rng = rand::thread_rng();
+                let mut random_elements: Vec<usize> = (0usize..self.all_countries.len())
+                    .choose_multiple(&mut rng, 6);
+                let target = self.current as i32; 
+                random_elements = random_elements
+                    .into_iter()
+                    .filter(|x| {
+                    (*x as i32) < (target - 1) || (*x as i32) > (target + 1)
+                }).collect();
+                random_elements = vec![random_elements[0], random_elements[1], random_elements[2]];
+                random_elements.push(self.current);
+                random_elements.shuffle(&mut rng);
+                let v = [random_elements[0], random_elements[1], random_elements[2], random_elements[3]];
+                self.choice_index_guesses.insert(self.current, v);
+                v
+            }
+        };
+        let correct_guess = guess_idx.iter().position(|x| *x == self.current).unwrap();
+        let country = self.all_countries[self.current].clone();
+        if info.is_txt {
+            info.txt = country.infos[to_txt_idx(self.choice_info_type)].full.clone().into();
+        } else {
+            info.img = load_img(&country.images[self.choice_info_type]);
+        }
+        if guesses[0].is_txt {
+            let idx = to_txt_idx(self.choice_guess_type); 
+            for i in 0..4 {
+                guesses[i].txt = self.all_countries[guess_idx[i]].infos[idx].full.clone().into();
+            }
+        } else {
+            let idx = self.choice_guess_type; 
+            for i in 0..4 {
+                guesses[i].img = load_img(&self.all_countries[guess_idx[i]].images[idx]);
+            }
+        }
+        ChoicePlayUpdate { 
+            correct_guess: correct_guess as i32, 
+            guess_num: 0, 
+            guesses: VecModel::from_slice(&guesses), 
+            info: info, 
+            num: self.current as i32, 
+            out_of: self.all_countries.len() as i32, 
+            prev_guess: prev_guess.clone()
+        }
+    }
+
     pub fn search_changed(&self, s: String) -> Vec<bool> {
         let s = s.to_lowercase();
         let search = s.as_str();
@@ -220,7 +311,7 @@ impl AppLogic {
             } else {
                 image_infos.push(ImageWithTitle {
                     title: CATEGORIES[i].into(),
-                    image: Image::load_from_svg_data(country.images[i].as_bytes()).unwrap(),
+                    image: load_img(&country.images[i]),
                 });
             }
         }

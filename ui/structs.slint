@@ -50,3 +50,13 @@ export struct MainPlayUpdate  {
     info: TxtOrImg,
     seen: bool, 
 }
+
+export struct ChoicePlayUpdate  {
+    num: int,
+    out_of: int,
+    info: TxtOrImg,
+    guesses: [TxtOrImg],
+    correct_guess: int,
+    prev_guess: [bool],
+    guess_num: int, 
+}

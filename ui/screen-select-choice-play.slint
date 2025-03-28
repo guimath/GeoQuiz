@@ -18,7 +18,7 @@ export component SelectChoicePlayScreen inherits Rectangle {
             padding: 0;
             Button {
                 text: "Play";
-                clicked => {}
+                clicked => {invoke_play()}
                 width: root.width/2;
             }
         }
@@ -41,7 +41,7 @@ export component SelectChoicePlayScreen inherits Rectangle {
             width: 100%;
             choices: root.info_types  ;
             width_per_elem: root.width/5;
-            choice_num: 0;
+            choice_num: 2;
             spacing: 5pt;
         }
         Rectangle {}

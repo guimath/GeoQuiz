@@ -1,6 +1,6 @@
 import { Button, VerticalBox, HorizontalBox } from "std-widgets.slint";
 import { MultiChoice, RegularText, TitleText, ScrollChoice, ChoiceElem, SwipeInfo, ImageChoice} from "widgets.slint";
-import { TxtOrImg, ChoiceState } from "structs.slint";
+import { TxtOrImg, ChoiceState, ChoicePlayUpdate } from "structs.slint";
 
 export component ChoicePlayScreen inherits Rectangle {
     callback changed(was_guessed:[bool], next:bool);
@@ -37,25 +37,25 @@ export component ChoicePlayScreen inherits Rectangle {
     property <[ChoiceState]> guess_states : [ChoiceState.NotClicked, ChoiceState.NotClicked, ChoiceState.NotClicked, ChoiceState.NotClicked];
 
 
-    public function update_screen(info: TxtOrImg, guess: [TxtOrImg], correct_guess:int, prev_guess:[bool], guess_num:int) {
-        root.guess_num = guess_num;
-        root.found = prev_guess[correct_guess];
-        guess_states[0] = prev_guess[0] ? ChoiceState.Wrong : ChoiceState.NotClicked;
-        guess_states[1] = prev_guess[1] ? ChoiceState.Wrong : ChoiceState.NotClicked;
-        guess_states[2] = prev_guess[2] ? ChoiceState.Wrong : ChoiceState.NotClicked;
-        guess_states[3] = prev_guess[3] ? ChoiceState.Wrong : ChoiceState.NotClicked;
+    public function update_screen(info : ChoicePlayUpdate) {
+        root.guess_num = info.guess_num;
+        root.found = info.prev_guess[info.correct_guess];
+        guess_states[0] = info.prev_guess[0] ? ChoiceState.Wrong : ChoiceState.NotClicked;
+        guess_states[1] = info.prev_guess[1] ? ChoiceState.Wrong : ChoiceState.NotClicked;
+        guess_states[2] = info.prev_guess[2] ? ChoiceState.Wrong : ChoiceState.NotClicked;
+        guess_states[3] = info.prev_guess[3] ? ChoiceState.Wrong : ChoiceState.NotClicked;
         if root.found {
-            guess_states[guess_num] = ChoiceState.Correct;
+            guess_states[info.correct_guess] = ChoiceState.Correct;
         }
-        root.info = info;
-        root.guesses = guess;
-        root.correct_guess = correct_guess;
+        root.info = info.info;
+        root.guesses = info.guesses;
+        root.correct_guess = info.correct_guess;
     }
 
     function prep_next() {
         timer.running = true;
     }
-    function collect_next(next:bool) {
+    public function collect_changed(next:bool) {
         root.changed([
             !(root.guess_states[0]==ChoiceState.NotClicked),
             !(root.guess_states[1]==ChoiceState.NotClicked),
@@ -68,7 +68,7 @@ export component ChoicePlayScreen inherits Rectangle {
         running: false;
         triggered() => {
             self.running = false;
-            collect_next(true);
+            collect_changed(true);
         }
     }
 
@@ -83,8 +83,8 @@ export component ChoicePlayScreen inherits Rectangle {
             // handle-swipe-right: root.num > 0;
             // handle-swipe-left: root.num < root.out_of - 1;
             height: root.height / 4;
-            prev => {collect_next(false)}
-            next => {collect_next(true)}
+            prev => {collect_changed(false)}
+            next => {collect_changed(true)}
         }
        
         RegularText {

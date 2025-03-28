@@ -69,7 +69,8 @@
   - [x] memoise what has been selected (right/wrong)
   - [x] add swipe and hotkey
   - [x] add images grid
-  - [ ] code backend (hashmap for memoisation?)
+  - [x] code backend (hashmap for memoisation?)
+  - [ ] add guess num count and score according
   - [ ] Add country name if not in selected infos once found
 
 ## Secondary

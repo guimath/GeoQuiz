@@ -68,6 +68,7 @@ fn init(path: PathBuf) -> Result<(), Box<dyn Error>> {
             logic.set_config(easy_first, hard_mode);
         }
     });
+    //  MAIN PLAY
     ui.on_start_play({
         let ui_handle = ui.as_weak();
         let logic_ref = logic.clone();
@@ -105,6 +106,34 @@ fn init(path: PathBuf) -> Result<(), Box<dyn Error>> {
             }
         }
     });
+    
+    //  CHOICE PLAY
+    ui.on_choice_start_play({
+        let ui_handle = ui.as_weak();
+        let logic_ref = logic.clone();
+        move |info_type, guess_type| {
+            let ui = ui_handle.unwrap();
+            let mut logic = logic_ref.lock().unwrap();
+            logic.prepare_choice_play(info_type as usize, guess_type as usize);
+            ui.invoke_update_choice(logic.get_choices());
+        }
+    });
+    ui.on_choice_changed({
+        let ui_handle = ui.as_weak();
+        let logic_ref = logic.clone();
+        move |guesses, next| {
+            let ui = ui_handle.unwrap();
+            let mut logic = logic_ref.lock().unwrap();
+            // let down_ref: &VecModel<bool> = guesses.as_any().downcast_ref().unwrap();
+            // let v: Vec<bool> = down_ref.iter().collect();    
+            if let Some(info) = logic.choice_changed(guesses, next) {
+                ui.invoke_update_choice(info);
+            }
+        }
+    });
+
+
+
     ui.on_close({
         let logic_ref = logic.clone();
         move || {

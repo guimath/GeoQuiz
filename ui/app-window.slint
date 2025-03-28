@@ -4,6 +4,8 @@ import { CatInfo, MainPlayUpdate, Screen, FullInfo } from "structs.slint";
 import { SelectLookUpScreen, LookUpScreen } from "screen-look-up.slint";
 import { SelectMainPlayScreen } from "screen-select-main-play.slint";
 import { MainPlayScreen } from "screen-main-play.slint";
+import { SelectChoicePlayScreen } from "screen-select-choice-play.slint";
+import { ChoicePlayScreen } from "screen-choice-play.slint";
 
 export component AppWindow inherits Window {
     title: "Geo quiz";
@@ -29,9 +31,13 @@ export component AppWindow inherits Window {
     callback reset_score();
     callback save_score();
     callback prep_look_up();
+    // main 
     callback next(int);
     callback prev();
     callback start_play([int], int);
+    // choice
+    callback choice_start_play(int, int);
+    callback choice_changed([bool], bool);
 
     // ***************************************************************** //
     //                            UI LOGIC
@@ -79,6 +85,13 @@ export component AppWindow inherits Window {
                 back();
             }
             if root.screen == Screen.MainPlay {
+                if event.text == Key.LeftArrow {
+                    root.prev();
+                } else if event.text == Key.RightArrow {
+                    next(0);
+                }
+            }
+            if root.screen == Screen.ChoicePlay {
                 if event.text == Key.LeftArrow {
                     root.prev();
                 } else if event.text == Key.RightArrow {
@@ -230,5 +243,22 @@ export component AppWindow inherits Window {
         visible: root.screen == Screen.MainPlay;
         next(score) => {next(score)}
         prev() => {prev()}
+    }
+
+    sel_choice_play_s := SelectChoicePlayScreen {
+        visible: root.screen == Screen.SelectChoicePlay;
+        info_types: root.all_categories_name;
+        play(info_type, guess_type) => {
+            choice_start_play(
+                info_type, 
+                guess_type
+            );
+            root.screen = Screen.MainPlay;
+        }
+        
+    }
+    choice_play_s := ChoicePlayScreen {
+        visible: root.screen == Screen.ChoicePlay;
+        changed(was_guessed, next) => {choice_changed(was_guessed, next)}
     }
 }

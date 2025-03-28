@@ -301,3 +301,31 @@ export component SwipeInfo inherits SwipeGestureHandler {
         }
     }
 }
+
+
+export component ImageChoice inherits TouchArea {
+    in property <image> image;
+    in property <ChoiceState> state : ChoiceState.NotClicked;
+    in property <color> background_elem: 
+        root.state == ChoiceState.NotClicked?  #ffffff3c:
+        root.state == ChoiceState.Correct?  #146d00:
+        #9a0000;
+    in property <length> radius: 10px;
+   
+    height: 30pt;
+    Rectangle {
+        // width: 100%;
+        // height: 100%;
+        border-radius: radius;
+        background: root.background_elem;
+    }
+    HorizontalBox {
+        padding: 10px;
+        Image {
+            // height: 100%;
+            // width: root.width - 20px;
+            source: root.image;
+            image-fit: contain;
+        }
+    }
+}

@@ -1,16 +1,36 @@
 import { Button, VerticalBox, HorizontalBox } from "std-widgets.slint";
-import { MultiChoice, RegularText, TitleText, ScrollChoice, ChoiceElem } from "widgets.slint";
+import { MultiChoice, RegularText, TitleText, ScrollChoice, ChoiceElem, SwipeInfo, ImageChoice} from "widgets.slint";
 import { TxtOrImg, ChoiceState } from "structs.slint";
 
 export component ChoicePlayScreen inherits Rectangle {
-    callback prev();
-    callback next(was_guessed:[bool]);
-    property <image> info_img: @image-url("../data/flags/jam.svg");
-    property <string> info_txt:"Kingston";
-    property <bool> info_is_txt : true;
-    property <[string]> guesses_txt : ["Singapore", "Jamaica", "France", "Brazil"];
-    property <[image]> guesses_img : [@image-url("../data/outlines/jam.svg")];
-    property <bool> guess_is_txt : true;
+    callback changed(was_guessed:[bool], next:bool);
+    property <TxtOrImg> info: {
+        is_txt: false,
+        txt: "Kingston",
+        img: @image-url("../data/flags/jam.svg"),
+    };
+    property <[TxtOrImg]> guesses : [
+        {
+            is_txt : false,
+            txt: "Singapore", 
+            img: @image-url("../data/flags/fra.svg")
+        },
+        {
+            is_txt : true,
+            txt: "Jamaica", 
+            img: @image-url("../data/flags/jam.svg")
+        },
+        {
+            is_txt : true,
+            txt: "France", 
+            img: @image-url("../data/flags/fra.svg")
+        },
+        {
+            is_txt : true,
+            txt: "Brazil", 
+            img: @image-url("../data/flags/fra.svg")
+        },
+    ];
     property <int> correct_guess : 1;
     property <int> guess_num : 0;
     property <bool> found : false;
@@ -19,49 +39,36 @@ export component ChoicePlayScreen inherits Rectangle {
 
     public function update_screen(info: TxtOrImg, guess: [TxtOrImg], correct_guess:int, prev_guess:[bool], guess_num:int) {
         root.guess_num = guess_num;
-        root.found = guess_num != 0;
+        root.found = prev_guess[correct_guess];
+        guess_states[0] = prev_guess[0] ? ChoiceState.Wrong : ChoiceState.NotClicked;
+        guess_states[1] = prev_guess[1] ? ChoiceState.Wrong : ChoiceState.NotClicked;
+        guess_states[2] = prev_guess[2] ? ChoiceState.Wrong : ChoiceState.NotClicked;
+        guess_states[3] = prev_guess[3] ? ChoiceState.Wrong : ChoiceState.NotClicked;
         if root.found {
-            guess_states[0] = prev_guess[0] ? ChoiceState.Wrong : ChoiceState.NotClicked;
-            guess_states[1] = prev_guess[1] ? ChoiceState.Wrong : ChoiceState.NotClicked;
-            guess_states[2] = prev_guess[2] ? ChoiceState.Wrong : ChoiceState.NotClicked;
-            guess_states[3] = prev_guess[3] ? ChoiceState.Wrong : ChoiceState.NotClicked;
             guess_states[guess_num] = ChoiceState.Correct;
         }
-        root.info_is_txt = info.is_txt;
-        if root.info_is_txt {
-            root.info_txt = info.txt;
-        } else {
-            root.info_img = info.img;
-        }
-        root.guess_is_txt = guess[0].is_txt;
-        if root.guess_is_txt{
-            root.guesses_txt[0] = guess[0].txt;
-            root.guesses_txt[1] = guess[1].txt;
-            root.guesses_txt[2] = guess[2].txt;
-            root.guesses_txt[3] = guess[3].txt;
-        } else {
-            root.guesses_img[0] = guess[0].img;
-            root.guesses_img[1] = guess[1].img;
-            root.guesses_img[2] = guess[2].img;
-            root.guesses_img[3] = guess[3].img;
-        }
+        root.info = info;
+        root.guesses = guess;
         root.correct_guess = correct_guess;
     }
 
     function prep_next() {
         timer.running = true;
     }
+    function collect_next(next:bool) {
+        root.changed([
+            !(root.guess_states[0]==ChoiceState.NotClicked),
+            !(root.guess_states[1]==ChoiceState.NotClicked),
+            !(root.guess_states[2]==ChoiceState.NotClicked),
+            !(root.guess_states[3]==ChoiceState.NotClicked),
+        ], next);
+    }
     timer := Timer {
         interval: 200ms;
         running: false;
         triggered() => {
             self.running = false;
-            root.next([
-                !(root.guess_states[0]==ChoiceState.NotClicked),
-                !(root.guess_states[1]==ChoiceState.NotClicked),
-                !(root.guess_states[2]==ChoiceState.NotClicked),
-                !(root.guess_states[3]==ChoiceState.NotClicked),
-            ]);
+            collect_next(true);
         }
     }
 
@@ -71,23 +78,15 @@ export component ChoicePlayScreen inherits Rectangle {
         TitleText {
             text: "Multi Choice Play";
         }
-        Rectangle {
-            height: root.height/3;
-            
-            TitleText {
-                visible: root.info_is_txt;
-                text:root.info_txt;
-                height: 100%;
-                width: 100%;
-            }
-            Image {
-                visible: !root.info_is_txt;
-                source: root.info_img;
-                height: 100%;
-                width: 100%;
-                image-fit: contain;
-            }
+        SwipeInfo {
+            info : root.info;
+            // handle-swipe-right: root.num > 0;
+            // handle-swipe-left: root.num < root.out_of - 1;
+            height: root.height / 4;
+            prev => {collect_next(false)}
+            next => {collect_next(true)}
         }
+       
         RegularText {
             visible: root.found;
             text: "Guess N°\{root.guess_num}";
@@ -95,27 +94,56 @@ export component ChoicePlayScreen inherits Rectangle {
         }
         Rectangle {
             VerticalLayout {
-                visible: root.guess_is_txt;
+                visible: root.guesses[0].is_txt;
                 padding: 0;
                 spacing: 10px;
-                for text[i] in root.guesses_txt : ChoiceElem {
-                    text: root.guesses_txt[i];
+                for text[i] in root.guesses : ChoiceElem {
+                    text: root.guesses[i].txt;
+                    state: guess_states[i];
                     clicked => {
                         if root.found {
                             return;
                         }
                         root.guess_num += 1;
                         if i == root.correct_guess {
-                            self.state = ChoiceState.Correct;
+                            root.guess_states[i] = ChoiceState.Correct;
                             root.found = true;
                             prep_next();
                         } else {
-                            self.state = ChoiceState.Wrong;
+                            root.guess_states[i] = ChoiceState.Wrong;
+                        }
+                    }
+                }
+            }
+            Rectangle {
+                // grid layout doesn't support for loops so I made my own
+                visible: !root.guesses[0].is_txt;
+                padding: 0;
+                for t[i] in root.guesses : ImageChoice {
+                    state: guess_states[i];
+                    height: root.height /4;
+                    width: (root.width - 30px)/2; 
+                    x: i==0 || i == 2 ? 0: self.width + 10px;
+                    y: i==0 || i == 1 ? 0: self.height + 10px;
+                    image : root.guesses[i].img;
+                    clicked => {
+                        if root.found || root.guess_states[i] != ChoiceState.NotClicked{
+                            return;
+                        }
+                        root.guess_num += 1;
+                        if i == root.correct_guess {
+                            root.guess_states[i] = ChoiceState.Correct;
+                            root.found = true;
+                            prep_next();
+                        } else {
+                            root.guess_states[i] = ChoiceState.Wrong;
                         }
                     }
                 }
             }
         }
-        Rectangle{}
+        Rectangle{
+
+        }
     }
 }

@@ -67,8 +67,8 @@
 - [ ] Add a 4 choice game mode
   - [x] Screens
   - [x] memoise what has been selected (right/wrong)
-  - [ ] add swipe and hotkey
-  - [ ] add images grid
+  - [x] add swipe and hotkey
+  - [x] add images grid
   - [ ] code backend (hashmap for memoisation?)
   - [ ] Add country name if not in selected infos once found
 

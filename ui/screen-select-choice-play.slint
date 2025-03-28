@@ -7,7 +7,6 @@ export component SelectChoicePlayScreen inherits Rectangle {
         play(info_cat.choice_num, guess_cat.choice_num);
     }
     in property <[string]> info_types: ["Flag", "Outline", "Country", "Capital", "Languages", "Borders", "Region", "Currencies"];
-    in property <[string]> info_types_text: ["Country", "Capital", "Languages", "Borders", "Region", "Currencies"];
     VerticalLayout {
 
         TitleText{
@@ -40,7 +39,7 @@ export component SelectChoicePlayScreen inherits Rectangle {
         }
         guess_cat := ScrollChoice {
             width: 100%;
-            choices: root.info_types_text  ;
+            choices: root.info_types  ;
             width_per_elem: root.width/5;
             choice_num: 0;
             spacing: 5pt;

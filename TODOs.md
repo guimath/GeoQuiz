@@ -57,11 +57,12 @@
 - [x] Make current advanced config and make easy playing modes
 - [x] Harmonize Text
 - [x] Remake back button
+- [x] move order and independent to start screen;
 
 ## Priority 
 - [ ] See how to catch back button on android (https://docs.rs/android-activity/latest/android_activity/input/enum.Keycode.html#variant.TvMediaContextMenu)
 - [ ] Dedicated button for more customizations
-- [ ] move order and independent to start screen;
+- [ ] Catch score parse error and use reset score instead;
 - [ ] Add a 4 choice game mode
   - [x] Screens
   - [x] memoise what has been selected (right/wrong)

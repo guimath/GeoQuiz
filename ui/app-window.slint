@@ -1,5 +1,5 @@
-import { Button } from "std-widgets.slint";
-import { TitleText } from "widgets.slint";
+import { Button, HorizontalBox } from "std-widgets.slint";
+import { TitleText, RegularText, MultiChoice } from "widgets.slint";
 import { CatInfo, FullUpdate, Screen, FullInfo } from "structs.slint";
 import { SelectLookUpScreen, LookUpScreen } from "screen-look-up.slint";
 import { SelectMainPlayScreen } from "screen-select-main-play.slint";
@@ -22,27 +22,18 @@ export component AppWindow inherits Window {
     // ***************************************************************** //
     callback look_up_search_changed(search: string);
     callback look_up_selected(num: int);
+    callback set_play_config(easy_first:bool, hard_mode:bool);
     callback close();
     callback reset_score();
     callback save_score();
     callback prep_look_up();
     callback next(int);
     callback prev();
-    callback start_play([int], bool, bool, int);
+    callback start_play([int], int);
 
     // ***************************************************************** //
     //                            UI LOGIC
     // ***************************************************************** //
-    function prep_start_play(play_mode:int, cat_choices:[int], order_normal:bool, hard:bool, im_choice:int) {
-        main_play_s.play_mode = play_mode;
-        root.start_play(
-            cat_choices, 
-            order_normal, 
-            hard, 
-            im_choice
-        );
-        root.screen = Screen.MainPlay;
-    }
 
     public function back() {
         if root.screen == Screen.MainPlay {
@@ -126,15 +117,66 @@ export component AppWindow inherits Window {
                 text: "Geo Quiz";
             }
             Rectangle {}
+            Rectangle {
+                background: #4a4458ff;
+                border-radius: 10px;
+                HorizontalBox {
+                    padding: 10px;
+                    RegularText {
+                        text: "Country list includes:";
+                        vertical-alignment: center;
+                        horizontal-alignment: right;
+                        wrap: word-wrap;
+                    }
+    
+                    w_hard := MultiChoice {
+                        width: 70%;
+                        choices: ["Independent countries only", "All territories"];
+                        choices_len: 2;
+                        width_per_elem: 40%;
+                        spacing: 20pt;
+                    }
+                }
+            }
+    
+            Rectangle {
+                width: 60%;
+                background: #4a4458ff;
+                border-radius: 10px;
+                HorizontalBox {
+                    padding: 10px;
+                    RegularText {
+                        text: "Start with:";
+                        horizontal-alignment: right;
+                        vertical-alignment: center;
+                        wrap: word-wrap;
+                    }
+    
+                    w_order := MultiChoice {
+                        width: 70%;
+                        choices: ["Lesser known countries", "Better known countries"];
+                        choices_len: 2;
+                        width_per_elem: 40%;
+                        spacing: 20pt;
+                    }
+                }
+            }
             Button{
                 height: root.height/6;
                 text: "Free Play";
-                clicked => {root.screen = Screen.SelectMainPlay}
+                clicked => {
+                    root.screen = Screen.SelectMainPlay;
+                    set_play_config(w_order.not_default, w_hard.not_default);
+                
+                }
             }
             Button{
                 height: root.height/6;
                 text: "Choices Play";
-                clicked => {root.screen = Screen.SelectChoicePlay}
+                clicked => {
+                    root.screen = Screen.SelectChoicePlay;
+                    set_play_config(w_order.not_default, w_hard.not_default);
+                }
             }
             Button {
                 height: root.height/6;
@@ -171,7 +213,13 @@ export component AppWindow inherits Window {
     
     sel_main_play_s := SelectMainPlayScreen {
         visible: root.screen == Screen.SelectMainPlay;
-        play(play-mode, cat-choices, order-normal, hard, im-choice) => {prep_start_play(play-mode, cat-choices, order-normal, hard, im-choice)}
+        play(cat_choices, im_choice) => {
+            start_play(
+                cat_choices, 
+                im_choice
+            );
+            root.screen = Screen.MainPlay;
+        }
     }
 
     main_play_s := MainPlayScreen {

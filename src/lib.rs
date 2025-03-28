@@ -58,10 +58,18 @@ fn init(path: PathBuf) -> Result<(), Box<dyn Error>> {
             ui.invoke_update_look_up_selected(logic.look_up_selected(search as usize));
         }
     });
+
+    ui.on_set_play_config({
+        let logic_ref = logic.clone();
+        move |easy_first, hard_mode| {
+            let mut logic = logic_ref.lock().unwrap();
+            logic.set_config(easy_first, hard_mode);
+        }
+    });
     ui.on_start_play({
         let ui_handle = ui.as_weak();
         let logic_ref = logic.clone();
-        move |selected, easy_first, hard_mode, image| {
+        move |selected, image| {
             let ui = ui_handle.unwrap();
             let mut logic = logic_ref.lock().unwrap();
 
@@ -73,7 +81,7 @@ fn init(path: PathBuf) -> Result<(), Box<dyn Error>> {
                 InfoType::from_int(selected[2]),
             ];
             let img = ImageType::from_int(image);
-            logic.prepare_infos(easy_first, hard_mode, info_types, img);
+            logic.prepare_main_play(info_types, img);
             let (update, cat) = logic.get_stat();
             ui.invoke_update_screen(update, cat.into());
         }

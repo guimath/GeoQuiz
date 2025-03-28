@@ -121,15 +121,8 @@ impl AppLogic {
         s
     }
 
-    pub fn prepare_infos(
-        &mut self,
-        easy_first: bool,
-        hard_mode: bool,
-        info_types: [InfoType; 3],
-        img: ImageType,
-    ) {
+    pub fn set_config(&mut self, easy_first: bool, hard_mode: bool) {
         let scores = info_parse::read(&self.all_countries_order, self.score_path.clone());
-
         let mut all_countries = if !hard_mode {
             self.all_countries_order
                 .clone()
@@ -160,6 +153,9 @@ impl AppLogic {
         self.current = 0;
         self.results = vec![0; len];
         self.scores = scores;
+    }
+
+    pub fn prepare_main_play(&mut self, info_types: [InfoType; 3], img: ImageType) {
         self.image_type = img;
         self.info_types = info_types;
     }

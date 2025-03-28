@@ -2,13 +2,10 @@ import { Button, VerticalBox, HorizontalBox } from "std-widgets.slint";
 import { MultiChoice, RegularText, TitleText, ScrollChoice } from "widgets.slint";
 
 export component SelectMainPlayScreen inherits Rectangle {
-    callback play(play_mode:int, cat_choices:[int], order_normal:bool, hard:bool, im_choice:int);
+    callback play(cat_choices:[int], im_choice:int);
     public function invoke_play() {
         play(
-            w_play_mode.choice_num,
             [cat1.choice_num, cat2.choice_num, cat3.choice_num], 
-            w_order.not_default, 
-            w_hard.not_default, 
             cat_im.choice_num
         );
     }
@@ -48,57 +45,13 @@ export component SelectMainPlayScreen inherits Rectangle {
                 }
             }
         }
+    
 
-        Rectangle {
-            background: #4a4458ff;
-            border-radius: 10px;
-            HorizontalBox {
-                padding: 10px;
-                RegularText {
-                    text: "Country list includes:";
-                    vertical-alignment: center;
-                    horizontal-alignment: right;
-                    wrap: word-wrap;
-                }
-
-                w_hard := MultiChoice {
-                    width: 70%;
-                    choices: ["Independent countries only", "All territories"];
-                    choices_len: 2;
-                    width_per_elem: 40%;
-                    spacing: 20pt;
-                }
-            }
-        }
-
-        Rectangle {
-            width: 60%;
-            background: #4a4458ff;
-            border-radius: 10px;
-            HorizontalBox {
-                padding: 10px;
-                RegularText {
-                    text: "Start with:";
-                    horizontal-alignment: right;
-                    vertical-alignment: center;
-                    wrap: word-wrap;
-                }
-
-                w_order := MultiChoice {
-                    width: 70%;
-                    choices: ["Lesser known countries", "Better known countries"];
-                    choices_len: 2;
-                    width_per_elem: 40%;
-                    spacing: 20pt;
-                }
-            }
-        }
-
-        Rectangle {
-            width: 100%;
-            height: 2px;
-            background: white;
-        }
+        // Rectangle {
+        //     width: 100%;
+        //     height: 2px;
+        //     background: white;
+        // }
 
         TitleText {
             text: "Playing Categories";
@@ -117,10 +70,7 @@ export component SelectMainPlayScreen inherits Rectangle {
                     text: "Flags";
                     clicked => {
                         play(
-                            w_play_mode.choice_num,
                             [0, 1, 2], 
-                            w_order.not_default, 
-                            w_hard.not_default, 
                             0
                         );
                     }
@@ -132,10 +82,7 @@ export component SelectMainPlayScreen inherits Rectangle {
                     text: "Outlines";
                     clicked => {
                         play(
-                            w_play_mode.choice_num,
                             [4, 3, 0], 
-                            w_order.not_default, 
-                            w_hard.not_default, 
                             1
                         );
                     }

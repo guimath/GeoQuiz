@@ -36,8 +36,11 @@ export component ChoicePlayScreen inherits Rectangle {
     property <bool> found : false;
     property <[ChoiceState]> guess_states : [ChoiceState.NotClicked, ChoiceState.NotClicked, ChoiceState.NotClicked, ChoiceState.NotClicked];
     property <string> default_info: "Jamaica";
+    property <int> num:0;
+    property <int> out_of:110;
 
     public function update_screen(info : ChoicePlayUpdate) {
+
         root.guess_num = info.guess_num;
         root.found = info.prev_guess[info.correct_guess];
         guess_states[0] = info.prev_guess[0] ? ChoiceState.Wrong : ChoiceState.NotClicked;
@@ -47,6 +50,8 @@ export component ChoicePlayScreen inherits Rectangle {
         if root.found {
             guess_states[info.correct_guess] = ChoiceState.Correct;
         }
+        root.num = info.num;
+        root.out_of = info.out_of;
         root.info = info.info;
         root.guesses = info.guesses;
         root.correct_guess = info.correct_guess;
@@ -77,7 +82,7 @@ export component ChoicePlayScreen inherits Rectangle {
         padding: 10px;
         spacing: 10px;
         TitleText {
-            text: "Multi Choice Play";
+            text: "\{root.num + 1} / \{root.out_of}";
         }
         SwipeInfo {
             info : root.info;

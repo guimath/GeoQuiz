@@ -59,20 +59,20 @@
 - [x] Remake back button
 - [x] move order and independent to start screen;
 - [x] Using Arrays instead of named field 
-
-## Priority 
-- [ ] See how to catch back button on android (https://docs.rs/android-activity/latest/android_activity/input/enum.Keycode.html#variant.TvMediaContextMenu)
-- [ ] Dedicated button for more customizations
-- [ ] Catch score parse error and use reset score instead;
-- [ ] Re shuffle between attempts
-- [ ] Add a 4 choice game mode
+- [x] Add a 4 choice game mode
   - [x] Screens
   - [x] memoise what has been selected (right/wrong)
   - [x] add swipe and hotkey
   - [x] add images grid
   - [x] code backend (hashmap for memoisation?)
   - [x] add guess num count and score according
-  - [ ] Add country name if not in selected infos once found
+  - [x] Add country name if not in selected infos once found
+
+## Priority 
+- [ ] See how to catch back button on android (https://docs.rs/android-activity/latest/android_activity/input/enum.Keycode.html#variant.TvMediaContextMenu)
+- [ ] Dedicated button for more customizations
+- [ ] Catch score parse error and use reset score instead;
+- [ ] Re shuffle between attempts
 
 ## Secondary
 - [ ] Add a Readme & LICENSE & Publish

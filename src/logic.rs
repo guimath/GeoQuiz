@@ -285,6 +285,12 @@ impl AppLogic {
         };
         let correct_guess = guess_idx.iter().position(|x| *x == self.current).unwrap();
         let country = self.all_countries[self.current].clone();
+        let default_type = txt_only_to_global_type(0);
+        let default_info = if self.choice_guess_type != default_type && self.choice_info_type != default_type {
+            country.infos[0].full.clone()
+        } else {
+            String::new()
+        };
         if info.is_txt {
             info.txt = country.infos[to_txt_idx(self.choice_info_type)].full.clone().into();
         } else {
@@ -308,7 +314,8 @@ impl AppLogic {
             info: info, 
             num: self.current as i32, 
             out_of: self.all_countries.len() as i32, 
-            prev_guess: prev_guess.clone()
+            prev_guess: prev_guess.clone(),
+            default_info: default_info.into()
         }
     }
 

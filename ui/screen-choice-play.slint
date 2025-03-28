@@ -35,7 +35,7 @@ export component ChoicePlayScreen inherits Rectangle {
     property <int> guess_num : 0;
     property <bool> found : false;
     property <[ChoiceState]> guess_states : [ChoiceState.NotClicked, ChoiceState.NotClicked, ChoiceState.NotClicked, ChoiceState.NotClicked];
-
+    property <string> default_info: "Jamaica";
 
     public function update_screen(info : ChoicePlayUpdate) {
         root.guess_num = info.guess_num;
@@ -50,6 +50,7 @@ export component ChoicePlayScreen inherits Rectangle {
         root.info = info.info;
         root.guesses = info.guesses;
         root.correct_guess = info.correct_guess;
+        root.default_info = info.default_info;
     }
 
     function prep_next() {
@@ -89,7 +90,7 @@ export component ChoicePlayScreen inherits Rectangle {
        
         RegularText {
             visible: root.found;
-            text: "Guess N°\{root.guess_num}";
+            text: root.default_info == "" ? "Guess N°\{root.guess_num}": "Guess N°\{root.guess_num} (\{root.default_info})";
             horizontal-alignment: center;
         }
         Rectangle {
@@ -142,6 +143,7 @@ export component ChoicePlayScreen inherits Rectangle {
                 }
             }
         }
+        
         Rectangle{
 
         }

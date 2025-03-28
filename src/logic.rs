@@ -45,6 +45,7 @@ fn load_img(raw_data: &String) -> Image {
 
 #[derive(Default)]
 pub struct AppLogic {
+    easy_first: bool,
     current: usize,
     results: Vec<u32>,
     scores: HashMap<String, Score>,
@@ -86,8 +87,7 @@ impl AppLogic {
         } else {
             self.score_folder.clone().join("score_choice.json")
         };
-        let scores = info_parse::read(&self.all_countries_order, self.score_path.clone());
-        let mut all_countries = if !hard_mode {
+        self.all_countries = if !hard_mode {
             self.all_countries_order
                 .clone()
                 .into_iter()
@@ -96,9 +96,14 @@ impl AppLogic {
         } else {
             self.all_countries_order.clone()
         };
+        self.easy_first = easy_first;
+    }
+
+    fn randomize_order(&mut self) {
+        let scores = info_parse::read(&self.all_countries_order, self.score_path.clone());
 
         let mut rng = thread_rng();
-        all_countries.shuffle(&mut rng);
+        self.all_countries.shuffle(&mut rng);
         let compare = |a: &CountryInfos, b: &CountryInfos| -> Ordering {
             scores
                 .get(&b.cca3.clone())
@@ -106,16 +111,14 @@ impl AppLogic {
                 .total_score
                 .cmp(&scores.get(&a.cca3.clone()).unwrap().total_score)
         };
-        if easy_first {
-            all_countries.sort_by(|a, b| compare(a, b));
+        if self.easy_first {
+            self.all_countries.sort_by(|a, b| compare(a, b));
         } else {
-            all_countries.sort_by(|b, a| compare(a, b));
+            self.all_countries.sort_by(|b, a| compare(a, b));
         }
-        let len = all_countries.len();
 
-        self.all_countries = all_countries;
         self.current = 0;
-        self.results = vec![0; len];
+        self.results = vec![0; self.all_countries.len()];
         self.scores = scores;
         self.choice_prev_guesses = Default::default();
         self.choice_index_guesses = Default::default();
@@ -128,6 +131,7 @@ impl AppLogic {
             txt_only_to_global_type(guess_types[2]),
         ];
         self.main_info_type = info_type;
+        self.randomize_order()
     }
 
     pub fn next(&mut self, result: u32) -> Option<(MainPlayUpdate, [CatInfo; 3])> {
@@ -207,10 +211,11 @@ impl AppLogic {
         (update, infos)
     }
 
-
+    
     pub fn prepare_choice_play(&mut self, info_type: usize, guess_type: usize) {
         self.choice_guess_type = guess_type;
         self.choice_info_type = info_type;
+        self.randomize_order()
 
     }
 

@@ -64,7 +64,7 @@
 - [ ] move order and independent to start screen;
 - [ ] Add a 4 choice game mode
   - [x] Screens
-  - [ ] memoise what has been selected (right/wrong)
+  - [x] memoise what has been selected (right/wrong)
   - [ ] add swipe and hotkey
   - [ ] add images grid
   - [ ] code backend (hashmap for memoisation?)

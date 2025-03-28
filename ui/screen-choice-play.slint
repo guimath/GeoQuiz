@@ -4,7 +4,7 @@ import { TxtOrImg, ChoiceState } from "structs.slint";
 
 export component ChoicePlayScreen inherits Rectangle {
     callback prev();
-    callback next(guess_num:int);
+    callback next(was_guessed:[bool]);
     property <image> info_img: @image-url("../data/flags/jam.svg");
     property <string> info_txt:"Kingston";
     property <bool> info_is_txt : true;
@@ -14,25 +14,18 @@ export component ChoicePlayScreen inherits Rectangle {
     property <int> correct_guess : 1;
     property <int> guess_num : 0;
     property <bool> found : false;
-    property <[ChoiceState]> states : [ChoiceState.NotClicked, ChoiceState.NotClicked, ChoiceState.NotClicked, ChoiceState.NotClicked];
+    property <[ChoiceState]> guess_states : [ChoiceState.NotClicked, ChoiceState.NotClicked, ChoiceState.NotClicked, ChoiceState.NotClicked];
 
 
-    public function update_screen(info: TxtOrImg, guess: [TxtOrImg], correct_guess:int, prev_guess:[int]) {
-        root.guess_num = prev_guess.length - 1;
-        root.found = prev_guess.length != 0;
+    public function update_screen(info: TxtOrImg, guess: [TxtOrImg], correct_guess:int, prev_guess:[bool], guess_num:int) {
+        root.guess_num = guess_num;
+        root.found = guess_num != 0;
         if root.found {
-            if prev_guess.length> 0 {
-                states[prev_guess[0]] = prev_guess[0] == correct_guess ? ChoiceState.Correct : ChoiceState.Wrong; 
-            }
-            if prev_guess.length> 1 {
-                states[prev_guess[1]] = prev_guess[1] == correct_guess ? ChoiceState.Correct : ChoiceState.Wrong; 
-            }
-            if prev_guess.length> 2 {
-                states[prev_guess[2]] = prev_guess[2] == correct_guess ? ChoiceState.Correct : ChoiceState.Wrong; 
-            }
-            if prev_guess.length> 3 {
-                states[prev_guess[3]] = prev_guess[3] == correct_guess ? ChoiceState.Correct : ChoiceState.Wrong; 
-            }
+            guess_states[0] = prev_guess[0] ? ChoiceState.Wrong : ChoiceState.NotClicked;
+            guess_states[1] = prev_guess[1] ? ChoiceState.Wrong : ChoiceState.NotClicked;
+            guess_states[2] = prev_guess[2] ? ChoiceState.Wrong : ChoiceState.NotClicked;
+            guess_states[3] = prev_guess[3] ? ChoiceState.Wrong : ChoiceState.NotClicked;
+            guess_states[guess_num] = ChoiceState.Correct;
         }
         root.info_is_txt = info.is_txt;
         if root.info_is_txt {
@@ -63,7 +56,12 @@ export component ChoicePlayScreen inherits Rectangle {
         running: false;
         triggered() => {
             self.running = false;
-            root.next(root.guess_num);
+            root.next([
+                !(root.guess_states[0]==ChoiceState.NotClicked),
+                !(root.guess_states[1]==ChoiceState.NotClicked),
+                !(root.guess_states[2]==ChoiceState.NotClicked),
+                !(root.guess_states[3]==ChoiceState.NotClicked),
+            ]);
         }
     }
 

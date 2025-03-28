@@ -1,5 +1,5 @@
 import { Button, VerticalBox, HorizontalBox, TextEdit, CheckBox, ComboBox, ScrollView } from "std-widgets.slint";
-import { CatInfo, ChoiceState} from "structs.slint";
+import { CatInfo, ChoiceState, TxtOrImg} from "structs.slint";
 
 
 export component RegularText inherits Text {
@@ -163,7 +163,7 @@ export component HiddenText inherits TouchArea {
                 w_type := RegularText {
                     horizontal-alignment: right;
                     vertical-alignment: center;
-                    text: root.type;
+                    text: "\{root.type}:";
                 }
                 Rectangle {width: 10px;}
                 RegularText { 
@@ -269,5 +269,35 @@ export component ScrollChoice inherits HorizontalLayout {
         width: 6pt;
         rotation-angle: -180deg;
         colorize: root.choice_num == 5 ? #ffffff55: white;
+    }
+}
+
+export component SwipeInfo inherits SwipeGestureHandler {
+    callback prev();
+    callback next();
+    in property <TxtOrImg> info;
+    swiped => {
+        if self.current-position.x > self.pressed-position.x + self.width / 4 {
+            prev();
+        } else if self.current-position.x < self.pressed-position.x - self.width / 4 {
+            next();
+        }
+    }
+
+    Rectangle {
+        Image {
+            height: 100%;
+            visible: !root.info.is-txt;
+            width: 100%;
+            source: root.info.img;
+            image-fit: contain;
+        }
+
+        TitleText {
+            height: 100%;
+            width: 100%;
+            visible: root.info.is-txt;
+            text: root.info.txt;
+        }
     }
 }

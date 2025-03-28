@@ -58,6 +58,7 @@
 - [x] Harmonize Text
 - [x] Remake back button
 - [x] move order and independent to start screen;
+- [x] Using Arrays instead of named field 
 
 ## Priority 
 - [ ] See how to catch back button on android (https://docs.rs/android-activity/latest/android_activity/input/enum.Keycode.html#variant.TvMediaContextMenu)

@@ -1,18 +1,21 @@
 import { HorizontalBox, VerticalBox } from "std-widgets.slint";
-import { CatInfo, FullUpdate } from "structs.slint";
-import { ThreeStartScore, TitleText, HiddenText } from "widgets.slint";
+import { CatInfo, MainPlayUpdate, TxtOrImg } from "structs.slint";
+import { ThreeStartScore, TitleText, HiddenText, SwipeInfo } from "widgets.slint";
 
 export component MainPlayScreen inherits Rectangle {
     callback prev();
-    callback next(score:int);
+    callback next(score: int);
     in-out property <int> play_mode: 1;
     in-out property <int> num:0;
     in-out property <int> out_of:110;
     property <int> score_delayed: 0;
     in-out property <int> info_level: 0;
-    in property <image> flag: @image-url("../data/flags/jam.svg");
-
-    public function update_screen(info: FullUpdate, cat: [CatInfo]) {
+    property <TxtOrImg> info: {
+        is_txt: true,
+        txt: "Jamaica",
+        img: @image-url("../data/flags/jam.svg"),
+    };
+    public function update_screen(info: MainPlayUpdate, cat: [CatInfo]) {
         w_score.score = info.score;
         w_score.prev_score = info.last-score;
         if root.play_mode == 3 || info.seen {
@@ -25,7 +28,7 @@ export component MainPlayScreen inherits Rectangle {
         w_cat3.update_cat(cat[2]);
         root.num = info.num;
         root.out_of = info.out_of;
-        flag.source = info.flag;
+        root.info = info.info;
     }
 
     function prep_next(score: int) {
@@ -57,24 +60,13 @@ export component MainPlayScreen inherits Rectangle {
             text: "\{root.num + 1} / \{root.out_of}";
         }
 
-        SwipeGestureHandler {
+        SwipeInfo {
+            info : root.info;
             handle-swipe-right: root.num > 0;
             handle-swipe-left: root.num < root.out_of - 1;
-            swiped => {
-                if self.current-position.x > self.pressed-position.x + self.width / 4 {
-                    prev();
-                } else if self.current-position.x < self.pressed-position.x - self.width / 4 {
-                    next(0);
-                }
-            }
-            HorizontalBox {
-                padding: 0;
-                flag := Image {
-                    height: root.height / 4;
-                    max-width: root.width;
-                    source: root.flag;
-                }
-            }
+            height: root.height / 4;
+            prev => {prev()}
+            next => {next(0)}
         }
 
         HorizontalBox {

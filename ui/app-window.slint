@@ -1,6 +1,6 @@
 import { Button, HorizontalBox } from "std-widgets.slint";
 import { TitleText, RegularText, MultiChoice } from "widgets.slint";
-import { CatInfo, FullUpdate, Screen, FullInfo } from "structs.slint";
+import { CatInfo, MainPlayUpdate, Screen, FullInfo } from "structs.slint";
 import { SelectLookUpScreen, LookUpScreen } from "screen-look-up.slint";
 import { SelectMainPlayScreen } from "screen-select-main-play.slint";
 import { MainPlayScreen } from "screen-main-play.slint";
@@ -16,6 +16,8 @@ export component AppWindow inherits Window {
     // for select look up 
     in property <[string]> search_all_countries : ["Jamaica"]; 
     in property <[bool]> search_countries_mask: [true];
+    in property <[string]> all_categories_name: ["Flag", "Outline", "Country", "Capital", "Languages", "Borders", "Region", "Currencies"];
+    in property <[string]> txt_categories_name: ["Country", "Capital", "Languages", "Borders", "Region", "Currencies"];
     
     // ***************************************************************** //
     //                            CALLBACKS
@@ -60,7 +62,7 @@ export component AppWindow inherits Window {
         root.screen = Screen.LookUp
     }
 
-    public function update_screen(info: FullUpdate, cat: [CatInfo]) {
+    public function update_screen(info: MainPlayUpdate, cat: [CatInfo]) {
         main_play_s.update_screen(info, cat);
     }
 
@@ -212,6 +214,8 @@ export component AppWindow inherits Window {
     }
     
     sel_main_play_s := SelectMainPlayScreen {
+        info_type_names: root.all_categories_name;
+        guess_type_names: root.txt_categories_name;
         visible: root.screen == Screen.SelectMainPlay;
         play(cat_choices, im_choice) => {
             start_play(

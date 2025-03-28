@@ -9,7 +9,7 @@ use std::{
 
 use slint::{ComponentHandle, LogicalSize, Model, VecModel};
 
-use logic::{AppLogic, AppWindow, ImageType, InfoType};
+use logic::{AppLogic, AppWindow};
 
 pub fn main() {
     let path = PathBuf::from_str(env!("CARGO_MANIFEST_DIR")).unwrap();
@@ -38,6 +38,8 @@ fn init(path: PathBuf) -> Result<(), Box<dyn Error>> {
         let logic_lock = logic.lock().unwrap();
         ui.set_search_countries_mask(logic_lock.search_changed("".into()).as_slice().into());
         ui.set_search_all_countries(logic_lock.all_names.as_slice().into());
+        ui.set_all_categories_name(logic_lock.get_all_categories_names());
+        ui.set_txt_categories_name(logic_lock.get_txt_categories_names());
     }
 
     ui.on_look_up_search_changed({
@@ -69,19 +71,14 @@ fn init(path: PathBuf) -> Result<(), Box<dyn Error>> {
     ui.on_start_play({
         let ui_handle = ui.as_weak();
         let logic_ref = logic.clone();
-        move |selected, image| {
+        move |guess_types, info_type| {
             let ui = ui_handle.unwrap();
             let mut logic = logic_ref.lock().unwrap();
 
-            let s: &VecModel<i32> = selected.as_any().downcast_ref().unwrap();
-            let selected: Vec<i32> = s.iter().collect();
-            let info_types: [InfoType; 3] = [
-                InfoType::from_int(selected[0]),
-                InfoType::from_int(selected[1]),
-                InfoType::from_int(selected[2]),
-            ];
-            let img = ImageType::from_int(image);
-            logic.prepare_main_play(info_types, img);
+            let down_ref: &VecModel<i32> = guess_types.as_any().downcast_ref().unwrap();
+            let v: Vec<usize> = down_ref.iter().map(|x| x as usize).collect();
+            let guess_types = [v[0], v[1], v[2]];
+            logic.prepare_main_play(info_type as usize, guess_types.into());
             let (update, cat) = logic.get_stat();
             ui.invoke_update_screen(update, cat.into());
         }

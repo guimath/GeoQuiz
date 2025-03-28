@@ -1,18 +1,4 @@
-export struct CatInfo {
-    category: string,
-    full: string,
-    first: string,
-    with_hint: bool,
-}
-  
-export struct FullUpdate  {
-    num: int,
-    out_of: int,
-    score: int,
-    last_score: int,
-    flag: image,
-    seen: bool, 
-}
+
 
 export struct TextWithTitle {
     text: string,
@@ -47,4 +33,20 @@ export struct TxtOrImg {
     is_txt: bool,
     txt: string,
     img: image,
+}
+
+export struct CatInfo {
+    category: string,
+    full: string,
+    first: string,
+    with_hint: bool,
+}
+  
+export struct MainPlayUpdate  {
+    num: int,
+    out_of: int,
+    score: int,
+    last_score: int,
+    info: TxtOrImg,
+    seen: bool, 
 }

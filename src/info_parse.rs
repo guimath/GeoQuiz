@@ -15,14 +15,8 @@ pub struct Category {
 pub struct CountryInfos {
     pub cca3: String,
     pub independent: bool,
-    pub name: Category,
-    pub capitals: Category,
-    pub currencies: Category,
-    pub languages: Category,
-    pub region: Category,
-    pub borders: Category,
-    pub svg_flag: String,
-    pub svg_outline: String,
+    pub infos: Vec<Category>,
+    pub images: Vec<String>,
 }
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct Score {

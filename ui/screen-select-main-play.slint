@@ -9,7 +9,8 @@ export component SelectMainPlayScreen inherits Rectangle {
             cat_im.choice_num
         );
     }
-    in property <[string]> info_types: ["Country", "Capital", "Languages", "Borders", "Region", "Currencies"];
+    in property <[string]> info_type_names: ["Flag", "Outline", "Country", "Capital", "Languages", "Borders", "Region", "Currencies"];
+    in property <[string]> guess_type_names: ["Country", "Capital", "Languages", "Borders", "Region", "Currencies"];
     property <bool> custom : false;
     padding: 0;
     VerticalBox {
@@ -128,12 +129,22 @@ export component SelectMainPlayScreen inherits Rectangle {
                     VerticalBox {
                         height: 30pt * 4 + 20px * 3;
                         padding: 0pt;
-                        cat_im := MultiChoice {
+                        
+                        RegularText {
+                            text: "What is shown";
+                            width:  100%;
+                            horizontal-alignment: center;
+                        }
+                        cat_im := ScrollChoice {
                             width: 100%;
-                            choices: ["Flags", "Outlines"];
-                            choices_len: 2;
-                            width_per_elem: 30%;
-                            spacing: 20px;
+                            choices: root.info_type_names;
+                            width_per_elem: root.width/5;
+                            spacing: 5pt;
+                        }
+                        RegularText {
+                            text: "What you need to guess";
+                            width:  100%;
+                            horizontal-alignment: center;
                         }
         
                         Rectangle {
@@ -141,7 +152,7 @@ export component SelectMainPlayScreen inherits Rectangle {
                             cat1 := ScrollChoice {
                                 y: 0;
                                 width: 100%;
-                                choices: root.info_types;
+                                choices: root.guess_type_names;
                                 width_per_elem: root.width/5;
                                 spacing: 5pt;
                             }
@@ -149,7 +160,7 @@ export component SelectMainPlayScreen inherits Rectangle {
                             cat2 := ScrollChoice {
                                 y: 30pt + 20px;
                                 width: 100%;
-                                choices: root.info_types;
+                                choices: root.guess_type_names;
                                 width_per_elem: root.width/5;
                                 choice_num: 1;
                                 spacing: 5pt;
@@ -159,7 +170,7 @@ export component SelectMainPlayScreen inherits Rectangle {
                                 y: 2 * 30pt + 2 * 20px;
                                 width: 100%;
         
-                                choices: root.info_types;
+                                choices: root.guess_type_names;
                                 width_per_elem: root.width/5;
                                 choice_num: 2;
                                 spacing: 5pt;

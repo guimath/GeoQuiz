@@ -1,7 +1,7 @@
 use rand::seq::SliceRandom;
 use rand::thread_rng;
 use rand::prelude::IteratorRandom;
-use slint::{Image, ModelRc, SharedString, VecModel};
+use slint::{Image, ModelRc, SharedString, VecModel, Model};
 
 use std::collections::HashMap;
 use std::{cmp::Ordering, path::PathBuf};
@@ -59,6 +59,7 @@ pub struct AppLogic {
     choice_info_type: usize,
     choice_guess_type: usize,
     score_path: PathBuf,
+    score_folder: PathBuf,
     
 }
 
@@ -74,11 +75,17 @@ impl AppLogic {
             .map(|x| x.infos[0].full.clone().into())
             .collect();
         s.search_names = s.all_names.iter().map(|x| x.to_lowercase()).collect();
-        s.score_path = score_path.join("score.json");
+        s.score_folder = score_path.join("user0_scores");
+        info_parse::init_score_folder(s.score_folder.clone());
         s
     }
 
-    pub fn set_config(&mut self, easy_first: bool, hard_mode: bool) {
+    pub fn set_config(&mut self, easy_first: bool, hard_mode: bool, main_play:bool) {
+        self.score_path = if main_play {
+            self.score_folder.clone().join("score_main.json")
+        } else {
+            self.score_folder.clone().join("score_choice.json")
+        };
         let scores = info_parse::read(&self.all_countries_order, self.score_path.clone());
         let mut all_countries = if !hard_mode {
             self.all_countries_order
@@ -110,6 +117,8 @@ impl AppLogic {
         self.current = 0;
         self.results = vec![0; len];
         self.scores = scores;
+        self.choice_prev_guesses = Default::default();
+        self.choice_index_guesses = Default::default();
     }
 
     pub fn prepare_main_play(&mut self, info_type: usize, guess_types: [usize; 3]) {
@@ -205,8 +214,21 @@ impl AppLogic {
 
     }
 
-    pub fn choice_changed(&mut self, was_guessed: ModelRc<bool>, next:bool) -> Option<ChoicePlayUpdate> {
-        self.choice_prev_guesses.insert(self.current, was_guessed);
+    pub fn choice_changed(&mut self, was_guessed: ModelRc<bool>, next:bool, found:bool) -> Option<ChoicePlayUpdate> {
+        self.choice_prev_guesses.insert(self.current, was_guessed.clone());
+        if found {
+            let down_ref: &VecModel<bool> = was_guessed.as_any().downcast_ref().unwrap();
+            let guess_num = down_ref.iter().filter(|&x|x).count();   
+            let score = self
+                .scores
+                .get_mut(&self.all_countries[self.current].cca3.clone())
+                .unwrap();
+            score.time_played += 1;
+            score.last_score = guess_num as u32;
+            score.total_score += (4 - guess_num) as u32;
+            self.save_scores();
+        }
+
         if next {
             if self.current < self.all_countries.len() {
                 self.current += 1;
@@ -238,6 +260,9 @@ impl AppLogic {
                 VecModel::from_slice(&d)
             }
         };
+        let down_ref: &VecModel<bool> = prev_guess.as_any().downcast_ref().unwrap();
+        let guess_num = down_ref.iter().filter(|&x|x).count();    
+        
         let guess_idx = match self.choice_index_guesses.get(&self.current) {
             Some(v) => v.clone(),
             None => {
@@ -278,7 +303,7 @@ impl AppLogic {
         }
         ChoicePlayUpdate { 
             correct_guess: correct_guess as i32, 
-            guess_num: 0, 
+            guess_num: guess_num as i32, 
             guesses: VecModel::from_slice(&guesses), 
             info: info, 
             num: self.current as i32, 
@@ -327,7 +352,7 @@ impl AppLogic {
         info_parse::save(&self.scores, self.score_path.clone());
     }
     pub fn reset_score(&self) {
-        info_parse::reset_score(self.score_path.clone())
+        info_parse::reset_score(self.score_folder.clone())
     }
     pub fn get_all_categories_names(&self) -> ModelRc<SharedString> {
         let v: VecModel<SharedString> = CATEGORIES.iter().map(|&x| SharedString::from(x)).collect();

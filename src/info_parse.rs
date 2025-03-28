@@ -18,7 +18,7 @@ pub struct CountryInfos {
     pub infos: Vec<Category>,
     pub images: Vec<String>,
 }
-#[derive(Deserialize, Serialize, Debug, Clone)]
+#[derive(Deserialize, Serialize, Debug, Clone, Default)]
 pub struct Score {
     #[serde(rename = "tp")]
     pub time_played: u32,
@@ -46,11 +46,7 @@ pub fn read(all_countries: &Vec<CountryInfos>, score_path: PathBuf) -> HashMap<S
             .map(|country| {
                 (
                     country.cca3.clone(),
-                    Score {
-                        total_score: 0,
-                        last_score: 0,
-                        time_played: 0,
-                    },
+                    Score::default(),
                 )
             })
             .collect()
@@ -62,8 +58,17 @@ pub fn save(scores: &HashMap<String, Score>, score_path: PathBuf) {
     file.write_all(json_data.as_bytes()).unwrap();
 }
 
-pub fn reset_score(score_path: PathBuf) {
-    if score_path.exists() {
-        fs::remove_file(score_path).unwrap();
+pub fn reset_score(score_folder: PathBuf) {
+    if score_folder.exists() {
+        fs::remove_dir_all(score_folder.clone()).unwrap();
     }
+    init_score_folder(score_folder);
+}
+
+
+pub fn init_score_folder(score_folder: PathBuf){
+    if !score_folder.exists() {
+        fs::create_dir(score_folder).unwrap();
+    }
+
 }

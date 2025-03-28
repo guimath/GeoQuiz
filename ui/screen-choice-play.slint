@@ -3,7 +3,7 @@ import { MultiChoice, RegularText, TitleText, ScrollChoice, ChoiceElem, SwipeInf
 import { TxtOrImg, ChoiceState, ChoicePlayUpdate } from "structs.slint";
 
 export component ChoicePlayScreen inherits Rectangle {
-    callback changed(was_guessed:[bool], next:bool);
+    callback changed(was_guessed:[bool], next:bool, found:bool);
     property <TxtOrImg> info: {
         is_txt: false,
         txt: "Kingston",
@@ -55,20 +55,20 @@ export component ChoicePlayScreen inherits Rectangle {
     function prep_next() {
         timer.running = true;
     }
-    public function collect_changed(next:bool) {
+    public function collect_changed(next:bool, found: bool) {
         root.changed([
             !(root.guess_states[0]==ChoiceState.NotClicked),
             !(root.guess_states[1]==ChoiceState.NotClicked),
             !(root.guess_states[2]==ChoiceState.NotClicked),
             !(root.guess_states[3]==ChoiceState.NotClicked),
-        ], next);
+        ], next, found);
     }
     timer := Timer {
         interval: 200ms;
         running: false;
         triggered() => {
             self.running = false;
-            collect_changed(true);
+            collect_changed(true, true);
         }
     }
 
@@ -83,8 +83,8 @@ export component ChoicePlayScreen inherits Rectangle {
             // handle-swipe-right: root.num > 0;
             // handle-swipe-left: root.num < root.out_of - 1;
             height: root.height / 4;
-            prev => {collect_changed(false)}
-            next => {collect_changed(true)}
+            prev => {collect_changed(false, false)}
+            next => {collect_changed(true, false)}
         }
        
         RegularText {

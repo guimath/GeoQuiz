@@ -63,9 +63,9 @@ fn init(path: PathBuf) -> Result<(), Box<dyn Error>> {
 
     ui.on_set_play_config({
         let logic_ref = logic.clone();
-        move |easy_first, hard_mode| {
+        move |easy_first, hard_mode, main_play| {
             let mut logic = logic_ref.lock().unwrap();
-            logic.set_config(easy_first, hard_mode);
+            logic.set_config(easy_first, hard_mode, main_play);
         }
     });
     //  MAIN PLAY
@@ -121,12 +121,12 @@ fn init(path: PathBuf) -> Result<(), Box<dyn Error>> {
     ui.on_choice_changed({
         let ui_handle = ui.as_weak();
         let logic_ref = logic.clone();
-        move |guesses, next| {
+        move |guesses, next, found| {
             let ui = ui_handle.unwrap();
             let mut logic = logic_ref.lock().unwrap();
             // let down_ref: &VecModel<bool> = guesses.as_any().downcast_ref().unwrap();
             // let v: Vec<bool> = down_ref.iter().collect();    
-            if let Some(info) = logic.choice_changed(guesses, next) {
+            if let Some(info) = logic.choice_changed(guesses, next, found) {
                 ui.invoke_update_choice(info);
             }
         }

@@ -1,8 +1,8 @@
 /target
 # temp
 data/
-score.json
 .vscode/
+user0_scores/
 
 # TEMP
 ui/icon.png

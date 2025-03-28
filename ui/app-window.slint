@@ -26,7 +26,7 @@ export component AppWindow inherits Window {
     // ***************************************************************** //
     callback look_up_search_changed(search: string);
     callback look_up_selected(num: int);
-    callback set_play_config(easy_first:bool, hard_mode:bool);
+    callback set_play_config(easy_first:bool, hard_mode:bool, main_play:bool);
     callback close();
     callback reset_score();
     callback save_score();
@@ -37,7 +37,7 @@ export component AppWindow inherits Window {
     callback start_play([int], int);
     // choice
     callback choice_start_play(int, int);
-    callback choice_changed([bool], bool);
+    callback choice_changed([bool], bool, bool);
 
     // ***************************************************************** //
     //                            UI LOGIC
@@ -97,9 +97,9 @@ export component AppWindow inherits Window {
             }
             if root.screen == Screen.ChoicePlay {
                 if event.text == Key.LeftArrow {
-                    choice_play_s.collect_changed(false);
+                    choice_play_s.collect_changed(false, false);
                 } else if event.text == Key.RightArrow {
-                    choice_play_s.collect_changed(true);
+                    choice_play_s.collect_changed(true, false);
                 }
             }
             accept
@@ -185,7 +185,7 @@ export component AppWindow inherits Window {
                 text: "Free Play";
                 clicked => {
                     root.screen = Screen.SelectMainPlay;
-                    set_play_config(w_order.not_default, w_hard.not_default);
+                    set_play_config(w_order.not_default, w_hard.not_default, true);
                 
                 }
             }
@@ -194,7 +194,7 @@ export component AppWindow inherits Window {
                 text: "Choices Play";
                 clicked => {
                     root.screen = Screen.SelectChoicePlay;
-                    set_play_config(w_order.not_default, w_hard.not_default);
+                    set_play_config(w_order.not_default, w_hard.not_default, false);
                 }
             }
             Button {
@@ -263,6 +263,6 @@ export component AppWindow inherits Window {
     }
     choice_play_s := ChoicePlayScreen {
         visible: root.screen == Screen.ChoicePlay;
-        changed(was_guessed, next) => {choice_changed(was_guessed, next)}
+        changed(was_guessed, next, found) => {choice_changed(was_guessed, next, found)}
     }
 }

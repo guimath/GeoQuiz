@@ -64,7 +64,7 @@
   - [x] memoise what has been selected (right/wrong)
   - [x] add swipe and hotkey
   - [x] add images grid
-  - [x] code backend (hashmap for memoisation?)
+  - [x] code backend 
   - [x] add guess num count and score according
   - [x] Add country name if not in selected infos once found
 - [x] Re shuffle between attempts
@@ -72,7 +72,13 @@
 
 ## Priority 
 - [ ] See how to catch back button on android (https://docs.rs/android-activity/latest/android_activity/input/enum.Keycode.html#variant.TvMediaContextMenu)
-- [ ] Dedicated button for more customizations
+- [ ] Add num and out_of to choices play
+- [ ] Improve UI
+  - [ ] Dedicated button for more customizations
+  - [ ] Harmonize sizes
+  - [ ] ScrollChoice add click on arrows
+  - [ ] Add "Score reset" message
+  - [ ] Better each Screen
 
 ## Secondary
 - [ ] Add a Readme & LICENSE & Publish
@@ -84,8 +90,11 @@
 
 ## Ideas to discuss
 - [ ] Give number of words in hints like for UK: U... ...  and better hints
-- [ ] Score specific for categories chosen ? (-> maybe have a score selection ie multiple scores named by users for different infos)
-- [ ] Add a way to add more infos ? (-> three already a lot IMO)
+- [ ] Have user be able to create and select users (different scores)
 - [ ] What other infos could be added 
   - [ ] Population
   - [ ] Position on a map (show continent, highlight & circle if small)
+- [ ] Data agnostic -> so that we can create different quizzes
+  - [ ] Add support for png/jpeg (/!\ requires a way to load images to phone)
+  - [ ] Remove cca, and move independent to "harder difficulty"
+  - [ ] Add categories names to json 

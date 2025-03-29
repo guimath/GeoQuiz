@@ -1,5 +1,5 @@
 import { Button, HorizontalBox, VerticalBox } from "std-widgets.slint";
-import { TitleText, RegularText, SubText, MultiChoice } from "widgets.slint";
+import { TitleText, RegularText, SubText, MultiChoice, TextButton } from "widgets.slint";
 import { CatInfo, MainPlayUpdate, Screen, FullInfo, ChoicePlayUpdate } from "structs.slint";
 import { SelectLookUpScreen, LookUpScreen } from "screen-look-up.slint";
 import { SelectMainPlayScreen } from "screen-select-main-play.slint";
@@ -129,15 +129,15 @@ export component AppWindow inherits Window {
     Rectangle {
         visible: root.screen == Screen.Start;
         VerticalLayout {
+            padding: 10px;
             spacing: 10px;
-            padding: 20px;
             // padding-left : root.width/10;
             TitleText {
                 text: "Geo Quiz";
             }
             Rectangle {}
             Rectangle {
-                background: #4a4458ff;
+                background: #ffffff3c;
                 border-radius: 10px;
                 VerticalBox {
                     padding: 10px;
@@ -159,7 +159,7 @@ export component AppWindow inherits Window {
             }
     
             Rectangle {
-                background: #4a4458ff;
+                background: #ffffff3c;
                 border-radius: 10px;
                 VerticalBox {
                     // padding: 10px;
@@ -182,8 +182,9 @@ export component AppWindow inherits Window {
                 }
             }
             Rectangle {}
-            Button{
+            TextButton {
                 height: root.height/10;
+                width_button: root.width/2;
                 text: "Free Play";
                 clicked => {
                     root.screen = Screen.SelectMainPlay;
@@ -191,8 +192,8 @@ export component AppWindow inherits Window {
                 
                 }
             }
-            Rectangle {}
-            Button{
+            TextButton{
+                width_button: root.width/2;
                 height: root.height/10;
                 text: "Choices Play";
                 clicked => {
@@ -200,18 +201,19 @@ export component AppWindow inherits Window {
                     set_play_config(w_order.not_default, w_hard.not_default, false);
                 }
             }
-            Rectangle {}
-            Button {
+            TextButton {
+                width_button: root.width/2;
                 height: root.height/10;
                 text: "Look Up Infos";
                 clicked => {root.screen = Screen.SelectLookUp}
             }
-            Rectangle {}
-            Button {
+            TextButton {
+                width_button: root.width/2;
                 height: root.height/10;
                 text: "Reset Score";
                 clicked => {reset_score()}
             }
+            Rectangle {}
             Rectangle {}
         }
         

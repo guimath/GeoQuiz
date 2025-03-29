@@ -1,5 +1,5 @@
 import { Button, VerticalBox, HorizontalBox } from "std-widgets.slint";
-import { MultiChoice, RegularText, SubText, TitleText, ScrollChoice } from "widgets.slint";
+import { MultiChoice, RegularText, SubText, TitleText, ScrollChoice, TextButton } from "widgets.slint";
 
 export component SelectMainPlayScreen inherits Rectangle {
     callback play(cat_choices:[int], im_choice:int, play_mode:int);
@@ -13,24 +13,14 @@ export component SelectMainPlayScreen inherits Rectangle {
     in property <[string]> info_type_names: ["Flag", "Outline", "Country", "Capital", "Languages", "Borders", "Region", "Currencies"];
     in property <[string]> guess_type_names: ["Country", "Capital", "Languages", "Borders", "Region", "Currencies"];
     property <bool> custom : false;
-    padding: 0;
     VerticalBox {
-        // HorizontalBox {
-        //     alignment: center;
-        //     padding: 20pt;
-        //     Button {
-        //         height: 70pt;
-        //         width: root.width / 4;
-        //         text: "Play";
-        //         clicked => {invoke_play()}
-        //     }
-        // }
+        padding: 10px;
         TitleText{
             text: "Free Play";
         }
         
         Rectangle {
-            background: #4a4458ff;
+            background: #ffffff3c;
             border-radius: 10px;
             VerticalBox {
                 padding: 10px;
@@ -56,24 +46,23 @@ export component SelectMainPlayScreen inherits Rectangle {
         }
     
 
-        // Rectangle {
-        //     width: 100%;
-        //     height: 2px;
-        //     background: white;
-        // } 
+        Rectangle {
+            width: 100%;
+            height: 2px;
+            background: white;
+        } 
 
         TitleText {
             text: "Playing Categories";
             horizontal-alignment: center;
             vertical-alignment: center;
-            font-size: 16pt;
         }
         Rectangle {
             HorizontalBox {
                 visible: !root.custom;
                 alignment: center;
                 padding: 0;
-                Button {
+                TextButton {
                     height: root.height/10;
                     width: root.width / 4;
                     text: "Flags";
@@ -86,7 +75,7 @@ export component SelectMainPlayScreen inherits Rectangle {
                     }
                 }
     
-                Button {
+                TextButton {
                     height: root.height/10;
                     width: root.width / 4;
                     text: "Outlines";
@@ -98,7 +87,7 @@ export component SelectMainPlayScreen inherits Rectangle {
                         );
                     }
                 }
-                Button {
+                TextButton {
                     height: root.height/10;
                     width: root.width / 4;
                     text: "Custom";
@@ -114,7 +103,7 @@ export component SelectMainPlayScreen inherits Rectangle {
                 HorizontalBox {
                     alignment: center;
                     padding: 0;
-                    Button {
+                    TextButton {
                         height: root.height/10;
                         width: root.width / 3;
                         text: "Back to default";
@@ -123,7 +112,7 @@ export component SelectMainPlayScreen inherits Rectangle {
                         }
                     }
         
-                    Button {
+                    TextButton {
                         height: root.height/10;
                         width: root.width / 3;
                         text: "Play";
@@ -174,8 +163,6 @@ export component SelectMainPlayScreen inherits Rectangle {
                 }
             }        
         }
-        Rectangle {
-            vertical-stretch: 1;
-        }
+        Rectangle {}
     }
 }

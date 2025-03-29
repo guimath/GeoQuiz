@@ -360,3 +360,32 @@ export component ImageChoice inherits TouchArea {
         }
     }
 }
+
+export component TextButton inherits HorizontalBox {
+    callback clicked();
+    in property <length> border_radius : 100px;
+    in property <string> text : "Button";
+    in property <length> width_button : root.width;
+    in property <length> height_button: root.height;
+    padding: 0;
+    spacing: 0;
+    Rectangle {}
+    TouchArea {
+        height: root.height_button;
+        width: root.width_button;
+        Rectangle {
+            background: #4a4458ff;
+            border-radius: root.border_radius;
+        }
+        RegularText {
+            text: root.text;
+            horizontal-alignment: center;
+            vertical-alignment: center;
+            wrap: word-wrap;
+            width : 100%;
+            height : 100%;
+        }
+        clicked() => {root.clicked()}
+    }
+    Rectangle {}
+}

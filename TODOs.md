@@ -73,16 +73,19 @@
 
 ## Priority 
 - [ ] See how to catch back button on android (https://docs.rs/android-activity/latest/android_activity/input/enum.Keycode.html#variant.TvMediaContextMenu)
-- [ ] Improve UI
+- [ ] For choices play treat empty infos ?
+- [ ] Add "Score reset" message
+- [x] Improve UI
   - [x] ScrollChoice add click on arrows and better sizing
-  - [ ] Dedicated button for more customizations
-  - [ ] Harmonize sizes
-  - [ ] Add "Score reset" message
-  - [ ] Better each Screen
+  - [x] Dedicated button for more customizations
+  - [x] Harmonize sizes
+  - [x] Better each Screen
+  - [ ] Add globals
 
 ## Secondary
 - [ ] Add a Readme & LICENSE & Publish
 - [ ] Make proper icon
+- [ ] Add selection of animation time (after score or answer found)
 - [ ] Animate (WIP)
   - [ ] Better scrolling on categories : maybe use timer to snap to center? 
   - [ ] Animate between screens? 

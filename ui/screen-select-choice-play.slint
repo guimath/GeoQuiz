@@ -1,5 +1,5 @@
 import { Button, VerticalBox, HorizontalBox } from "std-widgets.slint";
-import { MultiChoice, RegularText, TitleText, ScrollChoice } from "widgets.slint";
+import { MultiChoice, RegularText, TitleText, ScrollChoice, TextButton } from "widgets.slint";
 
 export component SelectChoicePlayScreen inherits Rectangle {
     callback play(info_cat:int, guess_cat:int);
@@ -13,16 +13,13 @@ export component SelectChoicePlayScreen inherits Rectangle {
             text: "Choice Play";
         }
         Rectangle {}
-        HorizontalBox {
-            alignment: center;
-            padding: 0;
-            Button {
-                height: root.height/10;
-                text: "Play";
-                clicked => {invoke_play()}
-                width: root.width/2;
-            }
+        TextButton {
+            height: root.height/10;
+            width_button: root.width/2;
+            text: "Play";
+            clicked => {invoke_play()}
         }
+        
         Rectangle {}
         TitleText {
             text: "Category displayed";

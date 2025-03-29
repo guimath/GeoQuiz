@@ -11,7 +11,7 @@ export component MainPlayScreen inherits Rectangle {
     property <int> score_delayed: 0;
     in-out property <int> info_level: 0;
     property <TxtOrImg> info: {
-        is_txt: true,
+        is_txt: false,
         txt: "Jamaica",
         img: @image-url("../data/flags/jam.svg"),
     };
@@ -81,7 +81,7 @@ export component MainPlayScreen inherits Rectangle {
 
         w_cat1 := HiddenText {
             play_mode: root.play_mode;
-            type: "Country:";
+            type: "Country";
             name: "Jamaica";
             first_letter: "J";
             show: root.info_level >= 1;
@@ -95,7 +95,7 @@ export component MainPlayScreen inherits Rectangle {
 
         w_cat2 := HiddenText {
             play_mode: root.play_mode;
-            type: "Capital:";
+            type: "Capital";
             name: "Kingston";
             first_letter: "K";
             show: root.info_level >= 2;
@@ -110,7 +110,7 @@ export component MainPlayScreen inherits Rectangle {
 
         w_cat3 := HiddenText {
             play_mode: root.play_mode;
-            type: "Language:";
+            type: "Language";
             name: "English, Jamaican Patois";
             first_letter: "E..., J...";
             show: root.info_level > 2;

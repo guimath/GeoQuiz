@@ -14,8 +14,8 @@ const CATEGORIES_TXT: [&str; 6] = [
     "Capital",
     "Languages",
     "Currencies",
-    "Borders",
     "Region",
+    "Borders",
 ];
 const CATEGORIES_IMG: [&str; 2] = ["Flag", "Outline"];
 const CATEGORIES: [&str; 8] = [
@@ -25,8 +25,8 @@ const CATEGORIES: [&str; 8] = [
     "Capital",
     "Languages",
     "Currencies",
-    "Borders",
     "Region",
+    "Borders",
 ];
 const NUM_IMG_TYPE: usize = CATEGORIES_IMG.len();
 fn is_info_txt(i: usize) -> bool {

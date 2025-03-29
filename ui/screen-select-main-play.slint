@@ -1,12 +1,13 @@
 import { Button, VerticalBox, HorizontalBox } from "std-widgets.slint";
-import { MultiChoice, RegularText, TitleText, ScrollChoice } from "widgets.slint";
+import { MultiChoice, RegularText, SubText, TitleText, ScrollChoice } from "widgets.slint";
 
 export component SelectMainPlayScreen inherits Rectangle {
-    callback play(cat_choices:[int], im_choice:int);
+    callback play(cat_choices:[int], im_choice:int, play_mode:int);
     public function invoke_play() {
         play(
             [cat1.choice_num, cat2.choice_num, cat3.choice_num], 
-            cat_im.choice_num
+            cat_im.choice_num,
+            w_play_mode.choice_num,
         );
     }
     in property <[string]> info_type_names: ["Flag", "Outline", "Country", "Capital", "Languages", "Borders", "Region", "Currencies"];
@@ -39,10 +40,17 @@ export component SelectMainPlayScreen inherits Rectangle {
                 }
 
                 w_play_mode := MultiChoice {
-                    choices: ["No hints", "Clickable hints", "Always on hints", "Full info"];
+                    choices: ["Learn", "Easy", "Medium", "Hard"];
                     choices_len: 4;
-                    choice_num: 1;
+                    choice_num: 2;
                     spacing: 10pt;
+                }
+                SubText {
+                    text: w_play_mode.choice_num == 0 ? "All info is shown":
+                        w_play_mode.choice_num == 1 ? "All hints are shown": 
+                        w_play_mode.choice_num == 2 ? "Hints are available":
+                        "No hints";
+                    horizontal-alignment: center;
                 }
             }
         }
@@ -66,30 +74,32 @@ export component SelectMainPlayScreen inherits Rectangle {
                 alignment: center;
                 padding: 0;
                 Button {
-                    height: 40pt;
+                    height: root.height/10;
                     width: root.width / 4;
                     text: "Flags";
                     clicked => {
                         play(
                             [0, 1, 2], 
-                            0
+                            0,
+                            w_play_mode.choice_num
                         );
                     }
                 }
     
                 Button {
-                    height: 40pt;
+                    height: root.height/10;
                     width: root.width / 4;
                     text: "Outlines";
                     clicked => {
                         play(
                             [4, 3, 0], 
-                            1
+                            1,
+                            w_play_mode.choice_num
                         );
                     }
                 }
                 Button {
-                    height: 40pt;
+                    height: root.height/10;
                     width: root.width / 4;
                     text: "Custom";
                     clicked => {
@@ -105,7 +115,7 @@ export component SelectMainPlayScreen inherits Rectangle {
                     alignment: center;
                     padding: 0;
                     Button {
-                        height: 40pt;
+                        height: root.height/10;
                         width: root.width / 3;
                         text: "Back to default";
                         clicked => {
@@ -114,7 +124,7 @@ export component SelectMainPlayScreen inherits Rectangle {
                     }
         
                     Button {
-                        height: 40pt;
+                        height: root.height/10;
                         width: root.width / 3;
                         text: "Play";
                         clicked => {

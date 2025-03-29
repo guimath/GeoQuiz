@@ -1,5 +1,5 @@
-import { Button, HorizontalBox } from "std-widgets.slint";
-import { TitleText, RegularText, MultiChoice } from "widgets.slint";
+import { Button, HorizontalBox, VerticalBox } from "std-widgets.slint";
+import { TitleText, RegularText, SubText, MultiChoice } from "widgets.slint";
 import { CatInfo, MainPlayUpdate, Screen, FullInfo, ChoicePlayUpdate } from "structs.slint";
 import { SelectLookUpScreen, LookUpScreen } from "screen-look-up.slint";
 import { SelectMainPlayScreen } from "screen-select-main-play.slint";
@@ -139,44 +139,45 @@ export component AppWindow inherits Window {
             Rectangle {
                 background: #4a4458ff;
                 border-radius: 10px;
-                HorizontalBox {
+                VerticalBox {
                     padding: 10px;
-                    RegularText {
-                        text: "Country list includes:";
-                        vertical-alignment: center;
-                        horizontal-alignment: right;
-                        wrap: word-wrap;
-                    }
-    
                     w_hard := MultiChoice {
-                        width: 70%;
-                        choices: ["Independent countries only", "All territories"];
+                        width: 100%;
+                        choices: ["Independent only", "All territories"];
                         choices_len: 2;
-                        width_per_elem: 40%;
-                        spacing: 20pt;
+                        width_per_elem: 45%;
+                        spacing: 20px;
+                    }
+                    SubText {
+                        text: w_hard.not_default?  "Show all territories (250 different)" : "Show only independent countries (190 different)" ;
+                        horizontal-alignment: center;
+                        vertical-alignment: center;
+                        width: 100%;
+                        wrap: word-wrap;
                     }
                 }
             }
     
             Rectangle {
-                width: 60%;
                 background: #4a4458ff;
                 border-radius: 10px;
-                HorizontalBox {
-                    padding: 10px;
-                    RegularText {
-                        text: "Start with:";
-                        horizontal-alignment: right;
-                        vertical-alignment: center;
-                        wrap: word-wrap;
-                    }
-    
+                VerticalBox {
+                    // padding: 10px;
+                    
                     w_order := MultiChoice {
-                        width: 70%;
-                        choices: ["Lesser known countries", "Better known countries"];
+                        width: 100%;
+                        choices: ["Hard first", "Easy first"];
                         choices_len: 2;
-                        width_per_elem: 40%;
-                        spacing: 20pt;
+                        width_per_elem: 45%;
+                        spacing: 20px;
+                    }
+
+                    SubText {
+                        text: w_order.not_default?  "Start with better known countries (according to previous scores)" : "Start with lesser known countries (according to previous scores)";
+                        horizontal-alignment: center;
+                        vertical-alignment: center;
+                        width: 100%;
+                        wrap: word-wrap;
                     }
                 }
             }
@@ -238,10 +239,12 @@ export component AppWindow inherits Window {
         info_type_names: root.all_categories_name;
         guess_type_names: root.txt_categories_name;
         visible: root.screen == Screen.SelectMainPlay;
-        play(cat_choices, im_choice) => {
+        play(cat_choices, im_choice, play_mode) => {
+            debug("here");
+            main_play_s.play_mode = 3 -  play_mode;
             start_play(
                 cat_choices, 
-                im_choice
+                im_choice,
             );
             root.screen = Screen.MainPlay;
         }

@@ -69,14 +69,14 @@
   - [x] Add country name if not in selected infos once found
 - [x] Re shuffle between attempts
 - [x] Catch score parse error and use reset score instead;
+- [x] Add num and out_of to choices play
 
 ## Priority 
 - [ ] See how to catch back button on android (https://docs.rs/android-activity/latest/android_activity/input/enum.Keycode.html#variant.TvMediaContextMenu)
-- [ ] Add num and out_of to choices play
 - [ ] Improve UI
+  - [x] ScrollChoice add click on arrows and better sizing
   - [ ] Dedicated button for more customizations
   - [ ] Harmonize sizes
-  - [ ] ScrollChoice add click on arrows
   - [ ] Add "Score reset" message
   - [ ] Better each Screen
 

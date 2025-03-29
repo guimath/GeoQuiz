@@ -211,48 +211,66 @@ export component HiddenText inherits TouchArea {
 
 export component ScrollChoice inherits HorizontalLayout {
     in property <[string]> choices: ["Country", "Capital", "Languages", "Borders", "Region", "Currencies"];
-    in property <length> width_per_elem: 100px;
+    in property <length> width_per_elem: (root.width - root.spacing_i *2 - 2*root.size_bar - 2*root.width_arrow)/3;
     in-out property <int> choice_num:0;
     in property <length> spacing_i: 20px;
+    in property <length> width_arrow: 6pt;
+    in property <length> height_elem: 30pt;
     property <length> size_bar: 12px; // bar is showing on modern-black
+    property <length> Width_w_spacing : root.spacing_i + root.width_per_elem;
+
     function set_x() -> length {
         return - (root.choice_num* (root.width_per_elem+ root.spacing_i));
     }
     alignment: center;
     padding: 0;
     spacing: 0;
-    Image {
-        source: @image-url("arrow_left.svg");
-        height: 30pt;
-        width: 6pt;
-        colorize: root.choice_num == 0 ? #ffffff55: white;
+    TouchArea {
+        height: root.height_elem;
+        width: root.width_arrow;
+
+        Image {
+            height: 100%;
+            width: 100%;
+            source: @image-url("arrow_left.svg");
+            colorize: root.choice_num == 0 ? #ffffff55: white;
+        }
+        clicked => {
+            if root.choice_num > 0 {root.choice_num -= 1;}
+            scroll.viewport-x= set_x();
+        }
     }
+
     Rectangle {
         width: root.size_bar;
     }
     scroll := ScrollView {
 
-        height: 30pt +root.size_bar;
-        viewport-height: 30pt;
+        height: root.height_elem +root.size_bar;
+        viewport-height: root.height_elem;
         horizontal-scrollbar-policy: always-off;
-        // viewport-width: (num_choice+1)*width_per_elem;
         width: 3*width_per_elem+ 2*root.spacing_i + root.size_bar;
         viewport-x: set_x();
+        
         HorizontalLayout {
             padding: 0;
             spacing: root.spacing_i;
             Rectangle {width: root.width_per_elem;}
             for text[index] in root.choices : ChoiceElem {
-                
+                height: root.choice_num == index ? root.height_elem: root.height_elem - 5pt;
                 text: text;
-                width: width_per_elem;
-                background_elem: index==root.choice_num ? #ffffff62 : #ffffff3c;
-                // horizontal-alignment: center;
-                // vertical-alignment: center;
+                width: root.width_per_elem;
+                background_elem: index == root.choice_num ? #ffffff62 : #ffffff3c;
                 clicked => {root.choice_num = index; scroll.viewport-x= set_x();}
+                animate height {
+                    duration: 50ms;
+                    easing: ease-in;
+                     
+                }
             }
             Rectangle {width: width_per_elem;}
         }
+
         scrolled() => {
             if scroll.viewport-x >= set_x() + root.spacing_i + root.width_per_elem/2 {
                 root.choice_num -= 1;
@@ -261,14 +279,22 @@ export component ScrollChoice inherits HorizontalLayout {
                 root.choice_num += 1;
             }
         }
-        
     }
-    Image {
-        source: @image-url("arrow_left.svg");
-        height: 30pt;
-        width: 6pt;
-        rotation-angle: -180deg;
-        colorize: root.choice_num == 5 ? #ffffff55: white;
+    TouchArea {
+        height: root.height_elem;
+        width: root.width_arrow;
+
+        Image {
+            height: 100%;
+            width: 100%;
+            source: @image-url("arrow_left.svg");
+            rotation-angle: -180deg;
+            colorize: root.choice_num == choices.length - 1 ? #ffffff55: white;
+        }
+        clicked => {
+            if root.choice_num < (choices.length - 1) {root.choice_num += 1;}
+            scroll.viewport-x= set_x();
+        }
     }
 }
 

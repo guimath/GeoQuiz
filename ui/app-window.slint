@@ -180,8 +180,9 @@ export component AppWindow inherits Window {
                     }
                 }
             }
+            Rectangle {}
             Button{
-                height: root.height/6;
+                height: root.height/10;
                 text: "Free Play";
                 clicked => {
                     root.screen = Screen.SelectMainPlay;
@@ -189,21 +190,24 @@ export component AppWindow inherits Window {
                 
                 }
             }
+            Rectangle {}
             Button{
-                height: root.height/6;
+                height: root.height/10;
                 text: "Choices Play";
                 clicked => {
                     root.screen = Screen.SelectChoicePlay;
                     set_play_config(w_order.not_default, w_hard.not_default, false);
                 }
             }
+            Rectangle {}
             Button {
-                height: root.height/6;
+                height: root.height/10;
                 text: "Look Up Infos";
                 clicked => {root.screen = Screen.SelectLookUp}
             }
+            Rectangle {}
             Button {
-                height: root.height/6;
+                height: root.height/10;
                 text: "Reset Score";
                 clicked => {reset_score()}
             }

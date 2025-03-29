@@ -86,8 +86,8 @@ export component ChoicePlayScreen inherits Rectangle {
         }
         SwipeInfo {
             info : root.info;
-            // handle-swipe-right: root.num > 0;
-            // handle-swipe-left: root.num < root.out_of - 1;
+            handle-swipe-right: root.num > 0;
+            handle-swipe-left: root.num < root.out_of - 1;
             height: root.height / 4;
             prev => {collect_changed(false, false)}
             next => {collect_changed(true, false)}

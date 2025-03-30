@@ -1,5 +1,6 @@
 import { Button, VerticalBox, HorizontalBox } from "std-widgets.slint";
 import { MultiChoice, RegularText, TitleText, ScrollChoice, TextButton } from "widgets.slint";
+import { TextStyle, FontSettings, Palette, Sizes } from "styling.slint";
 
 export component SelectChoicePlayScreen inherits Rectangle {
     callback play(info_cat:int, guess_cat:int);
@@ -8,7 +9,8 @@ export component SelectChoicePlayScreen inherits Rectangle {
     }
     in property <[string]> info_types: ["Flag", "Outline", "Country", "Capital", "Languages", "Borders", "Region", "Currencies"];
     VerticalLayout {
-        padding: 10px;
+        padding: Sizes.padding;
+        spacing: Sizes.spacing;
         TitleText{
             text: "Choice Play";
         }
@@ -23,7 +25,7 @@ export component SelectChoicePlayScreen inherits Rectangle {
         Rectangle {}
         TitleText {
             text: "Category displayed";
-            height: 100px;
+            style: FontSettings.title-small;
         }
         info_cat := ScrollChoice {
             width: 100%;
@@ -31,7 +33,7 @@ export component SelectChoicePlayScreen inherits Rectangle {
         }
         TitleText {
             text: "Category to guess";
-            height: 100px;
+            style: FontSettings.title-small;
         }
         guess_cat := ScrollChoice {
             width: 100%;

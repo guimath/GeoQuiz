@@ -1,6 +1,7 @@
 import { HorizontalBox, VerticalBox } from "std-widgets.slint";
 import { CatInfo, MainPlayUpdate, TxtOrImg } from "structs.slint";
 import { ThreeStartScore, TitleText, HiddenText, SwipeInfo } from "widgets.slint";
+import { TextStyle, FontSettings, Palette, Sizes } from "styling.slint";
 
 export component MainPlayScreen inherits Rectangle {
     callback prev();
@@ -50,11 +51,9 @@ export component MainPlayScreen inherits Rectangle {
         }
     }
 
-    padding: 0;
     VerticalLayout {
-        padding: 10px;
-        spacing: 10px;
-        height: 100%;
+        padding: Sizes.padding;
+        spacing: Sizes.spacing;
 
         TitleText {
             text: "\{root.num + 1} / \{root.out_of}";
@@ -70,7 +69,8 @@ export component MainPlayScreen inherits Rectangle {
         }
 
         HorizontalBox {
-            padding: 10px;
+            padding-top: Sizes.spacing;
+            padding-bottom: Sizes.spacing;
             alignment: center;
             w_score := ThreeStartScore {
                 score_changed(score) => {

@@ -1,6 +1,7 @@
 import { Button, VerticalBox, HorizontalBox } from "std-widgets.slint";
 import { MultiChoice, RegularText, TitleText, ScrollChoice, ChoiceElem, SwipeInfo, ImageChoice} from "widgets.slint";
 import { TxtOrImg, ChoiceState, ChoicePlayUpdate } from "structs.slint";
+import { TextStyle, FontSettings, Palette, Sizes } from "styling.slint";
 
 export component ChoicePlayScreen inherits Rectangle {
     callback changed(was_guessed:[bool], next:bool, found:bool);
@@ -11,7 +12,7 @@ export component ChoicePlayScreen inherits Rectangle {
     };
     property <[TxtOrImg]> guesses : [
         {
-            is_txt : false,
+            is_txt : true,
             txt: "Singapore", 
             img: @image-url("../data/flags/fra.svg")
         },
@@ -58,9 +59,6 @@ export component ChoicePlayScreen inherits Rectangle {
         root.default_info = info.default_info;
     }
 
-    function prep_next() {
-        timer.running = true;
-    }
     public function collect_changed(next:bool, found: bool) {
         root.changed([
             !(root.guess_states[0]==ChoiceState.NotClicked),
@@ -69,6 +67,7 @@ export component ChoicePlayScreen inherits Rectangle {
             !(root.guess_states[3]==ChoiceState.NotClicked),
         ], next, found);
     }
+
     timer := Timer {
         interval: 200ms;
         running: false;
@@ -79,8 +78,8 @@ export component ChoicePlayScreen inherits Rectangle {
     }
 
     VerticalLayout {
-        padding: 10px;
-        spacing: 10px;
+        padding: Sizes.padding;
+        spacing: Sizes.spacing;
         TitleText {
             text: "\{root.num + 1} / \{root.out_of}";
         }
@@ -102,10 +101,11 @@ export component ChoicePlayScreen inherits Rectangle {
             VerticalLayout {
                 visible: root.guesses[0].is_txt;
                 padding: 0;
-                spacing: 10px;
+                spacing: Sizes.spacing;
                 for text[i] in root.guesses : ChoiceElem {
                     text: root.guesses[i].txt;
                     state: guess_states[i];
+                    height: Sizes.height_multi_choice;
                     clicked => {
                         if root.found {
                             return;
@@ -114,7 +114,7 @@ export component ChoicePlayScreen inherits Rectangle {
                         if i == root.correct_guess {
                             root.guess_states[i] = ChoiceState.Correct;
                             root.found = true;
-                            prep_next();
+                            timer.running = true;
                         } else {
                             root.guess_states[i] = ChoiceState.Wrong;
                         }
@@ -128,9 +128,9 @@ export component ChoicePlayScreen inherits Rectangle {
                 for t[i] in root.guesses : ImageChoice {
                     state: guess_states[i];
                     height: root.height /4;
-                    width: (root.width - 30px)/2; 
-                    x: i==0 || i == 2 ? 0: self.width + 10px;
-                    y: i==0 || i == 1 ? 0: self.height + 10px;
+                    width: (root.width - (Sizes.padding*2 + Sizes.spacing))/2; 
+                    x: i==0 || i == 2 ? 0: self.width + Sizes.spacing;
+                    y: i==0 || i == 1 ? 0: self.height + Sizes.spacing;
                     image : root.guesses[i].img;
                     clicked => {
                         if root.found || root.guess_states[i] != ChoiceState.NotClicked{
@@ -140,7 +140,7 @@ export component ChoicePlayScreen inherits Rectangle {
                         if i == root.correct_guess {
                             root.guess_states[i] = ChoiceState.Correct;
                             root.found = true;
-                            prep_next();
+                            timer.running = true;
                         } else {
                             root.guess_states[i] = ChoiceState.Wrong;
                         }

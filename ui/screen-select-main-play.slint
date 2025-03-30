@@ -1,5 +1,6 @@
 import { Button, VerticalBox, HorizontalBox } from "std-widgets.slint";
-import { MultiChoice, RegularText, SubText, TitleText, ScrollChoice, TextButton } from "widgets.slint";
+import { MultiChoice, RegularText, TitleText, ScrollChoice, TextButton } from "widgets.slint";
+import { TextStyle, FontSettings, Palette, Sizes } from "styling.slint";
 
 export component SelectMainPlayScreen inherits Rectangle {
     callback play(cat_choices:[int], im_choice:int, play_mode:int);
@@ -14,16 +15,17 @@ export component SelectMainPlayScreen inherits Rectangle {
     in property <[string]> guess_type_names: ["Country", "Capital", "Languages", "Borders", "Region", "Currencies"];
     property <bool> custom : false;
     VerticalBox {
-        padding: 10px;
+        padding: Sizes.padding;
         TitleText{
             text: "Free Play";
         }
         
         Rectangle {
-            background: #ffffff3c;
-            border-radius: 10px;
+            background: Palette.accent1;
+            border-radius: Sizes.std_radius;
             VerticalBox {
-                padding: 10px;
+                padding: Sizes.spacing;
+                spacing: Sizes.spacing;
                 RegularText {
                     text: "Difficulty";
                     horizontal-alignment: center;
@@ -31,16 +33,15 @@ export component SelectMainPlayScreen inherits Rectangle {
 
                 w_play_mode := MultiChoice {
                     choices: ["Learn", "Easy", "Medium", "Hard"];
-                    choices_len: 4;
                     choice_num: 2;
-                    spacing: 10pt;
                 }
-                SubText {
+                RegularText {
                     text: w_play_mode.choice_num == 0 ? "All info is shown":
                         w_play_mode.choice_num == 1 ? "All hints are shown": 
                         w_play_mode.choice_num == 2 ? "Hints are available":
                         "No hints";
                     horizontal-alignment: center;
+                    style: FontSettings.body-small;
                 }
             }
         }
@@ -54,8 +55,7 @@ export component SelectMainPlayScreen inherits Rectangle {
 
         TitleText {
             text: "Playing Categories";
-            horizontal-alignment: center;
-            vertical-alignment: center;
+            style: FontSettings.title-small;
         }
         Rectangle {
             HorizontalBox {
@@ -123,7 +123,7 @@ export component SelectMainPlayScreen inherits Rectangle {
                 }
                 
                 VerticalBox {
-                    padding: 0pt;
+                    padding: 0;
                     
                     RegularText {
                         text: "What is shown";
@@ -142,7 +142,7 @@ export component SelectMainPlayScreen inherits Rectangle {
     
                     VerticalLayout {
                         padding: 0;
-                        spacing: 0;
+                        spacing: 2*Sizes.spacing - Sizes.size_bar;
                         cat1 := ScrollChoice {
                             width: 100%;
                             choices: root.guess_type_names;

@@ -1,11 +1,12 @@
 import { Button, HorizontalBox, VerticalBox } from "std-widgets.slint";
-import { TitleText, RegularText, SubText, MultiChoice, TextButton } from "widgets.slint";
+import { TitleText, RegularText, MultiChoice, TextButton } from "widgets.slint";
 import { CatInfo, MainPlayUpdate, Screen, FullInfo, ChoicePlayUpdate } from "structs.slint";
 import { SelectLookUpScreen, LookUpScreen } from "screen-look-up.slint";
 import { SelectMainPlayScreen } from "screen-select-main-play.slint";
 import { MainPlayScreen } from "screen-main-play.slint";
 import { SelectChoicePlayScreen } from "screen-select-choice-play.slint";
 import { ChoicePlayScreen } from "screen-choice-play.slint";
+import { TextStyle, FontSettings, Palette, Sizes } from "styling.slint";
 
 export component AppWindow inherits Window {
     title: "Geo quiz";
@@ -110,13 +111,13 @@ export component AppWindow inherits Window {
     // ***************************************************************** //
     TouchArea {
         visible: root.screen != Screen.Start;
-        x: 10px;
-        y: 10px;
-        width: 40px;
-        height: 40px;
+        x: Sizes.padding;
+        y: Sizes.padding;
+        width: Sizes.title_height;
+        height: Sizes.title_height;
         Image {
             source: @image-url("back.svg");
-            height: 40px;
+            height: Sizes.title_height;
         }
 
         clicked => {
@@ -129,55 +130,50 @@ export component AppWindow inherits Window {
     Rectangle {
         visible: root.screen == Screen.Start;
         VerticalLayout {
-            padding: 10px;
-            spacing: 10px;
+            padding: Sizes.padding;
+            spacing: Sizes.spacing;
             // padding-left : root.width/10;
             TitleText {
                 text: "Geo Quiz";
             }
             Rectangle {}
             Rectangle {
-                background: #ffffff3c;
-                border-radius: 10px;
+                background: Palette.accent1;
+                border-radius: Sizes.std_radius;
                 VerticalBox {
-                    padding: 10px;
+                    padding: Sizes.spacing;
+                    spacing: Sizes.spacing;
                     w_hard := MultiChoice {
-                        width: 100%;
                         choices: ["Independent only", "All territories"];
-                        choices_len: 2;
-                        width_per_elem: 45%;
-                        spacing: 20px;
                     }
-                    SubText {
+                    RegularText {
                         text: w_hard.not_default?  "Show all territories (250 different)" : "Show only independent countries (190 different)" ;
                         horizontal-alignment: center;
                         vertical-alignment: center;
                         width: 100%;
                         wrap: word-wrap;
+                        style: FontSettings.body-small;
                     }
                 }
             }
     
             Rectangle {
-                background: #ffffff3c;
-                border-radius: 10px;
+                background: Palette.accent1;
+                border-radius: Sizes.std_radius;
                 VerticalBox {
-                    // padding: 10px;
-                    
+                    padding: Sizes.spacing;
+                    spacing: Sizes.spacing;
                     w_order := MultiChoice {
-                        width: 100%;
                         choices: ["Hard first", "Easy first"];
-                        choices_len: 2;
-                        width_per_elem: 45%;
-                        spacing: 20px;
                     }
 
-                    SubText {
+                    RegularText {
                         text: w_order.not_default?  "Start with better known countries (according to previous scores)" : "Start with lesser known countries (according to previous scores)";
                         horizontal-alignment: center;
                         vertical-alignment: center;
                         width: 100%;
                         wrap: word-wrap;
+                        style: FontSettings.body-small;
                     }
                 }
             }
@@ -242,7 +238,6 @@ export component AppWindow inherits Window {
         guess_type_names: root.txt_categories_name;
         visible: root.screen == Screen.SelectMainPlay;
         play(cat_choices, im_choice, play_mode) => {
-            debug("here");
             main_play_s.play_mode = 3 -  play_mode;
             start_play(
                 cat_choices, 

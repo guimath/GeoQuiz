@@ -70,17 +70,17 @@
 - [x] Re shuffle between attempts
 - [x] Catch score parse error and use reset score instead;
 - [x] Add num and out_of to choices play
-
-## Priority 
-- [ ] See how to catch back button on android (https://docs.rs/android-activity/latest/android_activity/input/enum.Keycode.html#variant.TvMediaContextMenu)
-- [ ] For choices play treat empty infos ?
-- [ ] Add "Score reset" message
 - [x] Improve UI
   - [x] ScrollChoice add click on arrows and better sizing
   - [x] Dedicated button for more customizations
   - [x] Harmonize sizes
   - [x] Better each Screen
-  - [ ] Add globals
+  - [x] Add globals
+
+## Priority 
+- [ ] See how to catch back button on android (https://docs.rs/android-activity/latest/android_activity/input/enum.Keycode.html#variant.TvMediaContextMenu)
+- [ ] For choices play treat empty infos ?
+- [ ] Add "Score reset" message
 
 ## Secondary
 - [ ] Add a Readme & LICENSE & Publish

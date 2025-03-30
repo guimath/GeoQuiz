@@ -1,6 +1,7 @@
 import { ScrollView, LineEdit, HorizontalBox, VerticalBox } from "std-widgets.slint";
 import { ChoiceElem, RegularText, TitleText } from "widgets.slint";
 import { FullInfo } from "structs.slint";
+import { TextStyle, FontSettings, Palette, Sizes } from "styling.slint";
 
 export component SelectLookUpScreen inherits Rectangle {
     callback search_changed(search: string);
@@ -8,8 +9,8 @@ export component SelectLookUpScreen inherits Rectangle {
     in property <[string]> all: ["Albania", "Argentina", "Australia", "Barbados"];
     in-out property <[bool]> on: [true, true, true, true];
     VerticalLayout {
-        padding: 10px;
-        spacing: 10px;
+        padding: Sizes.padding;
+        spacing: Sizes.spacing;
         TitleText {  
             text: "Look Up";
         }
@@ -20,15 +21,15 @@ export component SelectLookUpScreen inherits Rectangle {
 
         scroll := ScrollView {
             VerticalLayout {
-                padding-left:12px; 
+                padding-left: Sizes.size_bar; 
                 for country[i] in all: VerticalBox{
                     padding: 0;
-                    padding-bottom: root.on[i] ? 5px : 0pt;
+                    padding-bottom: root.on[i] ? Sizes.spacing/2 : 0;
                     width: 100%;
                     ChoiceElem {
                     radius: 0;
                     text: country;
-                    height: root.on[i] ? 30pt : 0pt;
+                    height: root.on[i] ? Sizes.height_look_up : 0;
                     visible: root.on[i];
                     animate height {
                         duration: 300ms;
@@ -64,29 +65,26 @@ export component LookUpScreen inherits Rectangle {
         ]};
     
     VerticalLayout {
-        // padding: 20px;
-        padding-top: 10px;
-        spacing: 10px;
+        padding: 0;
+        padding-top: Sizes.padding;
+        padding-bottom: Sizes.padding;
+        spacing: Sizes.spacing;
         HorizontalBox {
             padding: 0;
-            width: root.width;
             alignment: center;
-            Rectangle {}
-            RegularText {
+            Rectangle {width: Sizes.title_height;}
+            TitleText {
                 text: infos.name;
-                horizontal-alignment: center;
-                vertical-alignment: center;
-                height: 50px;
                 wrap: word-wrap;
             }
-            Rectangle {}
+            Rectangle {width: Sizes.title_height;}
         }
         scroll := ScrollView {
             vertical-scrollbar-policy: always-off;
             VerticalLayout {
-                width: scroll.width - 12px;
-                padding-left: 12px;
-                for image_infos[i] in infos.image-infos: s :=VerticalLayout{
+                width: scroll.width - Sizes.size_bar;
+                padding-left: Sizes.size_bar;
+                for image_infos[i] in infos.image-infos: s := VerticalLayout{
                     padding: 0;
                     spacing: 0;
                     width: 100%;
@@ -100,19 +98,22 @@ export component LookUpScreen inherits Rectangle {
                         text: image_infos.title;
                         horizontal-alignment: center;
                         vertical-alignment: center;
+                        style: FontSettings.title-small;
                     }
                     
                 }
-                Rectangle {height: 10px;}
+                Rectangle {height: Sizes.spacing;}
                 for text_infos[i] in infos.text-infos: Rectangle{
-                    background: Math.mod(i,2) == 0 ? grey : #00000000;
+                    background: Math.mod(i,2) == 0 ? Palette.accent1 : Palette.background;
                     HorizontalBox {
                         RegularText {
                             text: "\{text_infos.title}:";
                             vertical-alignment: center;
+                            style: FontSettings.title-small;
                         }
                         RegularText {
                             horizontal-stretch: 1;
+                            vertical-alignment: center;
                             text: text_infos.text;
                             wrap: word-wrap;
                         }

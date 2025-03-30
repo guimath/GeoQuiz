@@ -1,0 +1,35 @@
+export struct TextStyle  {
+    font-size: length,
+    font-weight: int
+}
+export global FontSettings {
+    out property <TextStyle> title-large: { font-size: 20pt, font-weight: 500 };
+    out property <TextStyle> title-small: { font-size: 16pt, font-weight: 500 };
+    out property <TextStyle> body-large : { font-size: 12pt, font-weight: 400 };
+    out property <TextStyle> body-small : { font-size: 10pt, font-weight: 400 };
+}
+
+export global Palette {
+    out property <brush> regular_text: #ffffff;
+    out property <brush> background: #2a282d;
+    out property <brush> buttons: #4a4458ff;
+    out property <brush> accent1: #ffffff3c;
+    out property <brush> accent2: #ffffff62;
+    out property <brush> correct: #146d00;
+    out property <brush> wrong: #9a0000;
+    out property <brush> gold: #e2cb00;
+}
+
+export global Sizes {
+    out property <length> padding: 10px;
+    out property <length> spacing: 10px;
+    out property <length> title_height: 40px;
+    out property <length> button_radius: 40px;
+    out property <length> std_radius: 10px;
+    out property <length> size_bar: 12px;
+    out property <length> height_look_up: 30px;
+    out property <length> height_multi_choice: 30pt;
+    out property <length> height_hidden_text: 60pt;
+    out property <length> size_hint: 40pt;
+    out property <length> width_arrow: 6pt;
+}

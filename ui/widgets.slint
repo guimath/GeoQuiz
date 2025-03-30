@@ -1,20 +1,15 @@
 import { Button, VerticalBox, HorizontalBox, TextEdit, CheckBox, ComboBox, ScrollView } from "std-widgets.slint";
 import { CatInfo, ChoiceState, TxtOrImg} from "structs.slint";
-
+import { TextStyle, FontSettings, Palette, Sizes } from "styling.slint";
 
 export component RegularText inherits Text {
-    // font-family: 
-    font-size: 12pt;
-    // color: white;
+    in property <TextStyle> style: FontSettings.body-large;
+    font-size: style.font-size;
+    font-weight: style.font-weight;
 }
-export component SubText inherits Text {
-    // font-family: 
-    font-size: 10pt;
-    // color: white;
-}
-export component TitleText inherits Text {
-    font-size: 20pt;
-    height : 40px;
+export component TitleText inherits RegularText {
+    style: FontSettings.title-large;
+    height : Sizes.title_height;
     horizontal-alignment: center;
     vertical-alignment: center;
 }
@@ -23,22 +18,19 @@ export component ChoiceElem inherits TouchArea {
     in property <string> text;
     in property <ChoiceState> state : ChoiceState.NotClicked;
     in property <color> background_elem: 
-        root.state == ChoiceState.NotClicked?  #ffffff3c:
-        root.state == ChoiceState.Correct?  #146d00:
-        #9a0000;
-    in property <length> radius: 10px;
+        root.state == ChoiceState.NotClicked?  Palette.accent1:
+        root.state == ChoiceState.Correct?  Palette.correct:
+        Palette.wrong;
+    in property <length> radius: Sizes.std_radius;
     public function click() {
         root.clicked();
     } 
-    width: 20%;
-    height: 30pt;
     Rectangle {
         width: 100%;
         border-radius: radius;
         background: root.background_elem;
     }
     RegularText {
-        height: 30pt;
         width:100%;
         horizontal-alignment: center;
         vertical-alignment: center;
@@ -48,12 +40,13 @@ export component ChoiceElem inherits TouchArea {
 }
 export component MultiChoice {
     in property <[string]> choices;
-    in property <float> choices_len;
-    in property <percent> width_per_elem: 20%;
-    in property <length> spacing : 10pt;
-    in property <color> background_elem : #ffffff3c;
     in-out property <int> choice_num : 0;
     out property <bool> not_default : root.choice_num != 0;
+
+    in property <length> height_elem : Sizes.height_multi_choice;
+    in property <length> spacing : 2*Sizes.spacing;
+    in property <length> side_padding : Sizes.spacing;
+    in property <length> width_per_elem: (root.width - 2*root.side_padding -(choices.length - 1)*root.spacing)/choices.length;
   
     HorizontalBox {
         padding: 0;
@@ -61,22 +54,17 @@ export component MultiChoice {
         alignment: center;
         for text[index] in root.choices : ChoiceElem {
             text: text;
-            width: width_per_elem;
-            background_elem: root.background_elem;
+            width: root.width_per_elem;
+            height: root.height_elem;
             clicked => {root.choice_num = index}
         }
-            
-        
-    }
-    e := Rectangle {
-        width: root.width_per_elem;
     }
     highlight := Rectangle{
-        x: (root.width - e.width*root.choices_len - root.spacing*(root.choices_len - 1))/2 + (e.width+root.spacing)*root.choice_num;
-        background: #ffffff3c;
-        height: 30pt;
+        x: (root.width - root.width_per_elem*root.choices.length - root.spacing*(root.choices.length - 1))/2 + (root.width_per_elem+root.spacing)*root.choice_num;
+        background: Palette.accent1;
+        height: root.height_elem;
         width:root.width_per_elem;
-        border-radius: 10px;
+        border-radius: Sizes.std_radius;
         animate x {
             duration: 300ms;
             easing: ease-in-out;
@@ -88,14 +76,14 @@ export component MultiChoice {
 component ToggleStar inherits TouchArea {
     in property <bool> on: false;
     in property <bool> semi: true;
-    height: 40px;
-    width: 40px;
+    height: Sizes.title_height;
+    width: Sizes.title_height;
     im := Image {
-        height: 40px;
-        width: 40px;
+        height: Sizes.title_height;
+        width: Sizes.title_height;
         source: @image-url("star.svg");
-        colorize: on? #e2cb00:
-            root.semi? @radial-gradient(circle, white 0%, #e2cb00 100%)://#f2edbc: 
+        colorize: on? Palette.gold:
+            root.semi? @radial-gradient(circle, white 0%, Palette.gold 100%):
             white;
     }
 }
@@ -107,6 +95,7 @@ export component ThreeStartScore {
     VerticalBox {
         padding: 0;
         HorizontalBox {
+            spacing: Sizes.spacing;
             padding: 0;
             for i in [0, 1, 2, 4, 5] : ToggleStar {
                 clicked => {
@@ -117,7 +106,6 @@ export component ThreeStartScore {
                 on: root.score>i;
                 semi: root.prev_score>i;
             }
-           
         }
     }
 }
@@ -129,7 +117,7 @@ export component HiddenText inherits TouchArea {
     in-out property <string> type;
     in property <bool> show;
     in-out property <bool> show_first_letter;
-    in-out property <length> size_hint: 40pt;
+    in-out property <length> size_hint: Sizes.size_hint;
     in property <int> play_mode; 
     callback hint();
 
@@ -139,10 +127,10 @@ export component HiddenText inherits TouchArea {
         self.first_letter = cat.first;
 
         if root.play_mode == 1 && cat.with_hint && !root.show { 
-            self.size_hint = 40pt;
+            self.size_hint = Sizes.size_hint;
         }
         else {
-            self.size_hint = 0pt;
+            self.size_hint = 0;
         }
 
         if root.play_mode == 2 && cat.with_hint {
@@ -158,19 +146,17 @@ export component HiddenText inherits TouchArea {
     VerticalBox {
         padding: 0;
         Rectangle {
-            background: #4a4458ff;
-            border-radius: 10px;
-            preferred-height: 70pt;
+            background: Palette.buttons;
+            border-radius: Sizes.std_radius;
+            preferred-height: Sizes.height_hidden_text;
             HorizontalLayout {
-                padding: 0;
-                padding-left: 10px;
-                padding-right: 10px;
+                padding: Sizes.spacing;
+                spacing: Sizes.spacing;
                 w_type := RegularText {
                     horizontal-alignment: right;
                     vertical-alignment: center;
                     text: "\{root.type}:";
                 }
-                Rectangle {width: 10px;}
                 RegularText { 
                     horizontal-stretch: 1;
                     vertical-stretch: 1;
@@ -181,15 +167,12 @@ export component HiddenText inherits TouchArea {
                     visible: root.show || root.show_first_letter;
                     wrap: word-wrap;
                 }
-                
-                
             }   
         }
-        
     }
     
     TouchArea {
-        x : root.width - root.size_hint - 10px;
+        x : root.width - root.size_hint - Sizes.spacing;
         height: root.size_hint;
         width: root.size_hint;
         clicked => {
@@ -197,31 +180,26 @@ export component HiddenText inherits TouchArea {
             root.size_hint = 0;
             root.show_first_letter = true
         }
-        animate height, width {
-            duration: 300ms;
-            easing: ease-in-out;
-        }
     }
     Image {
-        x : root.width - root.size_hint  - 10px;
-        source: @image-url("hint.svg");
+        x : root.size_hint == 0 ? root.width - Sizes.size_hint/2 - Sizes.spacing : root.width - Sizes.size_hint - Sizes.spacing;
         height: root.size_hint;
         width: root.size_hint;
+        source: @image-url("hint.svg");
         animate height, width, x {
-            duration: 400ms;
-            easing: ease-in-out;
+            duration: 250ms;
         }
     }
 }
 
 export component ScrollChoice inherits HorizontalLayout {
     in property <[string]> choices: ["Country", "Capital", "Languages", "Borders", "Region", "Currencies"];
-    in property <length> width_per_elem: (root.width - root.spacing_i *2 - 2*root.size_bar - 2*root.width_arrow)/3;
+    in property <length> width_per_elem: (root.width - root.spacing_i *2 - 2*Sizes.size_bar - 2*root.width_arrow)/3;
     in-out property <int> choice_num:0;
-    in property <length> spacing_i: 20px;
-    in property <length> width_arrow: 6pt;
-    in property <length> height_elem: 30pt;
-    property <length> size_bar: 12px; // bar is showing on modern-black
+
+    in property <length> spacing_i: 2*Sizes.spacing;
+    in property <length> width_arrow: Sizes.width_arrow;
+    in property <length> height_elem: Sizes.height_multi_choice;
     property <length> Width_w_spacing : root.spacing_i + root.width_per_elem;
 
     function set_x() -> length {
@@ -238,7 +216,7 @@ export component ScrollChoice inherits HorizontalLayout {
             height: 100%;
             width: 100%;
             source: @image-url("arrow_left.svg");
-            colorize: root.choice_num == 0 ? #ffffff55: white;
+            colorize: root.choice_num == 0 ? white.transparentize(0.5) : white;
         }
         clicked => {
             if root.choice_num > 0 {root.choice_num -= 1;}
@@ -247,14 +225,14 @@ export component ScrollChoice inherits HorizontalLayout {
     }
 
     Rectangle {
-        width: root.size_bar;
+        width: Sizes.size_bar;
     }
     scroll := ScrollView {
 
-        height: root.height_elem +root.size_bar;
+        height: root.height_elem + Sizes.size_bar;
         viewport-height: root.height_elem;
         horizontal-scrollbar-policy: always-off;
-        width: 3*width_per_elem+ 2*root.spacing_i + root.size_bar;
+        width: 3*width_per_elem+ 2*root.spacing_i + Sizes.size_bar;
         viewport-x: set_x();
         
         HorizontalLayout {
@@ -265,7 +243,7 @@ export component ScrollChoice inherits HorizontalLayout {
                 height: root.choice_num == index ? root.height_elem: root.height_elem - 5pt;
                 text: text;
                 width: root.width_per_elem;
-                background_elem: index == root.choice_num ? #ffffff62 : #ffffff3c;
+                background_elem: index == root.choice_num ? Palette.accent2 : Palette.accent1;
                 clicked => {root.choice_num = index; scroll.viewport-x= set_x();}
                 animate height {
                     duration: 50ms;
@@ -294,7 +272,7 @@ export component ScrollChoice inherits HorizontalLayout {
             width: 100%;
             source: @image-url("arrow_left.svg");
             rotation-angle: -180deg;
-            colorize: root.choice_num == choices.length - 1 ? #ffffff55: white;
+            colorize: root.choice_num == choices.length - 1 ? white.transparentize(0.5): white;
         }
         clicked => {
             if root.choice_num < (choices.length - 1) {root.choice_num += 1;}
@@ -338,23 +316,18 @@ export component ImageChoice inherits TouchArea {
     in property <image> image;
     in property <ChoiceState> state : ChoiceState.NotClicked;
     in property <color> background_elem: 
-        root.state == ChoiceState.NotClicked?  #ffffff3c:
-        root.state == ChoiceState.Correct?  #146d00:
-        #9a0000;
-    in property <length> radius: 10px;
+        root.state == ChoiceState.NotClicked?  Palette.accent1:
+        root.state == ChoiceState.Correct?  Palette.correct:
+        Palette.wrong;
+    in property <length> radius: Sizes.std_radius;
    
-    height: 30pt;
     Rectangle {
-        // width: 100%;
-        // height: 100%;
-        border-radius: radius;
+        border-radius: root.radius;
         background: root.background_elem;
     }
     HorizontalBox {
-        padding: 10px;
+        padding: Sizes.padding;
         Image {
-            // height: 100%;
-            // width: root.width - 20px;
             source: root.image;
             image-fit: contain;
         }
@@ -363,7 +336,7 @@ export component ImageChoice inherits TouchArea {
 
 export component TextButton inherits HorizontalBox {
     callback clicked();
-    in property <length> border_radius : 100px;
+    in property <length> border_radius : Sizes.button_radius;
     in property <string> text : "Button";
     in property <length> width_button : root.width;
     in property <length> height_button: root.height;
@@ -374,7 +347,7 @@ export component TextButton inherits HorizontalBox {
         height: root.height_button;
         width: root.width_button;
         Rectangle {
-            background: #4a4458ff;
+            background: Palette.buttons;
             border-radius: root.border_radius;
         }
         RegularText {

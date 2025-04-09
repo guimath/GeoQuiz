@@ -10,7 +10,6 @@ export component MainPlayScreen inherits Rectangle {
     in-out property <int> num:0;
     in-out property <int> out_of:110;
     property <int> score_delayed: 0;
-    in-out property <int> info_level: 0;
     property <TxtOrImg> info: {
         is_txt: false,
         txt: "Jamaica",
@@ -19,14 +18,9 @@ export component MainPlayScreen inherits Rectangle {
     public function update_screen(info: MainPlayUpdate, cat: [CatInfo]) {
         w_score.score = info.score;
         w_score.prev_score = info.last-score;
-        if root.play_mode == 3 || info.seen {
-            root.info_level = 3
-        } else {
-            root.info_level = 0
-        }
-        w_cat1.update_cat(cat[0]);
-        w_cat2.update_cat(cat[1]);
-        w_cat3.update_cat(cat[2]);
+        w_cat1.update_cat(cat[0], info.seen);
+        w_cat2.update_cat(cat[1], info.seen);
+        w_cat3.update_cat(cat[2], info.seen);
         root.num = info.num;
         root.out_of = info.out_of;
         root.info = info.info;
@@ -38,7 +32,9 @@ export component MainPlayScreen inherits Rectangle {
         } else {
             w_score.score = score;
             root.score_delayed = score;
-            root.info_level = 3;
+            w_cat1.show = true;
+            w_cat2.show = true;
+            w_cat3.show = true;
             timer.running = true;
         }
     }
@@ -84,13 +80,6 @@ export component MainPlayScreen inherits Rectangle {
             type: "Country";
             name: "Jamaica";
             first_letter: "J";
-            show: root.info_level >= 1;
-            clicked => {
-                if root.info_level < 1 {
-                    root.info_level = 1;
-                    self.size_hint = 0;
-                }
-            }
         }
 
         w_cat2 := HiddenText {
@@ -98,14 +87,6 @@ export component MainPlayScreen inherits Rectangle {
             type: "Capital";
             name: "Kingston";
             first_letter: "K";
-            show: root.info_level >= 2;
-            clicked => {
-                if root.info_level < 2 {
-                    root.info_level = 2;
-                    self.size_hint = 0;
-                    w_cat1.size_hint = 0;
-                }
-            }
         }
 
         w_cat3 := HiddenText {
@@ -113,15 +94,6 @@ export component MainPlayScreen inherits Rectangle {
             type: "Language";
             name: "English, Jamaican Patois";
             first_letter: "E..., J...";
-            show: root.info_level > 2;
-            clicked => {
-                if root.info_level < 3 {
-                    root.info_level = 3;
-                    self.size_hint = 0;
-                    w_cat1.size_hint = 0;
-                    w_cat2.size_hint = 0;
-                }
-            }
         }
 
         Rectangle { } // spacing

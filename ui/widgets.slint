@@ -115,17 +115,23 @@ export component HiddenText inherits TouchArea {
     in-out property <string> name;
     in-out property <string> first_letter;
     in-out property <string> type;
-    in property <bool> show;
+    in-out property <bool> show;
     in-out property <bool> show_first_letter;
     in-out property <length> size_hint: Sizes.size_hint;
     in property <int> play_mode; 
     callback hint();
-
-    public function update_cat(cat: CatInfo) {
+    
+    public function update_cat(cat: CatInfo, seen: bool) {
         self.type = cat.category;
         self.name = cat.full;
         self.first_letter = cat.first;
-
+        if root.play_mode == 3 || seen {
+            root.show = true;
+        } else {
+            root.show = false;
+        }
+        
+        
         if root.play_mode == 1 && cat.with_hint && !root.show { 
             self.size_hint = Sizes.size_hint;
         }
@@ -142,6 +148,11 @@ export component HiddenText inherits TouchArea {
 
     }
     
+    clicked => {
+        root.show = true;
+        root.show_first_letter = false;
+        self.size_hint = 0;
+    }
 
     VerticalBox {
         padding: 0;

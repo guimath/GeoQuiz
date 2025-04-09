@@ -76,16 +76,18 @@
   - [x] Harmonize sizes
   - [x] Better each Screen
   - [x] Add globals
+- [x] (Main play) Remove info level to let user which ever info first
 
 ## Priority 
 - [ ] See how to catch back button on android (https://docs.rs/android-activity/latest/android_activity/input/enum.Keycode.html#variant.TvMediaContextMenu)
 - [ ] For choices play treat empty infos ?
-- [ ] Add "Score reset" message
 
 ## Secondary
 - [ ] Add a Readme & LICENSE & Publish
+- [ ] improve outlines
 - [ ] Make proper icon
 - [ ] Add selection of animation time (after score or answer found)
+- [ ] Add "Score reset" message
 - [ ] Animate (WIP)
   - [ ] Better scrolling on categories : maybe use timer to snap to center? 
   - [ ] Animate between screens? 
@@ -98,6 +100,6 @@
   - [ ] Population
   - [ ] Position on a map (show continent, highlight & circle if small)
 - [ ] Data agnostic -> so that we can create different quizzes
-  - [ ] Add support for png/jpeg (/!\ requires a way to load images to phone)
+  - [ ] Add support for png/jpeg (/!\ requires a way to load images to phone or use another preloading step and convert to base64?)
   - [ ] Remove cca, and move independent to "harder difficulty"
-  - [ ] Add categories names to json 
+  - [ ] Add categories names to json / move to csv

@@ -12,11 +12,19 @@ pub struct Category {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct AllInfos {
+    pub all_countries: Vec<CountryInfos>,
+    pub info_names : Vec<String>,
+    pub image_names : Vec<String>,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct CountryInfos {
     pub cca3: String,
     pub independent: bool,
     pub infos: Vec<Category>,
     pub images: Vec<ImageLink>,
+
 }
 #[derive(Deserialize, Serialize, Debug, Clone, Default)]
 pub struct Score {
@@ -35,7 +43,7 @@ pub enum ImageLink {
 }
 
 const JSON_DATA: &str = include_str!("../data/infos.json"); // Embed the JSON file
-pub fn get_data() -> Vec<CountryInfos> {
+pub fn get_data() -> AllInfos {
     serde_json::from_str(JSON_DATA).unwrap()
 }
 

@@ -79,6 +79,7 @@
 - [x] (Main play) Remove info level to let user which ever info first
 - [x] For choices play treat empty infos
 - [x] No release with large svgs -> switch to file and read
+- [x] Don't use constants but instead json provided info for category names
 
 ## Priority 
 - [ ] Add geographic position
@@ -92,7 +93,6 @@
 
 ## Secondary
 - [ ] Add a Readme & LICENSE & Publish
-- [ ] Don't use constants but instead json provided info for category names
 - [ ] Make proper icon
 - [ ] Add "Score reset" message
 - [ ] Animate (WIP)

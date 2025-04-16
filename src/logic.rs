@@ -7,35 +7,9 @@ use std::{cmp::Ordering, path::PathBuf};
 use crate::info_parse::{self, CountryInfos, Score, ImageLink};
 
 slint::include_modules!();
-const CATEGORIES_TXT: [&str; 6] = [
-    "Country",
-    "Capital",
-    "Languages",
-    "Currencies",
-    "Region",
-    "Borders",
-];
-const CATEGORIES_IMG: [&str; 2] = ["Flag", "Outline"];
-const CATEGORIES: [&str; 8] = [
-    "Flag",
-    "Outline",
-    "Country",
-    "Capital",
-    "Languages",
-    "Currencies",
-    "Region",
-    "Borders",
-];
-const NUM_IMG_TYPE: usize = CATEGORIES_IMG.len();
-fn is_info_txt(i: usize) -> bool {
-    i >= NUM_IMG_TYPE
-}
-fn txt_only_to_global_type(i: usize) -> usize {
-    i + NUM_IMG_TYPE
-}
-fn to_txt_idx(i: usize) -> usize {
-    i - NUM_IMG_TYPE
-}
+
+
+
 
 
 
@@ -48,6 +22,9 @@ pub struct AppLogic {
     all_countries: Vec<CountryInfos>,
     all_countries_order: Vec<CountryInfos>,
     pub all_names: Vec<SharedString>,
+    txt_cat_names: Vec<String>,
+    img_cat_names: Vec<String>,
+    all_cat_names: Vec<String>,
     search_names: Vec<String>,
     main_info_type: usize,
     main_guess_types: [usize; 3],
@@ -64,7 +41,12 @@ pub struct AppLogic {
 impl AppLogic {
     pub fn new(score_path: PathBuf) -> Self {
         let mut s = Self::default();
-        s.all_countries_order = info_parse::get_data();
+        let all_data = info_parse::get_data();
+        s.all_countries_order = all_data.all_countries;
+        s.txt_cat_names = all_data.info_names;
+        s.img_cat_names = all_data.image_names;
+        s.all_cat_names = s.img_cat_names.clone();
+        s.all_cat_names.extend(s.txt_cat_names.clone());
         s.all_countries_order
             .sort_by(|a, b| a.infos[0].full.cmp(&b.infos[0].full));
         s.all_names = s
@@ -81,9 +63,9 @@ impl AppLogic {
 
     pub fn set_config(&mut self, easy_first: bool, hard_mode: bool, main_play:bool) {
         self.score_path = if main_play {
-            self.score_folder.clone().join("score_main.json")
+            self.score_folder.join("score_main.json")
         } else {
-            self.score_folder.clone().join("score_choice.json")
+            self.score_folder.join("score_choice.json")
         };
         self.all_countries = if !hard_mode {
             self.all_countries_order
@@ -124,9 +106,9 @@ impl AppLogic {
 
     pub fn prepare_main_play(&mut self, info_type: usize, guess_types: [usize; 3]) {
         self.main_guess_types = [
-            txt_only_to_global_type(guess_types[0]),
-            txt_only_to_global_type(guess_types[1]),
-            txt_only_to_global_type(guess_types[2]),
+            self.txt_only_to_global_type(guess_types[0]),
+            self.txt_only_to_global_type(guess_types[1]),
+            self.txt_only_to_global_type(guess_types[2]),
         ];
         self.main_info_type = info_type;
         self.randomize_order()
@@ -171,13 +153,13 @@ impl AppLogic {
             .last_score as i32;
 
         let mut info = TxtOrImg {
-            is_txt: is_info_txt(self.main_info_type),
+            is_txt: self.is_info_txt(self.main_info_type),
             txt: SharedString::default(),
             img: Image::default(),
         };
 
         if info.is_txt {
-            info.txt = country.infos[to_txt_idx(self.main_info_type)]
+            info.txt = country.infos[self.to_txt_idx(self.main_info_type)]
                 .full
                 .clone()
                 .into();
@@ -195,10 +177,10 @@ impl AppLogic {
         };
         let infos: [CatInfo; 3] = (0..3)
             .map(|i| {
-                let cat = country.infos[to_txt_idx(self.main_guess_types[i])].clone();
+                let cat = country.infos[self.to_txt_idx(self.main_guess_types[i])].clone();
                 CatInfo {
                     full: cat.full.into(),
-                    category: CATEGORIES[self.main_guess_types[i]].into(),
+                    category: self.all_cat_names[self.main_guess_types[i]].clone().into(),
                     first: cat.hint.clone().unwrap_or(" ".to_string()).into(),
                     with_hint: cat.hint.is_some(),
                 }
@@ -249,7 +231,7 @@ impl AppLogic {
     }
 
     fn choice_same_info(&self, idx:usize) -> bool {
-        if is_info_txt(self.choice_info_type) {
+        if self.is_info_txt(self.choice_info_type) {
             let info = &self.all_countries[idx].infos[self.choice_info_type].full;
             let compare = &self.all_countries[self.current].infos[self.choice_info_type].full;
             info ==  compare
@@ -261,8 +243,8 @@ impl AppLogic {
     }    
     fn generate_guesses(&self) -> [usize; 4] {
         let guess_type = self.choice_guess_type;
-        let unique_indices: Vec<usize> = if is_info_txt(guess_type) {
-            let guess_idx = to_txt_idx(guess_type); 
+        let unique_indices: Vec<usize> = if self.is_info_txt(guess_type) {
+            let guess_idx = self.to_txt_idx(guess_type); 
             let mut hash_map: HashMap<String, usize> = HashMap::new();
             for (idx, item) in self.all_countries.iter().enumerate() {
                 if self.choice_same_info(idx) {continue;}
@@ -297,10 +279,10 @@ impl AppLogic {
 
     pub fn get_choices(&mut self) -> ChoicePlayUpdate {
         let mut info = TxtOrImg::default();
-        info.is_txt = is_info_txt(self.choice_info_type);
+        info.is_txt = self.is_info_txt(self.choice_info_type);
         let mut guesses = vec![TxtOrImg::default(); 4];
         for i in 0..4 {
-            guesses[i].is_txt = is_info_txt(self.choice_guess_type);
+            guesses[i].is_txt = self.is_info_txt(self.choice_guess_type);
         }
         
 
@@ -327,7 +309,7 @@ impl AppLogic {
 
         let country = self.all_countries[self.current].clone();
         // adding default info only if the idx 0 info is not either infos
-        let default_type = txt_only_to_global_type(0);
+        let default_type = self.txt_only_to_global_type(0);
         let default_info = if self.choice_guess_type != default_type && self.choice_info_type != default_type {
             country.infos[0].full.clone()
         } else {
@@ -335,13 +317,13 @@ impl AppLogic {
         };
 
         if info.is_txt {
-            info.txt = country.infos[to_txt_idx(self.choice_info_type)].full.clone().into();
+            info.txt = country.infos[self.to_txt_idx(self.choice_info_type)].full.clone().into();
         } else {
             info.img = self.load_img(&country.images[self.choice_info_type]);
         }
 
         if guesses[0].is_txt {
-            let idx = to_txt_idx(self.choice_guess_type); 
+            let idx = self.to_txt_idx(self.choice_guess_type); 
             for i in 0..4 {
                 guesses[i].txt = self.all_countries[guess_idx[i]].infos[idx].full.clone().into();
             }
@@ -378,15 +360,15 @@ impl AppLogic {
         let mut text_infos: Vec<TextWithTitle> = Vec::new();
         let mut image_infos: Vec<ImageWithTitle> = Vec::new();
 
-        for i in 0..CATEGORIES.len() {
-            if is_info_txt(i) {
+        for i in 0..self.all_cat_names.len() {
+            if self.is_info_txt(i) {
                 text_infos.push(TextWithTitle {
-                    title: CATEGORIES[i].into(),
-                    text: country.infos[to_txt_idx(i)].full.clone().into(),
+                    title: self.all_cat_names[i].clone().into(),
+                    text: country.infos[self.to_txt_idx(i)].full.clone().into(),
                 });
             } else {
                 image_infos.push(ImageWithTitle {
-                    title: CATEGORIES[i].into(),
+                    title: self.all_cat_names[i].clone().into(),
                     image: self.load_img(&country.images[i]),
                 });
             }
@@ -418,14 +400,25 @@ impl AppLogic {
     pub fn reset_score(&self) {
         info_parse::reset_score(self.score_folder.clone())
     }
+    fn is_info_txt(&self, i: usize) -> bool {
+        i >= self.img_cat_names.len()
+    }
+    fn txt_only_to_global_type(&self, i: usize) -> usize {
+        i + self.img_cat_names.len()
+    }
+    fn to_txt_idx(&self, i: usize) -> usize {
+        i - self.img_cat_names.len()
+    }
+
     pub fn get_all_categories_names(&self) -> ModelRc<SharedString> {
-        let v: VecModel<SharedString> = CATEGORIES.iter().map(|&x| SharedString::from(x)).collect();
+        let v: VecModel<SharedString> = self.all_cat_names.iter().map(|x| SharedString::from(x)).collect();
         ModelRc::new(v)
     }
+
     pub fn get_txt_categories_names(&self) -> ModelRc<SharedString> {
-        let v: VecModel<SharedString> = CATEGORIES_TXT
+        let v: VecModel<SharedString> = self.txt_cat_names
             .iter()
-            .map(|&x| SharedString::from(x))
+            .map(|x| SharedString::from(x))
             .collect();
         ModelRc::new(v)
     }

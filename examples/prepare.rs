@@ -35,7 +35,7 @@ struct CountryStat {
     subregion: String,
     borders: Vec<String>,
 }
-use geo_quiz::info_parse::{Category, CountryInfos, ImageLink};
+use geo_quiz::info_parse::{AllInfos, Category, CountryInfos, ImageLink};
 
 fn hint_from_name(s: String) -> String {
     let mut s = s.chars().nth(0).unwrap_or(' ').to_string();
@@ -52,20 +52,17 @@ fn main() {
         cca3_to_name.insert(country.cca3, country.name.common);
     }
 
-    let converted: Vec<CountryInfos> = raw
+    let all_countries: Vec<CountryInfos> = raw
         .iter()
         .map(|x: &CountryStat| {
             let mut infos: Vec<Category> = Vec::new();
-            let mut txt_cat_names: Vec<&str> = Vec::new();
             // NAME
-            txt_cat_names.push("Country");
             let full = x.name.common.clone();
             infos.push(Category {
                 full: full.clone(),
                 hint: Some(hint_from_name(full)),
             });
             // CAPITAL
-            txt_cat_names.push("Capital");
             let hint: Vec<String> = x
                 .capital
                 .iter()
@@ -76,7 +73,6 @@ fn main() {
                 hint: Some(hint.join(", ")),
             });
             // LANGUAGES
-            txt_cat_names.push("Languages");
             let full: Vec<String> = x.languages.values().map(|v| v.to_string()).collect();
             let hint: Vec<String> = full.iter().map(|s| hint_from_name(s.clone())).collect();
             infos.push(Category {
@@ -84,7 +80,6 @@ fn main() {
                 hint: Some(hint.join(", ")),
             });
             // CURRENCIES
-            txt_cat_names.push("Currencies");
             let mut full = Vec::new();
             if let Some(c) = x.currencies.clone() {
                 if let CurrencyType::PRESENT(currencies) = c {
@@ -99,11 +94,9 @@ fn main() {
                 hint: None,
             });
             // REGION
-            txt_cat_names.push("Region");
             let full = format!("{} ({})", x.subregion, x.region);
             infos.push(Category { full, hint: None });
             // BORDERS
-            txt_cat_names.push("Borders");
             let full: Vec<String> = x
                 .borders
                 .iter()
@@ -116,14 +109,11 @@ fn main() {
             });
 
             let mut images: Vec<ImageLink> = Vec::new();
-            let mut img_cat_names: Vec<&str> = Vec::new();
             // SVG_FLAG
-            img_cat_names.push("Flag");
             let svg_path_o = format!("data/flags/{}.svg", x.cca3.to_lowercase());
             let svg_path = Path::new(&svg_path_o);
             images.push(ImageLink::EmbeddedSVG(fs::read_to_string(svg_path).unwrap()));
             // SVG_OUTLINE
-            img_cat_names.push("Outline");
             println!("{}",x.cca3.clone());
             let svg_path_o = format!("positions/{}.svg", x.cca3.to_lowercase());
             images.push(ImageLink::FilePath(svg_path_o));
@@ -135,6 +125,21 @@ fn main() {
             }
         })
         .collect();
+    let converted = AllInfos{
+        all_countries,
+        info_names: vec![
+            "Country".to_string(),
+            "Capital".to_string(),
+            "Language".to_string(),
+            "Currencies".to_string(),
+            "Region".to_string(),
+            "Borders".to_string(),
+        ],
+        image_names: vec![
+            "Flag".to_string(),
+            "Map".to_string(),
+        ]
+    };
     let out_json = serde_json::to_string(&converted).unwrap();
     let mut file = File::create("data/infos.json").unwrap();
     file.write_all(out_json.as_bytes()).unwrap();

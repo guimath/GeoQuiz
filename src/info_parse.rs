@@ -16,7 +16,7 @@ pub struct CountryInfos {
     pub cca3: String,
     pub independent: bool,
     pub infos: Vec<Category>,
-    pub images: Vec<String>,
+    pub images: Vec<ImageLink>,
 }
 #[derive(Deserialize, Serialize, Debug, Clone, Default)]
 pub struct Score {
@@ -26,6 +26,12 @@ pub struct Score {
     pub total_score: u32,
     #[serde(rename = "sl")]
     pub last_score: u32,
+}
+
+#[derive(Deserialize, Serialize, Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ImageLink {
+    EmbeddedSVG(String),
+    FilePath(String)
 }
 
 const JSON_DATA: &str = include_str!("../data/infos.json"); // Embed the JSON file

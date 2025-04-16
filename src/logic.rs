@@ -4,7 +4,7 @@ use slint::{Image, ModelRc, SharedString, VecModel, Model};
 
 use std::collections::HashMap;
 use std::{cmp::Ordering, path::PathBuf};
-use crate::info_parse::{self, CountryInfos, Score};
+use crate::info_parse::{self, CountryInfos, Score, ImageLink};
 
 slint::include_modules!();
 const CATEGORIES_TXT: [&str; 6] = [
@@ -37,9 +37,7 @@ fn to_txt_idx(i: usize) -> usize {
     i - NUM_IMG_TYPE
 }
 
-fn load_img(raw_data: &String) -> Image {
-    Image::load_from_svg_data(raw_data.as_bytes()).unwrap()
-}
+
 
 #[derive(Default)]
 pub struct AppLogic {
@@ -58,6 +56,7 @@ pub struct AppLogic {
     choice_info_type: usize,
     choice_guess_type: usize,
     score_path: PathBuf,
+    data_path: PathBuf,
     score_folder: PathBuf,
     
 }
@@ -75,6 +74,7 @@ impl AppLogic {
             .collect();
         s.search_names = s.all_names.iter().map(|x| x.to_lowercase()).collect();
         s.score_folder = score_path.join("user0_scores");
+        s.data_path = score_path.join("data");
         info_parse::init_score_folder(s.score_folder.clone());
         s
     }
@@ -182,7 +182,7 @@ impl AppLogic {
                 .clone()
                 .into();
         } else {
-            info.img = load_img(&country.images[self.main_info_type]);
+            info.img = self.load_img(&country.images[self.main_info_type]);
         }
 
         let update = MainPlayUpdate {
@@ -337,7 +337,7 @@ impl AppLogic {
         if info.is_txt {
             info.txt = country.infos[to_txt_idx(self.choice_info_type)].full.clone().into();
         } else {
-            info.img = load_img(&country.images[self.choice_info_type]);
+            info.img = self.load_img(&country.images[self.choice_info_type]);
         }
 
         if guesses[0].is_txt {
@@ -348,7 +348,7 @@ impl AppLogic {
         } else {
             let idx = self.choice_guess_type; 
             for i in 0..4 {
-                guesses[i].img = load_img(&self.all_countries[guess_idx[i]].images[idx]);
+                guesses[i].img = self.load_img(&self.all_countries[guess_idx[i]].images[idx]);
             }
         }
         ChoicePlayUpdate { 
@@ -387,7 +387,7 @@ impl AppLogic {
             } else {
                 image_infos.push(ImageWithTitle {
                     title: CATEGORIES[i].into(),
-                    image: load_img(&country.images[i]),
+                    image: self.load_img(&country.images[i]),
                 });
             }
         }
@@ -397,6 +397,19 @@ impl AppLogic {
             text_infos: text_infos.as_slice().into(),
             image_infos: image_infos.as_slice().into(),
         }
+    }
+
+    fn load_img(&self, image_link: &ImageLink) -> Image {
+        match image_link {
+            ImageLink::EmbeddedSVG(raw_data) => {
+                Image::load_from_svg_data(raw_data.as_bytes()).unwrap()
+            },
+            ImageLink::FilePath(path) => {
+                let p = self.data_path.join(path);
+                Image::load_from_path(&p).unwrap()
+            }
+        }
+        
     }
 
     pub fn save_scores(&self) {

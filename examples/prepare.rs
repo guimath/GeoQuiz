@@ -35,7 +35,7 @@ struct CountryStat {
     subregion: String,
     borders: Vec<String>,
 }
-use geo_quiz::info_parse::{Category, CountryInfos};
+use geo_quiz::info_parse::{Category, CountryInfos, ImageLink};
 
 fn hint_from_name(s: String) -> String {
     let mut s = s.chars().nth(0).unwrap_or(' ').to_string();
@@ -45,7 +45,8 @@ fn hint_from_name(s: String) -> String {
 
 const JSON_DATA: &str = include_str!("../data/countries.json"); // Embed the JSON file
 fn main() {
-    let raw: Vec<CountryStat> = serde_json::from_str(JSON_DATA).unwrap();
+    let  raw: Vec<CountryStat> = serde_json::from_str(JSON_DATA).unwrap();
+    // raw = raw.iter().filter(|x| x.name.common >"bzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz".to_string()).cloned().collect();
     let mut cca3_to_name = HashMap::new();
     for country in raw.clone() {
         cca3_to_name.insert(country.cca3, country.name.common);
@@ -114,18 +115,18 @@ fn main() {
                 hint: Some(hint.join(", ")),
             });
 
-            let mut images: Vec<String> = Vec::new();
+            let mut images: Vec<ImageLink> = Vec::new();
             let mut img_cat_names: Vec<&str> = Vec::new();
             // SVG_FLAG
             img_cat_names.push("Flag");
             let svg_path_o = format!("data/flags/{}.svg", x.cca3.to_lowercase());
             let svg_path = Path::new(&svg_path_o);
-            images.push(fs::read_to_string(svg_path).unwrap());
+            images.push(ImageLink::EmbeddedSVG(fs::read_to_string(svg_path).unwrap()));
             // SVG_OUTLINE
             img_cat_names.push("Outline");
-            let svg_path_o = format!("data/outlines/{}.svg", x.cca3.to_lowercase());
-            let svg_path = Path::new(&svg_path_o);
-            images.push(fs::read_to_string(svg_path).unwrap());
+            println!("{}",x.cca3.clone());
+            let svg_path_o = format!("positions/{}.svg", x.cca3.to_lowercase());
+            images.push(ImageLink::FilePath(svg_path_o));
             CountryInfos {
                 cca3: x.cca3.clone(),
                 independent: x.independent.unwrap_or(false),

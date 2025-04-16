@@ -77,6 +77,7 @@
   - [x] Better each Screen
   - [x] Add globals
 - [x] (Main play) Remove info level to let user which ever info first
+- [x] For choices play treat empty infos
 
 ## Priority 
 - [ ] Add geographic position
@@ -86,7 +87,6 @@
   - [ ] clean script
   - [ ] See how to use files to reduce size of executable
 - [ ] No release with large svgs -> switch to file and read
-- [ ] For choices play treat empty infos ?
 - [ ] Add More of test of sorts like choices but stops after 3 wrong guess 
 - [ ] See how to catch back button on android (https://docs.rs/android-activity/latest/android_activity/input/enum.Keycode.html#variant.TvMediaContextMenu)
 

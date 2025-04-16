@@ -1,11 +1,9 @@
 use rand::seq::SliceRandom;
 use rand::thread_rng;
-use rand::prelude::IteratorRandom;
 use slint::{Image, ModelRc, SharedString, VecModel, Model};
 
 use std::collections::HashMap;
 use std::{cmp::Ordering, path::PathBuf};
-
 use crate::info_parse::{self, CountryInfos, Score};
 
 slint::include_modules!();
@@ -249,15 +247,64 @@ impl AppLogic {
         }
         Some(self.get_choices())
     }
-    
+
+    fn choice_same_info(&self, idx:usize) -> bool {
+        if is_info_txt(self.choice_info_type) {
+            let info = &self.all_countries[idx].infos[self.choice_info_type].full;
+            let compare = &self.all_countries[self.current].infos[self.choice_info_type].full;
+            info ==  compare
+        } else {
+            let info = &self.all_countries[idx].images[self.choice_info_type];
+            let compare = &self.all_countries[self.current].images[self.choice_info_type];
+            info ==  compare
+        }
+    }    
+    fn generate_guesses(&self) -> [usize; 4] {
+        let guess_type = self.choice_guess_type;
+        let unique_indices: Vec<usize> = if is_info_txt(guess_type) {
+            let guess_idx = to_txt_idx(guess_type); 
+            let mut hash_map: HashMap<String, usize> = HashMap::new();
+            for (idx, item) in self.all_countries.iter().enumerate() {
+                if self.choice_same_info(idx) {continue;}
+                let t_value = item.infos[guess_idx].full.clone();
+                hash_map.entry(t_value).or_insert(idx);
+            }
+            let true_value = self.all_countries[self.current].infos[guess_idx].full.clone();
+            hash_map.remove(&true_value);
+            hash_map.values().cloned().collect()
+        } else {
+            let mut hash_map = HashMap::new();
+            for (idx, item) in self.all_countries.iter().enumerate() {
+                if self.choice_same_info(idx) {continue;}
+                let t_value = item.images[guess_type].clone();
+                hash_map.entry(t_value).or_insert(idx);
+            }
+            let true_value = self.all_countries[self.current].images[guess_type].clone();
+            hash_map.remove(&true_value);
+            hash_map.values().cloned().collect()
+        };
+        let mut rng = rand::thread_rng();
+        let mut random_elements: Vec<usize> = unique_indices.choose_multiple(&mut rng, 3).cloned().collect();
+        random_elements.push(self.current);
+        if random_elements.len() != 4 {
+            // TODO treat cases less than 4 possible choices (rare but you never know)
+            panic!("Not enough possibilities to chose from")
+        }
+        random_elements.shuffle(&mut rng);
+        [random_elements[0], random_elements[1], random_elements[2], random_elements[3]]
+    }
+
+
     pub fn get_choices(&mut self) -> ChoicePlayUpdate {
-        let mut info = TxtOrImg { img: Image::default(), is_txt: is_info_txt(self.choice_info_type), txt: SharedString::default()};
-        let mut guesses = vec![
-            TxtOrImg { img: Image::default(), is_txt: is_info_txt(self.choice_guess_type), txt: SharedString::default()},
-            TxtOrImg { img: Image::default(), is_txt: is_info_txt(self.choice_guess_type), txt: SharedString::default()},
-            TxtOrImg { img: Image::default(), is_txt: is_info_txt(self.choice_guess_type), txt: SharedString::default()},
-            TxtOrImg { img: Image::default(), is_txt: is_info_txt(self.choice_guess_type), txt: SharedString::default()},
-        ];
+        let mut info = TxtOrImg::default();
+        info.is_txt = is_info_txt(self.choice_info_type);
+        let mut guesses = vec![TxtOrImg::default(); 4];
+        for i in 0..4 {
+            guesses[i].is_txt = is_info_txt(self.choice_guess_type);
+        }
+        
+
+        // getting previous guesses or default (no guess) + counting guesses
         let prev_guess = match self.choice_prev_guesses.get(&self.current) {
             Some(v) => v.clone(),
             None => {
@@ -267,40 +314,32 @@ impl AppLogic {
         };
         let down_ref: &VecModel<bool> = prev_guess.as_any().downcast_ref().unwrap();
         let guess_num = down_ref.iter().filter(|&x|x).count();    
-        
+        // getting randomly sorted array of guess idx
         let guess_idx = match self.choice_index_guesses.get(&self.current) {
             Some(v) => v.clone(),
             None => {
-                let mut rng = rand::thread_rng();
-                let mut random_elements: Vec<usize> = (0usize..self.all_countries.len())
-                    .choose_multiple(&mut rng, 6);
-                let target = self.current as i32; 
-                random_elements = random_elements
-                    .into_iter()
-                    .filter(|x| {
-                    (*x as i32) < (target - 1) || (*x as i32) > (target + 1)
-                }).collect();
-                random_elements = vec![random_elements[0], random_elements[1], random_elements[2]];
-                random_elements.push(self.current);
-                random_elements.shuffle(&mut rng);
-                let v = [random_elements[0], random_elements[1], random_elements[2], random_elements[3]];
+                let v = self.generate_guesses();
                 self.choice_index_guesses.insert(self.current, v);
                 v
             }
         };
         let correct_guess = guess_idx.iter().position(|x| *x == self.current).unwrap();
+
         let country = self.all_countries[self.current].clone();
+        // adding default info only if the idx 0 info is not either infos
         let default_type = txt_only_to_global_type(0);
         let default_info = if self.choice_guess_type != default_type && self.choice_info_type != default_type {
             country.infos[0].full.clone()
         } else {
             String::new()
         };
+
         if info.is_txt {
             info.txt = country.infos[to_txt_idx(self.choice_info_type)].full.clone().into();
         } else {
             info.img = load_img(&country.images[self.choice_info_type]);
         }
+
         if guesses[0].is_txt {
             let idx = to_txt_idx(self.choice_guess_type); 
             for i in 0..4 {
@@ -319,7 +358,7 @@ impl AppLogic {
             info: info, 
             num: self.current as i32, 
             out_of: self.all_countries.len() as i32, 
-            prev_guess: prev_guess.clone(),
+            prev_guess: prev_guess,
             default_info: default_info.into()
         }
     }

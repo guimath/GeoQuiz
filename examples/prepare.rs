@@ -115,7 +115,7 @@ fn main() {
             images.push(ImageLink::EmbeddedSVG(fs::read_to_string(svg_path).unwrap()));
             // SVG_OUTLINE
             println!("{}",x.cca3.clone());
-            let svg_path_o = format!("positions/{}.svg", x.cca3.to_lowercase());
+            let svg_path_o = format!("positions2/{}.svg", x.cca3.to_lowercase());
             images.push(ImageLink::FilePath(svg_path_o));
             CountryInfos {
                 cca3: x.cca3.clone(),

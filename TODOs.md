@@ -80,14 +80,14 @@
 - [x] For choices play treat empty infos
 - [x] No release with large svgs -> switch to file and read
 - [x] Don't use constants but instead json provided info for category names
+- [x] Add geographic position
+  - [x] Basic done
+  - [x] better edge case (islands etc)
+  - [x] clean script
+  - [x] See how to use files to reduce size of executable
 
 ## Priority 
-- [ ] Add geographic position
-  - [x] Basic done
-  - [ ] Use more precise geo.json data -> [https://github.com/sdimunzio/countries-geojson/tree/master](https://github.com/datasets/geo-countries/tree/main)
-  - [ ] better edge case (islands etc)
-  - [ ] clean script
-  - [ ] See how to use files to reduce size of executable
+- [ ] Try to find more precise country outlines 
 - [ ] Add More of test of sorts like choices but stops after 3 wrong guess 
 - [ ] See how to catch back button on android (https://docs.rs/android-activity/latest/android_activity/input/enum.Keycode.html#variant.TvMediaContextMenu)
 

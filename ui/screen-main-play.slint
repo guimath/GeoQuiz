@@ -59,7 +59,7 @@ export component MainPlayScreen inherits Rectangle {
             info : root.info;
             handle-swipe-right: root.num > 0;
             handle-swipe-left: root.num < root.out_of - 1;
-            height: root.height / 4;
+            height: root.width / 16*9;
             prev => {prev()}
             next => {next(0)}
         }

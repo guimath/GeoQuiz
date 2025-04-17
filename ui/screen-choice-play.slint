@@ -8,7 +8,7 @@ export component ChoicePlayScreen inherits Rectangle {
     property <TxtOrImg> info: {
         is_txt: false,
         txt: "Kingston",
-        img: @image-url("../data/flags/jam.svg"),
+        img: @image-url("../data/positions2/jam.svg"),
     };
     property <[TxtOrImg]> guesses : [
         {
@@ -87,7 +87,7 @@ export component ChoicePlayScreen inherits Rectangle {
             info : root.info;
             handle-swipe-right: root.num > 0;
             handle-swipe-left: root.num < root.out_of - 1;
-            height: root.height / 4;
+            height: root.width / 16*9;
             prev => {collect_changed(false, false)}
             next => {collect_changed(true, false)}
         }

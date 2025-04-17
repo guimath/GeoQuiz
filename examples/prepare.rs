@@ -38,15 +38,17 @@ struct CountryStat {
 use geo_quiz::info_parse::{AllInfos, Category, CountryInfos, ImageLink};
 
 fn hint_from_name(s: String) -> String {
-    let mut s = s.chars().nth(0).unwrap_or(' ').to_string();
-    s.push_str("...");
-    s
+    let mut hint = s.chars().nth(0).unwrap_or(' ').to_string();
+    hint.push_str("...");
+    for _ in 1..s.split_whitespace().count() {
+        hint.push_str(" ...");
+    }
+    hint
 }
 
 const JSON_DATA: &str = include_str!("../data/countries.json"); // Embed the JSON file
 fn main() {
     let  raw: Vec<CountryStat> = serde_json::from_str(JSON_DATA).unwrap();
-    // raw = raw.iter().filter(|x| x.name.common >"bzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz".to_string()).cloned().collect();
     let mut cca3_to_name = HashMap::new();
     for country in raw.clone() {
         cca3_to_name.insert(country.cca3, country.name.common);

@@ -85,6 +85,7 @@
   - [x] better edge case (islands etc)
   - [x] clean script
   - [x] See how to use files to reduce size of executable
+- [x] Give number of words in hints like for UK: U... ...  and better hints
 
 ## Priority 
 - [ ] Try to find more precise country outlines 
@@ -94,19 +95,20 @@
 ## Secondary
 - [ ] Add a Readme & LICENSE & Publish
 - [ ] Make proper icon
-- [ ] Add "Score reset" message
+- [ ] Revamp Score
+  - [ ] Score in a sepatate window 
+  - [ ] Add "Score reset" message
+  - [ ] Add stats
+  - [ ] Add Multi profile
 - [ ] Animate (WIP)
   - [ ] Better scrolling on categories : maybe use timer to snap to center? 
   - [ ] Animate between screens? 
 
 
 ## Ideas to discuss
-- [ ] Add selection of animation time (after score or answer found)
-- [ ] Give number of words in hints like for UK: U... ...  and better hints
-- [ ] Have user be able to create and select users (different scores)
 - [ ] What other infos could be added 
   - [ ] Population
-  - [ ] Position on a map (show continent, highlight & circle if small)
+  - [ ] Outline (only if a more detailed outline is available)
 - [ ] Data agnostic -> so that we can create different quizzes
   - [ ] Add support for png/jpeg (/!\ requires a way to load images to phone or use another preloading step and convert to base64?) -> In the works
   - [ ] Remove cca, and move independent to "harder difficulty"

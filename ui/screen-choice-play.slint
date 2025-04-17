@@ -69,7 +69,7 @@ export component ChoicePlayScreen inherits Rectangle {
     }
 
     timer := Timer {
-        interval: 200ms;
+        interval: Sizes.time_delay;
         running: false;
         triggered() => {
             self.running = false;

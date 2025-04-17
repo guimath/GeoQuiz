@@ -96,10 +96,11 @@
 - [ ] Add a Readme & LICENSE & Publish
 - [ ] Make proper icon
 - [ ] Revamp Score
-  - [ ] Score in a sepatate window 
+  - [ ] Score in a separate window 
   - [ ] Add "Score reset" message
   - [ ] Add stats
   - [ ] Add Multi profile
+  - [ ] Remove cca3
 - [ ] Animate (WIP)
   - [ ] Better scrolling on categories : maybe use timer to snap to center? 
   - [ ] Animate between screens? 
@@ -110,6 +111,6 @@
   - [ ] Population
   - [ ] Outline (only if a more detailed outline is available)
 - [ ] Data agnostic -> so that we can create different quizzes
-  - [ ] Add support for png/jpeg (/!\ requires a way to load images to phone or use another preloading step and convert to base64?) -> In the works
-  - [ ] Remove cca, and move independent to "harder difficulty"
-  - [ ] Add categories names to json / move to csv
+  - [x] Add support for png/jpeg
+  - [x] Add categories names to json / move to csv
+  - [ ] Move independent to "harder difficulty" or something

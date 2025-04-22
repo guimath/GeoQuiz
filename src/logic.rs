@@ -10,7 +10,7 @@ slint::include_modules!();
 
 #[derive(Default)]
 pub struct AppLogic {
-    easy_first: bool,
+    order_type: u32,
     current: usize,
     results: Vec<u32>,
     scores: HashMap<String, Score>,
@@ -69,17 +69,14 @@ impl AppLogic {
 
     pub fn set_config(
         &mut self,
-        easy_first: bool,
-        hard_mode: bool,
-        sub_cat: usize,
-        main_play: bool,
+        conf: PlaySelectParams,
     ) {
-        self.score_path = if main_play {
+        self.score_path = if conf.play_type { 
             self.score_folder.join("score_main.json")
         } else {
             self.score_folder.join("score_choice.json")
         };
-        self.all_countries = if !hard_mode {
+        self.all_countries = if !conf.include_hard {
             self.all_countries_order
                 .clone()
                 .into_iter()
@@ -88,15 +85,16 @@ impl AppLogic {
         } else {
             self.all_countries_order.clone()
         };
-        if sub_cat > 0 {
+        if conf.region_idx > 0 {
+            let idx = conf.region_idx as usize;
             self.all_countries = self
                 .all_countries
                 .clone()
                 .into_iter()
-                .filter(|country| country.region == self.sub_cat_names[sub_cat])
+                .filter(|country| country.region == self.sub_cat_names[idx])
                 .collect();
         }
-        self.easy_first = easy_first;
+        self.order_type = conf.order as u32;
     }
 
     fn randomize_order(&mut self) {
@@ -111,9 +109,9 @@ impl AppLogic {
                 .total_score
                 .cmp(&scores.get(&get_score_key(&a)).unwrap().total_score)
         };
-        if self.easy_first {
+        if self.order_type == 0 {
             self.all_countries.sort_by(|a, b| compare(a, b));
-        } else {
+        } else if self.order_type == 2 {
             self.all_countries.sort_by(|b, a| compare(a, b));
         }
 

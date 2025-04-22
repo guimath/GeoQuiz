@@ -12,19 +12,13 @@ export component SelectChoicePlayScreen inherits Rectangle {
         padding: Sizes.padding;
         spacing: Sizes.spacing;
         TitleText{
-            text: "Choice Play";
+            text: "4 Choices";
         }
         Rectangle {}
-        TextButton {
-            height: root.height/10;
-            width_button: root.width/2;
-            text: "Play";
-            clicked => {invoke_play()}
-        }
         
-        Rectangle {}
+        
         TitleText {
-            text: "Category displayed";
+            text: "Info shown";
             style: FontSettings.title-small;
         }
         info_cat := ScrollChoice {
@@ -32,7 +26,7 @@ export component SelectChoicePlayScreen inherits Rectangle {
             choices: root.info_types;
         }
         TitleText {
-            text: "Category to guess";
+            text: "Info to guess";
             style: FontSettings.title-small;
         }
         guess_cat := ScrollChoice {
@@ -40,6 +34,14 @@ export component SelectChoicePlayScreen inherits Rectangle {
             choices: root.info_types  ;
             choice_num: 2;
         }
+        Rectangle {height: Sizes.spacing;}
+        TextButton {
+            height: root.height/10;
+            width_button: root.width/2;
+            text: "Play";
+            clicked => {invoke_play()}
+        }
+
         Rectangle {}
     }
 }

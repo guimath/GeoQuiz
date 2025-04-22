@@ -1,11 +1,12 @@
 import { Button, HorizontalBox, VerticalBox } from "std-widgets.slint";
 import { TitleText, RegularText, MultiChoice, TextButton, ScrollChoice } from "widgets.slint";
-import { CatInfo, MainPlayUpdate, Screen, FullInfo, ChoicePlayUpdate } from "structs.slint";
+import { CatInfo, MainPlayUpdate, Screen, FullInfo, ChoicePlayUpdate, PlaySelectParams } from "structs.slint";
 import { SelectLookUpScreen, LookUpScreen } from "screen-look-up.slint";
 import { SelectMainPlayScreen } from "screen-select-main-play.slint";
 import { MainPlayScreen } from "screen-main-play.slint";
 import { SelectChoicePlayScreen } from "screen-select-choice-play.slint";
 import { ChoicePlayScreen } from "screen-choice-play.slint";
+import { SelectPlayScreen } from "screen-select-play.slint";
 import { TextStyle, FontSettings, Palette, Sizes } from "styling.slint";
 
 export component AppWindow inherits Window {
@@ -28,7 +29,7 @@ export component AppWindow inherits Window {
     // ***************************************************************** //
     callback look_up_search_changed(search: string);
     callback look_up_selected(num: int);
-    callback set_play_config(easy_first:bool, hard_mode:bool, sub_cat:int, main_play:bool);
+    callback set_play_config(params:PlaySelectParams);
     callback close();
     callback reset_score();
     callback save_score();
@@ -49,7 +50,7 @@ export component AppWindow inherits Window {
         if root.screen == Screen.MainPlay {
             root.screen = Screen.SelectMainPlay;
         } else if root.screen == Screen.SelectMainPlay {
-            root.screen = Screen.Start
+            root.screen = Screen.SelectPlay
         } else if root.screen == Screen.LookUp {
             root.screen = Screen.SelectLookUp;
         } else if root.screen == Screen.SelectLookUp {
@@ -57,10 +58,10 @@ export component AppWindow inherits Window {
         } else if root.screen == Screen.ChoicePlay {
             root.screen = Screen.SelectChoicePlay;
         } else if root.screen == Screen.SelectChoicePlay {
+            root.screen = Screen.SelectPlay
+        } else if root.screen == Screen.SelectPlay {
             root.screen = Screen.Start
         }
-        
-
     }
 
     public function update_look_up_selected(infos: FullInfo) {
@@ -135,69 +136,12 @@ export component AppWindow inherits Window {
                 text: "Geo Quiz";
             }
             Rectangle {}
-            Rectangle {
-                background: Palette.accent1;
-                border-radius: Sizes.std_radius;
-                VerticalBox {
-                    padding: Sizes.spacing;
-                    spacing: Sizes.spacing;
-                    w_hard := MultiChoice {
-                        choices: ["Independent only", "All territories"];
-                    }
-                    RegularText {
-                        text: w_hard.not_default?  "Show all territories (250 different)" : "Show only independent countries (190 different)" ;
-                        horizontal-alignment: center;
-                        vertical-alignment: center;
-                        width: 100%;
-                        wrap: word-wrap;
-                        style: FontSettings.body-small;
-                    }
-                }
-            }
-    
-            Rectangle {
-                background: Palette.accent1;
-                border-radius: Sizes.std_radius;
-                VerticalBox {
-                    padding: Sizes.spacing;
-                    spacing: Sizes.spacing;
-                    w_order := MultiChoice {
-                        choices: ["Hard first", "Easy first"];
-                    }
-
-                    RegularText {
-                        text: w_order.not_default?  "Start with better known countries (according to previous scores)" : "Start with lesser known countries (according to previous scores)";
-                        horizontal-alignment: center;
-                        vertical-alignment: center;
-                        width: 100%;
-                        wrap: word-wrap;
-                        style: FontSettings.body-small;
-                    }
-                }
-            }
-
-            sub_cat_choice := ScrollChoice {
-                width: 100%;
-                choices: root.sub_categories_name;
-            }
-            Rectangle {}
             TextButton {
                 height: root.height/10;
                 width_button: root.width/2;
-                text: "Free Play";
+                text: "Play";
                 clicked => {
-                    root.screen = Screen.SelectMainPlay;
-                    set_play_config(w_order.not_default, w_hard.not_default, sub_cat_choice.choice_num, true);
-                
-                }
-            }
-            TextButton{
-                width_button: root.width/2;
-                height: root.height/10;
-                text: "Choices Play";
-                clicked => {
-                    root.screen = Screen.SelectChoicePlay;
-                    set_play_config(w_order.not_default, w_hard.not_default, sub_cat_choice.choice_num, false);
+                    root.screen = Screen.SelectPlay;
                 }
             }
             TextButton {
@@ -218,8 +162,21 @@ export component AppWindow inherits Window {
         
     }
     // ***************************************************************** //
-    //                            LOOK UP SCREEN
+    //                            OTHER SCREENS
     // ***************************************************************** //
+
+    w_select_play := SelectPlayScreen {
+        visible: root.screen == Screen.SelectPlay;
+        sub_categories_name: root.sub_categories_name;
+        set_play_config(params) => {
+            if params.play_type {
+                root.screen = Screen.SelectMainPlay
+            } else {
+                root.screen = Screen.SelectChoicePlay
+            }
+            set_play_config(params);
+        }
+    }
     w_sel_look_up := SelectLookUpScreen {
         visible: root.screen == Screen.SelectLookUp;
         all: root.search_all_countries;

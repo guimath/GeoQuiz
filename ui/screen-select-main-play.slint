@@ -19,6 +19,7 @@ export component SelectMainPlayScreen inherits Rectangle {
         TitleText{
             text: "Free Play";
         }
+        Rectangle {}
         
         Rectangle {
             background: Palette.accent1;
@@ -81,7 +82,7 @@ export component SelectMainPlayScreen inherits Rectangle {
                     text: "Outlines";
                     clicked => {
                         play(
-                            [4, 3, 0], 
+                            [0, 1, 5], 
                             1,
                             w_play_mode.choice_num
                         );
@@ -126,7 +127,7 @@ export component SelectMainPlayScreen inherits Rectangle {
                     padding: 0;
                     
                     RegularText {
-                        text: "What is shown";
+                        text: "Info shown";
                         width:  100%;
                         horizontal-alignment: center;
                     }
@@ -135,7 +136,7 @@ export component SelectMainPlayScreen inherits Rectangle {
                         width:  100%;
                     }
                     RegularText {
-                        text: "What you need to guess";
+                        text: "Info to guess";
                         width:  100%;
                         horizontal-alignment: center;
                     }

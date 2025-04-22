@@ -1,0 +1,99 @@
+import { Button, VerticalBox, HorizontalBox } from "std-widgets.slint";
+import { MultiChoice, RegularText, TitleText, ScrollChoice, TextButton } from "widgets.slint";
+import { TextStyle, FontSettings, Palette, Sizes } from "styling.slint";
+import { PlaySelectParams } from "structs.slint";
+
+export component SelectPlayScreen inherits Rectangle {
+    callback set_play_config(params : PlaySelectParams);
+    in property <[string]> sub_categories_name: ["World", "Africa", "Americas", "Asia", "Europe", "Oceania"];
+
+    VerticalBox {
+        padding: Sizes.padding;
+        TitleText{
+            text: "Play";
+        }
+        Rectangle {}
+        
+        Rectangle {
+            background: Palette.accent1;
+            border-radius: Sizes.std_radius;
+            VerticalBox {
+                padding: Sizes.spacing;
+                spacing: Sizes.spacing;
+                w_hard := MultiChoice {
+                    choices: ["Independent only", "All territories"];
+                }
+                RegularText {
+                    text: w_hard.not_default?  "Show all territories (250 different)" : "Show only independent countries (194 different)" ;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                    width: 100%;
+                    wrap: word-wrap;
+                    style: FontSettings.body-small;
+                }
+            }
+        }
+
+        Rectangle {
+            background: Palette.accent1;
+            border-radius: Sizes.std_radius;
+            VerticalBox {
+                padding: Sizes.spacing;
+                spacing: Sizes.spacing;
+                w_order := MultiChoice {
+                    choices: ["Easy first", "Random", "Hard first"];
+                    choice_num: 1;
+                }
+
+                RegularText {
+                    text: 
+                        w_order.choice_num==0 ? "Start with better known countries (according to previous scores)" : 
+                        w_order.choice_num==1 ? "Random order\n ":
+                        "Start with lesser known countries (according to previous scores)";
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                    width: 100%;
+                    wrap: word-wrap;
+                    style: FontSettings.body-small;
+                }
+            }
+        }
+
+        sub_cat_choice := ScrollChoice {
+            width: 100%;
+            choices: root.sub_categories_name;
+        }
+        TextButton {
+            height: root.height/10;
+            width_button: root.width/2;
+            text: "Free Play";
+            clicked => {
+                set_play_config(
+                    {
+                        order:w_order.choice_num, 
+                        include_hard:w_hard.not_default, 
+                        region_idx:sub_cat_choice.choice_num, 
+                        play_type: true
+                    }
+                );
+            
+            }
+        }
+        TextButton{
+            width_button: root.width/2;
+            height: root.height/10;
+            text: "4 Choices";
+            clicked => {
+                set_play_config(
+                    {
+                        order:w_order.choice_num, 
+                        include_hard:w_hard.not_default, 
+                        region_idx:sub_cat_choice.choice_num, 
+                        play_type: false
+                    }
+                );
+            }
+        }
+        Rectangle {}
+    }
+}

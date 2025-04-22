@@ -61,7 +61,7 @@ impl AppLogic {
             "Oceania".to_string(),
         ];
         s.search_names = s.all_names.iter().map(|x| x.to_lowercase()).collect();
-        s.score_folder = score_path.join("user0_scores");
+        s.score_folder = score_path.join("scores/User 1");
         s.data_path = score_path.join("data");
         info_parse::init_score_folder(s.score_folder.clone());
         s

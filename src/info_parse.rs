@@ -77,6 +77,6 @@ pub fn reset_score(score_folder: PathBuf) {
 
 pub fn init_score_folder(score_folder: PathBuf) {
     if !score_folder.exists() {
-        fs::create_dir(score_folder).unwrap();
+        fs::create_dir_all(score_folder).unwrap();
     }
 }

@@ -14,17 +14,16 @@ pub struct Category {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct AllInfos {
     pub all_countries: Vec<CountryInfos>,
-    pub info_names : Vec<String>,
-    pub image_names : Vec<String>,
+    pub info_names: Vec<String>,
+    pub image_names: Vec<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct CountryInfos {
-    pub cca3: String,
+    pub region: String,
     pub independent: bool,
     pub infos: Vec<Category>,
     pub images: Vec<ImageLink>,
-
 }
 #[derive(Deserialize, Serialize, Debug, Clone, Default)]
 pub struct Score {
@@ -39,7 +38,7 @@ pub struct Score {
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ImageLink {
     EmbeddedSVG(String),
-    FilePath(String)
+    FilePath(String),
 }
 
 const JSON_DATA: &str = include_str!("../data/infos.json"); // Embed the JSON file
@@ -52,19 +51,14 @@ pub fn read(all_countries: &Vec<CountryInfos>, score_path: PathBuf) -> HashMap<S
         let mut file = File::open(score_path).unwrap();
         let mut file_content = String::new();
         file.read_to_string(&mut file_content).unwrap();
-        
-        if let Ok(score) = serde_json::from_str(&file_content){
+
+        if let Ok(score) = serde_json::from_str(&file_content) {
             return score;
         }
     }
     all_countries
         .iter()
-        .map(|country| {
-            (
-                country.cca3.clone(),
-                Score::default(),
-            )
-        })
+        .map(|country| (country.infos[0].full.clone(), Score::default()))
         .collect()
 }
 
@@ -81,10 +75,8 @@ pub fn reset_score(score_folder: PathBuf) {
     init_score_folder(score_folder);
 }
 
-
-pub fn init_score_folder(score_folder: PathBuf){
+pub fn init_score_folder(score_folder: PathBuf) {
     if !score_folder.exists() {
         fs::create_dir(score_folder).unwrap();
     }
-
 }

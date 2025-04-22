@@ -96,7 +96,7 @@ fn main() {
                 hint: None,
             });
             // REGION
-            let full = format!("{} ({})", x.subregion, x.region);
+            let full = format!("{} ({})", x.subregion, x.region.clone());
             infos.push(Category { full, hint: None });
             // BORDERS
             let full: Vec<String> = x
@@ -120,7 +120,7 @@ fn main() {
             let svg_path_o = format!("positions2/{}.svg", x.cca3.to_lowercase());
             images.push(ImageLink::FilePath(svg_path_o));
             CountryInfos {
-                cca3: x.cca3.clone(),
+                region: x.region.clone(),
                 independent: x.independent.unwrap_or(false),
                 infos,
                 images,

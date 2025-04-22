@@ -4,6 +4,7 @@ use std::collections::HashMap;
 use std::fs::{self, File};
 use std::io::Write;
 use std::path::Path;
+use num_format::{Locale, ToFormattedString};
 
 #[derive(Deserialize, Debug, Clone)]
 struct CountryName {
@@ -35,6 +36,15 @@ struct CountryStat {
     subregion: String,
     borders: Vec<String>,
 }
+
+#[derive(Debug, Deserialize)]
+struct PopulationStat {
+    #[serde(rename = "Country Code")]
+    cca3: String,
+    #[serde(rename = "2023")]
+    population: u64,
+}
+
 use geo_quiz::info_parse::{AllInfos, Category, CountryInfos, ImageLink};
 
 fn hint_from_name(s: String) -> String {
@@ -46,8 +56,15 @@ fn hint_from_name(s: String) -> String {
     hint
 }
 
-const JSON_DATA: &str = include_str!("../data/countries.json"); // Embed the JSON file
+const JSON_DATA: &str = include_str!("../data/countries.json"); 
+const POP_DATA: &str = include_str!("../data/pop_last.csv"); 
 fn main() {
+    let mut rdr = csv::Reader::from_reader(POP_DATA.as_bytes());
+    let mut cca_to_pop: HashMap<String, u64> = HashMap::new();
+    for result in rdr.deserialize() {
+        let r: PopulationStat = result.unwrap();
+        cca_to_pop.insert(r.cca3, r.population);
+    }
     let  raw: Vec<CountryStat> = serde_json::from_str(JSON_DATA).unwrap();
     let mut cca3_to_name = HashMap::new();
     for country in raw.clone() {
@@ -109,6 +126,33 @@ fn main() {
                 full: full.join(", "),
                 hint: Some(hint.join(", ")),
             });
+            // POPULATION 
+            let pop_string = if let Some(pop) = cca_to_pop.get(&x.cca3.to_string()) {
+                // if *pop > 10_000_000 {
+                //     let pop_m = pop/1_000_000;
+                //     let mut s = pop_m.to_formatted_string(&Locale::en);
+                //     s.push_str(" M");
+                //     s
+                // } else {
+                // }
+                pop.to_formatted_string(&Locale::fr)
+            } else {
+                "".to_string()
+            };
+            println!("{}", pop_string.clone());
+            infos.push(Category {
+                full: pop_string,
+                hint: None,
+            });
+            
+            // YEM
+            // 63,212,384
+            // ZAF
+            // 20,723,965
+            // ZMB
+            // 16,340,822
+            // ZWE
+
 
             let mut images: Vec<ImageLink> = Vec::new();
             // SVG_FLAG
@@ -136,6 +180,7 @@ fn main() {
             "Currencies".to_string(),
             "Region".to_string(),
             "Borders".to_string(),
+            "Population".to_string(),
         ],
         image_names: vec![
             "Flag".to_string(),

@@ -103,16 +103,16 @@
 - [ ] See how to catch back button on android (https://docs.rs/android-activity/latest/android_activity/input/enum.Keycode.html#variant.TvMediaContextMenu)
 - [ ] Add a Readme & LICENSE & Publish
 - [ ] Make proper icon
-- [ ] Animate (WIP)
-  - [ ] Better scrolling on categories : maybe use timer to snap to center? 
-  - [ ] Animate between screens? 
 
 
 ## Ideas to discuss
 - [ ] What other infos could be added 
-  - [ ] Population
+  - [x] Population
   - [ ] Outline (only if a more detailed outline is available)
 - [ ] Data agnostic -> so that we can create different quizzes
   - [x] Add support for png/jpeg
   - [x] Add categories names to json / move to csv
   - [ ] Move independent to "harder difficulty" or something
+- [ ] Animate (WIP)
+  - [ ] Better scrolling on categories : maybe use timer to snap to center? 
+  - [ ] Animate between screens? 

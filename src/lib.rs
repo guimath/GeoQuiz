@@ -70,9 +70,9 @@ fn init(path: PathBuf) -> Result<(), Box<dyn Error>> {
 
     ui.on_set_play_config({
         let logic_ref = logic.clone();
-        move |easy_first, hard_mode, sub_cat, main_play| {
+        move |params| {
             let mut logic = logic_ref.lock().unwrap();
-            logic.set_config(easy_first, hard_mode, sub_cat as usize, main_play);
+            logic.set_config(params);
         }
     });
     //  MAIN PLAY

@@ -7,9 +7,15 @@ use std::{
     sync::{Arc, Mutex},
 };
 
-use slint::{ComponentHandle, LogicalSize, Model, VecModel};
+use slint::{ComponentHandle, LogicalSize, Model, ModelRc, SharedString, VecModel};
 
 use logic::{AppLogic, AppWindow};
+
+fn vec_to_model(vec: &Vec<String>) -> ModelRc<SharedString> {
+    let vc = vec.clone();
+    let v: VecModel<SharedString> = vc.iter().map(|x| SharedString::from(x)).collect();
+    ModelRc::new(v)
+}
 
 pub fn main() {
     let path = PathBuf::from_str(env!("CARGO_MANIFEST_DIR")).unwrap();
@@ -38,8 +44,9 @@ fn init(path: PathBuf) -> Result<(), Box<dyn Error>> {
         let logic_lock = logic.lock().unwrap();
         ui.set_search_countries_mask(logic_lock.search_changed("".into()).as_slice().into());
         ui.set_search_all_countries(logic_lock.all_names.as_slice().into());
-        ui.set_all_categories_name(logic_lock.get_all_categories_names());
-        ui.set_txt_categories_name(logic_lock.get_txt_categories_names());
+        ui.set_all_categories_name(vec_to_model(&logic_lock.all_cat_names));
+        ui.set_txt_categories_name(vec_to_model(&logic_lock.txt_cat_names));
+        ui.set_sub_categories_name(vec_to_model(&logic_lock.sub_cat_names));
     }
 
     ui.on_look_up_search_changed({
@@ -63,9 +70,9 @@ fn init(path: PathBuf) -> Result<(), Box<dyn Error>> {
 
     ui.on_set_play_config({
         let logic_ref = logic.clone();
-        move |easy_first, hard_mode, main_play| {
+        move |easy_first, hard_mode, sub_cat, main_play| {
             let mut logic = logic_ref.lock().unwrap();
-            logic.set_config(easy_first, hard_mode, main_play);
+            logic.set_config(easy_first, hard_mode, sub_cat as usize, main_play);
         }
     });
     //  MAIN PLAY
@@ -106,7 +113,7 @@ fn init(path: PathBuf) -> Result<(), Box<dyn Error>> {
             }
         }
     });
-    
+
     //  CHOICE PLAY
     ui.on_choice_start_play({
         let ui_handle = ui.as_weak();
@@ -125,14 +132,12 @@ fn init(path: PathBuf) -> Result<(), Box<dyn Error>> {
             let ui = ui_handle.unwrap();
             let mut logic = logic_ref.lock().unwrap();
             // let down_ref: &VecModel<bool> = guesses.as_any().downcast_ref().unwrap();
-            // let v: Vec<bool> = down_ref.iter().collect();    
+            // let v: Vec<bool> = down_ref.iter().collect();
             if let Some(info) = logic.choice_changed(guesses, next, found) {
                 ui.invoke_update_choice(info);
             }
         }
     });
-
-
 
     ui.on_close({
         let logic_ref = logic.clone();

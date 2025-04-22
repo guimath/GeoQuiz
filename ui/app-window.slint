@@ -1,5 +1,5 @@
 import { Button, HorizontalBox, VerticalBox } from "std-widgets.slint";
-import { TitleText, RegularText, MultiChoice, TextButton } from "widgets.slint";
+import { TitleText, RegularText, MultiChoice, TextButton, ScrollChoice } from "widgets.slint";
 import { CatInfo, MainPlayUpdate, Screen, FullInfo, ChoicePlayUpdate } from "structs.slint";
 import { SelectLookUpScreen, LookUpScreen } from "screen-look-up.slint";
 import { SelectMainPlayScreen } from "screen-select-main-play.slint";
@@ -21,13 +21,14 @@ export component AppWindow inherits Window {
     in property <[bool]> search_countries_mask: [true];
     in property <[string]> all_categories_name: ["Flag", "Outline", "Country", "Capital", "Languages", "Borders", "Region", "Currencies"];
     in property <[string]> txt_categories_name: ["Country", "Capital", "Languages", "Borders", "Region", "Currencies"];
+    in property <[string]> sub_categories_name: ["World", "Africa", "Americas", "Asia", "Europe", "Oceania"];
     
     // ***************************************************************** //
     //                            CALLBACKS
     // ***************************************************************** //
     callback look_up_search_changed(search: string);
     callback look_up_selected(num: int);
-    callback set_play_config(easy_first:bool, hard_mode:bool, main_play:bool);
+    callback set_play_config(easy_first:bool, hard_mode:bool, sub_cat:int, main_play:bool);
     callback close();
     callback reset_score();
     callback save_score();
@@ -174,6 +175,11 @@ export component AppWindow inherits Window {
                     }
                 }
             }
+
+            sub_cat_choice := ScrollChoice {
+                width: 100%;
+                choices: root.sub_categories_name;
+            }
             Rectangle {}
             TextButton {
                 height: root.height/10;
@@ -181,7 +187,7 @@ export component AppWindow inherits Window {
                 text: "Free Play";
                 clicked => {
                     root.screen = Screen.SelectMainPlay;
-                    set_play_config(w_order.not_default, w_hard.not_default, true);
+                    set_play_config(w_order.not_default, w_hard.not_default, sub_cat_choice.choice_num, true);
                 
                 }
             }
@@ -191,7 +197,7 @@ export component AppWindow inherits Window {
                 text: "Choices Play";
                 clicked => {
                     root.screen = Screen.SelectChoicePlay;
-                    set_play_config(w_order.not_default, w_hard.not_default, false);
+                    set_play_config(w_order.not_default, w_hard.not_default, sub_cat_choice.choice_num, false);
                 }
             }
             TextButton {

@@ -1,12 +1,13 @@
 import { Button, HorizontalBox, VerticalBox } from "std-widgets.slint";
 import { TitleText, RegularText, MultiChoice, TextButton, ScrollChoice } from "widgets.slint";
-import { CatInfo, MainPlayUpdate, Screen, FullInfo, ChoicePlayUpdate, PlaySelectParams } from "structs.slint";
+import { CatInfo, MainPlayUpdate, Screen, FullInfo, ChoicePlayUpdate, PlaySelectParams, ScoreStatSlint } from "structs.slint";
 import { SelectLookUpScreen, LookUpScreen } from "screen-look-up.slint";
 import { SelectMainPlayScreen } from "screen-select-main-play.slint";
 import { MainPlayScreen } from "screen-main-play.slint";
 import { SelectChoicePlayScreen } from "screen-select-choice-play.slint";
 import { ChoicePlayScreen } from "screen-choice-play.slint";
 import { SelectPlayScreen } from "screen-select-play.slint";
+import { ScoreScreen } from "screen-score.slint";
 import { TextStyle, FontSettings, Palette, Sizes } from "styling.slint";
 
 export component AppWindow inherits Window {
@@ -41,6 +42,10 @@ export component AppWindow inherits Window {
     // choice
     callback choice_start_play(int, int);
     callback choice_changed([bool], bool, bool);
+    // score
+    callback score_filter_changed(bool);
+    callback score_sub_cat_changed(int);
+
 
     // ***************************************************************** //
     //                            UI LOGIC
@@ -53,13 +58,11 @@ export component AppWindow inherits Window {
             root.screen = Screen.SelectPlay
         } else if root.screen == Screen.LookUp {
             root.screen = Screen.SelectLookUp;
-        } else if root.screen == Screen.SelectLookUp {
-            root.screen = Screen.Start;
         } else if root.screen == Screen.ChoicePlay {
             root.screen = Screen.SelectChoicePlay;
         } else if root.screen == Screen.SelectChoicePlay {
             root.screen = Screen.SelectPlay
-        } else if root.screen == Screen.SelectPlay {
+        } else { // Score, SelectLookUp, SelectPlay
             root.screen = Screen.Start
         }
     }
@@ -77,6 +80,10 @@ export component AppWindow inherits Window {
 
     public function update_choice(info : ChoicePlayUpdate) {
         choice_play_s.update_screen(info);
+    }
+
+    public function update_score(stat: ScoreStatSlint) {
+        w_score.stat = stat;
     }
 
     forward-focus: my-key-handler;
@@ -153,8 +160,12 @@ export component AppWindow inherits Window {
             TextButton {
                 width_button: root.width/2;
                 height: root.height/10;
-                text: "Reset Score";
-                clicked => {reset_score()}
+                text: "Score";
+                clicked => {
+                    score_filter_changed(false);
+                    score_sub_cat_changed(0);
+                    root.screen = Screen.Score;
+                }
             }
             Rectangle {}
             Rectangle {}
@@ -164,6 +175,13 @@ export component AppWindow inherits Window {
     // ***************************************************************** //
     //                            OTHER SCREENS
     // ***************************************************************** //
+
+    w_score := ScoreScreen {
+        visible: root.screen == Screen.Score;
+        sub_categories_name: root.sub_categories_name;
+        filter_changed(all) => {score_filter_changed(all)}
+        category_changed(idx) => {score_sub_cat_changed(idx)}
+    }
 
     w_select_play := SelectPlayScreen {
         visible: root.screen == Screen.SelectPlay;

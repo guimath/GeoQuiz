@@ -16,6 +16,7 @@ export struct FullInfo {
 
 export enum Screen {
     Start,
+    Score,
     SelectLookUp,
     LookUp,
     SelectPlay,
@@ -71,3 +72,11 @@ export struct ChoicePlayUpdate  {
     default_info: string
 }
 
+export struct ScoreStatSlint {
+    main_avg: [int],
+    main_last: [int],
+    choice_avg: [int],
+    choice_last: [int],
+    main_max:  int,
+    choice_max : int,
+}

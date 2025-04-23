@@ -1,0 +1,198 @@
+import { Button, VerticalBox, HorizontalBox, ComboBox, ScrollView } from "std-widgets.slint";
+import { MultiChoice, RegularText, TitleText, ScrollChoice, TextButton, BarGraph } from "widgets.slint";
+import { TextStyle, FontSettings, Palette, Sizes } from "styling.slint";
+import { ScoreStatSlint } from "structs.slint";
+
+export component ScoreScreen inherits Rectangle {
+    callback filter_changed(all:bool);
+    callback category_changed(idx:int);
+    callback delete_user();
+    
+    in property <[string]> users: ["User 0"];
+    in property <[string]> sub_categories_name: ["World", "Africa", "Americas", "Asia", "Europe", "Oceania"];
+    in property <ScoreStatSlint> stat: {
+        main_avg: [100, 10, 30, 42, 41, 57],
+        main_last: [100, 9, 31, 47, 44, 52],
+        choice_avg: [100, 20, 25, 35, 170],
+        choice_last: [0, 23, 22, 30, 170],
+        main_max: 100,
+        choice_max: 170,
+    };
+    
+    // in property <[int]> main_avg: [100, 10, 30, 42, 41, 57];
+    // in property <[int]> main_last: [100, 9, 31, 47, 44, 52];
+    // in property <[int]> choice_avg: [0, 20, 25, 35, 170];
+    // in property <[int]> choice_last: [0, 23, 22, 30, 170];
+    // in property <int> main_max: 100;
+    // in property <int> choice_max: 170;
+    property <length> bar_width: 60px;
+    property <length> half_bar_width: bar_width/2;
+    property <length> bar_height: 200px;
+    VerticalLayout {
+        padding: Sizes.padding;
+        spacing: Sizes.spacing;
+        TitleText{
+            text: "Score";
+        }
+        HorizontalBox {
+            padding: 0;
+            spacing: Sizes.spacing/2;
+            Rectangle {}
+            TitleText {
+                text: "User:";
+                style: FontSettings.title-small;
+            }
+            ComboBox {
+                height: Sizes.title_height;
+                // width: 100px;
+                model: root.users;
+                current-value: root.users[0];
+            }
+            TouchArea {
+                width: Sizes.title_height;
+                height: Sizes.title_height;
+                TitleText {
+                    text:"+";
+                    style:  { font-size: 20pt, font-weight: 1000 };
+                }
+                
+        
+                clicked => {
+                    //();
+                }
+            }
+            TitleText {
+                text:"/";
+            }
+            TouchArea {
+                width: Sizes.title_height;
+                height: Sizes.title_height;
+                TitleText {
+                    text:"-";
+                    style:  { font-size: 20pt, font-weight: 1000 };
+                }
+                
+        
+                clicked => {
+                    //TODO add confirmation
+                    delete_user();
+                    category_changed(sub_cat_choice.choice_num)
+                }
+            }
+            
+            Rectangle {}
+        }
+
+    scroll := ScrollView {
+        vertical-scrollbar-policy: always-off;
+
+    VerticalBox {
+        width: scroll.width - Sizes.size_bar;
+        spacing: Sizes.spacing;
+        padding: 0;
+        padding-left: Sizes.size_bar;
+        
+        Rectangle {
+            background: Palette.accent1;
+            border-radius: Sizes.std_radius;
+            VerticalBox {
+                padding: Sizes.spacing;
+                spacing: Sizes.spacing;
+                w_hard := MultiChoice {
+                    choices: ["Independent only", "All territories"];
+                    changed not_default => {
+                        filter_changed(self.not_default);
+                        category_changed(sub_cat_choice.choice_num);
+                    }
+                }
+                RegularText {
+                    text: w_hard.not_default?  "Score for all territories (250 different)" : "Score for only independent countries (194 different)" ;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                    width: 100%;
+                    wrap: word-wrap;
+                    style: FontSettings.body-small;
+                }
+            }
+        }
+        TitleText {
+            text: "Region";
+            style: FontSettings.title-small;
+        }
+        sub_cat_choice := ScrollChoice {
+            width: 100%;
+            choices: root.sub_categories_name;
+            changed choice_num => {category_changed(self.choice_num)}
+        }
+        HorizontalBox {
+            Rectangle {}
+
+            Rectangle {
+                width: (root.width - 5*Sizes.spacing - 4*Sizes.padding)/12;
+                Rectangle {
+                    width: 100%;
+                    height: Sizes.spacing;
+                    background: white;
+                }
+            }
+            RegularText {
+                text: "Average";
+                vertical-alignment: center;
+            }
+            Rectangle {}
+
+            Rectangle {
+                width: (root.width - 5*Sizes.spacing - 4*Sizes.padding)/12;
+                Rectangle {
+                    width: 100%;
+                    height: Sizes.spacing;
+                    background: green;
+                }
+            }
+            RegularText {
+                text: "Last play";
+                vertical-alignment: center;
+            }
+            Rectangle {}
+        }
+        TitleText {
+            text: "Free play score";
+            style: FontSettings.title-small;
+        }
+        BarGraph {
+            bar_width: (root.width - 5*Sizes.spacing - 4*Sizes.padding)/6;
+            max_num: root.stat.main_max;
+            names: ["Not\nPlayed", 1, 2, 3, 4, 5];
+            avg: root.stat.main_avg;
+            last: root.stat.main_last;
+        }
+        RegularText {
+            height: 50px;
+            text: "Number of countries per star rating";
+            horizontal-alignment: center;
+            vertical-alignment: bottom;
+        }
+        Rectangle {}
+        TitleText {
+            text: "4 Choices score";
+            style: FontSettings.title-small;
+        }
+        BarGraph {
+            bar_width: (root.width - 4*Sizes.spacing - 4*Sizes.padding)/5;
+            max_num: root.stat.choice_max;
+            names: ["Not\nPlayed", 3, 2, 1, 0];
+            avg: root.stat.choice_avg;
+            last: root.stat.choice_last;
+        }
+        RegularText {
+            height: 50px;
+            text: "Number of countries per wrong guesses";
+            horizontal-alignment: center;
+            vertical-alignment: bottom;
+        }
+        Rectangle {}
+    }
+}
+}
+
+}

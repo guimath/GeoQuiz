@@ -92,11 +92,13 @@
 - [ ] Add More of test of sorts like choices but stops after 3 wrong guess 
 - [ ] Add a help section with contact, sources & desc
 - [ ] Revamp Score
-  - [ ] Score in a separate window 
-  - [ ] Add "Score reset" message
-  - [ ] Add stats
-  - [ ] Add Multi profile
+  - [x] Score in a separate window 
+  - [x] Add stats
   - [x] Remove cca3
+  - [ ] Change fonts and layout for better readability
+  - [ ] Add "Score reset" pop up verif
+  - [ ] Add Multi profile
+- [ ] Add score to look up
 
 ## Secondary
 - [ ] Try to find more precise country outlines 

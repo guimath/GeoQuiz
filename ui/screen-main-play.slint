@@ -1,6 +1,6 @@
 import { HorizontalBox, VerticalBox } from "std-widgets.slint";
 import { CatInfo, MainPlayUpdate, TxtOrImg } from "structs.slint";
-import { ThreeStartScore, TitleText, HiddenText, SwipeInfo } from "widgets.slint";
+import { FiveStarScore, TitleText, HiddenText, SwipeInfo } from "widgets.slint";
 import { TextStyle, FontSettings, Palette, Sizes } from "styling.slint";
 
 export component MainPlayScreen inherits Rectangle {
@@ -30,7 +30,7 @@ export component MainPlayScreen inherits Rectangle {
         if score == 0 {
             root.next(score);
         } else {
-            w_score.score = score;
+            // w_score.score = score;
             root.score_delayed = score;
             w_cat1.show = true;
             w_cat2.show = true;
@@ -68,7 +68,7 @@ export component MainPlayScreen inherits Rectangle {
             padding-top: Sizes.spacing;
             padding-bottom: Sizes.spacing;
             alignment: center;
-            w_score := ThreeStartScore {
+            w_score := FiveStarScore {  
                 score_changed(score) => {
                     prep_next(score)
                 }

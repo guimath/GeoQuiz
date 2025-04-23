@@ -9,7 +9,7 @@ use std::{
 
 use slint::{ComponentHandle, LogicalSize, Model, ModelRc, SharedString, VecModel};
 
-use logic::{AppLogic, AppWindow};
+use logic::{AppLogic, AppWindow, ScoreStatSlint};
 
 fn vec_to_model(vec: &Vec<String>) -> ModelRc<SharedString> {
     let vc = vec.clone();
@@ -138,6 +138,34 @@ fn init(path: PathBuf) -> Result<(), Box<dyn Error>> {
             }
         }
     });
+    // SCORE
+    ui.on_score_filter_changed({
+        let logic_ref = logic.clone();
+        move |all| {
+            let mut logic = logic_ref.lock().unwrap();
+            logic.score_filter_changed(all);
+        }
+    });
+    ui.on_score_sub_cat_changed({
+        let ui_handle = ui.as_weak();
+        let logic_ref = logic.clone();
+        move |sub_cat_idx| {
+            let ui = ui_handle.unwrap();
+            let logic = logic_ref.lock().unwrap();
+            let stat = logic.score_sub_cat_changed(sub_cat_idx as usize) ;
+
+            ui.invoke_update_score(ScoreStatSlint{
+                    main_avg: stat.main_avg.into(),
+                    main_last: stat.main_last.into(),
+                    choice_avg: stat.choice_avg.into(),
+                    choice_last: stat.choice_last.into(),
+                    main_max: stat.main_max.into(),
+                    choice_max: stat.choice_max.into(),
+                }
+            );
+        }
+    });
+
 
     ui.on_close({
         let logic_ref = logic.clone();

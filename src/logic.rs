@@ -33,6 +33,16 @@ pub struct AppLogic {
     score_folder: PathBuf,
 }
 
+#[derive(Default)]
+pub struct ScoreStats{
+    pub main_avg: [i32; 6],
+    pub main_last: [i32; 6],
+    pub choice_avg: [i32; 5],
+    pub choice_last: [i32; 5],
+    pub main_max:  i32,
+    pub choice_max : i32,
+}
+
 fn get_score_key(country: &CountryInfos) -> String {
     country.infos[0].full.clone()
 }
@@ -231,8 +241,8 @@ impl AppLogic {
                 .get_mut(&get_score_key(&self.all_countries[self.current]))
                 .unwrap();
             score.time_played += 1;
-            score.last_score = guess_num as u32;
-            score.total_score += (4 - guess_num) as u32;
+            score.last_score = (5 - guess_num) as u32;
+            score.total_score += (5 - guess_num) as u32;
             self.save_scores();
         }
 
@@ -420,6 +430,66 @@ impl AppLogic {
             text_infos: text_infos.as_slice().into(),
             image_infos: image_infos.as_slice().into(),
         }
+    }
+
+    pub fn score_folder_changed(&mut self, new_folder: String){
+        panic!("Not implemented")
+    }
+    pub fn score_filter_changed(&mut self, all:bool) {
+        self.all_countries = if !all {
+            self.all_countries_order
+                .clone()
+                .into_iter()
+                .filter(|country| country.independent)
+                .collect()
+        } else {
+            self.all_countries_order.clone()
+        };
+    }
+    pub fn score_sub_cat_changed(&self, sub_cat_idx:usize) -> ScoreStats {
+        let filtered_countries: Vec<String> = if sub_cat_idx == 0 {
+            self.all_countries
+                .clone()
+                .into_iter()
+                .map(|x| x.infos[0].full.clone())
+                .collect()
+        } else {
+            self.all_countries
+                .clone()
+                .into_iter()
+                .filter(|country| country.region == self.sub_cat_names[sub_cat_idx])
+                .map(|x| x.infos[0].full.clone())
+                .collect()
+        };
+
+        let score_path_main = self.score_folder.join("score_main.json");
+        let score_path_choice = self.score_folder.join("score_choice.json");
+        let main_scores = info_parse::read(&self.all_countries_order, score_path_main);
+        let choice_scores = info_parse::read(&self.all_countries_order, score_path_choice);
+
+        let mut stat = ScoreStats::default();
+        for country_name in filtered_countries {
+            let s = main_scores.get(&country_name).unwrap();
+            stat.main_last[s.last_score as usize] += 1;
+            if s.time_played > 0 {
+                let avg = ((s.total_score as f32)/(s.time_played as f32)).round() as usize;
+                stat.main_avg[avg] += 1;
+            } else {
+                stat.main_avg[0] += 1;
+            }
+            let s = choice_scores.get(&country_name).unwrap();
+            stat.choice_last[s.last_score as usize] += 1;
+            if s.time_played > 0 {
+                let avg = ((s.total_score as f32)/(s.time_played as f32)).round() as usize;
+                stat.choice_avg[avg] += 1;
+            } else {
+                stat.choice_avg[0] += 1;
+            }
+        }
+        stat.main_max   =   stat.main_avg.iter().max().unwrap().max(stat.main_last.iter().max().unwrap()).clone();
+        stat.choice_max = stat.choice_avg.iter().max().unwrap().max(stat.choice_last.iter().max().unwrap()).clone();
+        stat
+
     }
 
     fn load_img(&self, image_link: &ImageLink) -> Image {

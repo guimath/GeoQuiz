@@ -167,14 +167,6 @@ fn init(path: PathBuf) -> Result<(), Box<dyn Error>> {
     });
 
 
-    ui.on_close({
-        let logic_ref = logic.clone();
-        move || {
-            let logic = logic_ref.lock().unwrap();
-            logic.save_scores();
-            slint::quit_event_loop().unwrap();
-        }
-    });
     ui.on_reset_score({
         let logic_ref = logic.clone();
         move || {
@@ -190,11 +182,19 @@ fn init(path: PathBuf) -> Result<(), Box<dyn Error>> {
         }
     });
 
-    ui.window().on_close_requested({
-        let logic_ref = logic.clone();
+    ui.on_close({
+        // let logic_ref = logic.clone();
         move || {
-            let logic = logic_ref.lock().unwrap();
-            logic.save_scores();
+            // let logic = logic_ref.lock().unwrap();
+            // logic.save_scores();
+            slint::quit_event_loop().unwrap();
+        }
+    });
+    ui.window().on_close_requested({
+        // let logic_ref = logic.clone();
+        move || {
+            // let logic = logic_ref.lock().unwrap();
+            // logic.save_scores();
             slint::CloseRequestResponse::HideWindow
         }
     });

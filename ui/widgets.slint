@@ -88,7 +88,7 @@ component ToggleStar inherits TouchArea {
     }
 }
 
-export component ThreeStartScore {
+export component FiveStarScore {
     in-out property <int> score:0;
     in-out property <int> prev_score:2;
     callback score_changed(score: int);
@@ -97,7 +97,7 @@ export component ThreeStartScore {
         HorizontalBox {
             spacing: Sizes.spacing;
             padding: 0;
-            for i in [0, 1, 2, 4, 5] : ToggleStar {
+            for i in [0, 1, 2, 3, 4] : ToggleStar {
                 clicked => {
                     root.score = i+1;
                     root.prev_score = i+1;
@@ -372,4 +372,72 @@ export component TextButton inherits HorizontalBox {
         clicked() => {root.clicked()}
     }
     Rectangle {}
+}
+
+export component BarGraph {
+    in property <length> bar_width: 80px;
+    property <length> half_bar_width: bar_width/2;
+    in property <length> bar_height: 200px;
+    in property <int> max_num: 100;
+    in property <[string]> names: [0, 1, 2, 3, 4, 5];
+    in property <[int]> avg: [100, 10, 30, 42, 41, 57];
+    in property <[int]> last: [100, 9, 31, 47, 44, 52];
+    height: root.bar_height;
+    Rectangle {
+    width: root.bar_width*root.names.length + Sizes.spacing*(root.names.length - 1);
+    height: root.bar_height;
+    for val[i] in root.names : Rectangle {
+        width: root.bar_width;
+        height: 100%;
+        x: i*(bar_width+Sizes.spacing);
+        y: 0;
+        TitleText {
+            vertical-alignment: top;
+            text:val;
+            width: 100%;
+            y: root.bar_height;
+            style: FontSettings.title-small;
+        }
+        Rectangle {
+            x : 0;
+            y: root.bar_height - root.avg[i]/root.max_num*root.bar_height;
+            height:  root.avg[i]/root.max_num*root.bar_height;
+            width: root.half_bar_width;
+            background: white;
+        }
+        Text {
+            x: 0;
+            y: root.bar_height - root.avg[i]/root.max_num*root.bar_height  - 20px;
+            width: root.half_bar_width;
+            horizontal-alignment: center;
+            text:root.avg[i];
+            visible: root.last[i] != root.avg[i];
+        }
+        Rectangle {
+            x : root.half_bar_width;
+            y: root.bar_height - root.last[i]/root.max_num*root.bar_height;
+            height:  root.last[i]/root.max_num*root.bar_height;
+            width: root.half_bar_width;
+            background: green;
+        }
+        Text {
+            x : root.half_bar_width;
+            y: root.bar_height - root.last[i]/root.max_num*root.bar_height  - 20px;
+            width: root.half_bar_width;
+            horizontal-alignment: center;
+            text:root.last[i];
+            visible: root.last[i] != root.avg[i];
+        }
+        Text {
+            x : 0;
+            y: root.bar_height - root.last[i]/root.max_num*root.bar_height  - 20px;
+            width: root.bar_width;
+            horizontal-alignment: center;
+            text:root.last[i];
+            visible: root.last[i] == root.avg[i];
+        }
+    }
+
+}
+    
 }

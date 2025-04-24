@@ -159,7 +159,7 @@ impl AppLogic {
             self.results[self.current] = result;
             self.save_scores(); // TODO ONLY SAVE WHEN LEAVING APP OR BACK TO MENU
         }
-        if self.current < self.all_countries.len() {
+        if self.current < self.all_countries.len() - 1 {
             self.current += 1;
             return Some(self.get_stat());
         }
@@ -250,9 +250,10 @@ impl AppLogic {
         }
 
         if next {
-            if self.current < self.all_countries.len() {
+            if self.current < self.all_countries.len() - 1 {
                 self.current += 1;
             } else {
+                println!("here");
                 return None;
             }
         } else {

@@ -99,10 +99,10 @@
 - [x] added Population
 - [x] added Area
 - [x] Add a help section with contact, sources & desc
+- [x] Patch crash when at the end of play
 
 ## Priority 
 - [ ] Add score to look up
-- [ ] Patch crash when at the end of a 4 choice
 
 ## Secondary
 - [ ] Try to find more precise country outlines 
@@ -111,6 +111,7 @@
 - [ ] Add a Readme & LICENSE & Publish
 - [ ] Add python map generation
 - [ ] Add URL links
+- [ ] Add screenshots to readme
 
 
 ## Ideas to discuss

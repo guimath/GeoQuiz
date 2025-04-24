@@ -396,45 +396,48 @@ export component BarGraph {
                 text:val;
                 width: 100%;
                 y: root.bar_height;
-                style: FontSettings.title-small;
+                style: FontSettings.body-large;
             }
             Rectangle {
                 x : 0;
                 y: root.bar_height - root.avg[i]/root.max_num*root.bar_height;
                 height:  root.avg[i]/root.max_num*root.bar_height;
                 width: root.half_bar_width;
-                background: white;
+                background: Palette.regular_text;
             }
-            Text {
+            RegularText {
                 x: 0;
                 y: root.bar_height - root.avg[i]/root.max_num*root.bar_height  - 20px;
                 width: root.half_bar_width;
                 horizontal-alignment: center;
                 text:root.avg[i];
                 visible: root.last[i] != root.avg[i];
+                style: FontSettings.body-small;
             }
             Rectangle {
                 x : root.half_bar_width;
                 y: root.bar_height - root.last[i]/root.max_num*root.bar_height;
                 height:  root.last[i]/root.max_num*root.bar_height;
                 width: root.half_bar_width;
-                background: green;
+                background: Palette.correct;
             }
-            Text {
+            RegularText {
                 x : root.half_bar_width;
                 y: root.bar_height - root.last[i]/root.max_num*root.bar_height  - 20px;
                 width: root.half_bar_width;
                 horizontal-alignment: center;
                 text:root.last[i];
                 visible: root.last[i] != root.avg[i];
+                style: FontSettings.body-small;
             }
-            Text {
+            RegularText {
                 x : 0;
                 y: root.bar_height - root.last[i]/root.max_num*root.bar_height  - 20px;
                 width: root.bar_width;
                 horizontal-alignment: center;
                 text:root.last[i];
                 visible: root.last[i] == root.avg[i];
+                style: FontSettings.body-small;
             }
         }
 

@@ -166,7 +166,7 @@ export component ScoreScreen inherits Rectangle {
                         Rectangle {
                             width: 100%;
                             height: Sizes.spacing;
-                            background: white;
+                            background: Palette.regular_text;
                         }
                     }
                     RegularText {
@@ -180,7 +180,7 @@ export component ScoreScreen inherits Rectangle {
                         Rectangle {
                             width: 100%;
                             height: Sizes.spacing;
-                            background: green;
+                            background: Palette.correct;
                         }
                     }
                     RegularText {
@@ -194,9 +194,10 @@ export component ScoreScreen inherits Rectangle {
                     style: FontSettings.title-small;
                 }
                 BarGraph {
+                    bar_height: root.height/7;
                     bar_width: (root.width - 5*Sizes.spacing - 4*Sizes.padding)/6;
                     max_num: root.stat.main_max;
-                    names: ["Not\nPlayed", 1, 2, 3, 4, 5];
+                    names: ["Not Played", 1, 2, 3, 4, 5];
                     avg: root.stat.main_avg;
                     last: root.stat.main_last;
                 }
@@ -212,9 +213,10 @@ export component ScoreScreen inherits Rectangle {
                     style: FontSettings.title-small;
                 }
                 BarGraph {
+                    bar_height: root.height/7;
                     bar_width: (root.width - 4*Sizes.spacing - 4*Sizes.padding)/5;
                     max_num: root.stat.choice_max;
-                    names: ["Not\nPlayed", 3, 2, 1, 0];
+                    names: ["Not Played", 3, 2, 1, 0];
                     avg: root.stat.choice_avg;
                     last: root.stat.choice_last;
                 }

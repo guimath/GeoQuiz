@@ -93,11 +93,11 @@
   - [x] Remove cca3
   - [x] Add "Score reset" pop up verif
   - [x] Add Multi profile
+- [x] Change fonts and layout in Score for better readability
 
 ## Priority 
 - [ ] Add More of test of sorts like choices but stops after 3 wrong guess 
 - [ ] Add a help section with contact, sources & desc
-- [ ] Change fonts and layout in Score for better readability
 - [ ] Add score to look up
 
 ## Secondary

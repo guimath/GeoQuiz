@@ -68,15 +68,28 @@ pub fn save(scores: &HashMap<String, Score>, score_path: PathBuf) {
     file.write_all(json_data.as_bytes()).unwrap();
 }
 
-pub fn reset_score(score_folder: PathBuf) {
+pub fn delete_score(score_folder: PathBuf) {
     if score_folder.exists() {
         fs::remove_dir_all(score_folder.clone()).unwrap();
     }
-    init_score_folder(score_folder);
+    // init_score_folder(score_folder);
 }
 
 pub fn init_score_folder(score_folder: PathBuf) {
     if !score_folder.exists() {
         fs::create_dir_all(score_folder).unwrap();
     }
+}
+
+pub fn rename_score_folder(path1: PathBuf, path2: PathBuf) {
+    fs::rename(path1, path2).unwrap();
+}
+
+pub fn list_folders(path: PathBuf) -> Vec<String> {
+    let a = fs::read_dir(path).unwrap();
+    let mut v: Vec<String> = a.into_iter()
+        .map(|x| x.unwrap().file_name().into_string().unwrap())
+        .collect();
+    v.sort();
+    v
 }

@@ -1,0 +1,78 @@
+import { ScrollView, LineEdit, HorizontalBox, VerticalBox } from "std-widgets.slint";
+import { ChoiceElem, RegularText, TitleText } from "widgets.slint";
+import { FullInfo, TextWithTitle } from "structs.slint";
+import { TextStyle, FontSettings, Palette, Sizes } from "styling.slint";
+
+export component HelpScreen inherits Rectangle {
+            
+    property <[TextWithTitle]> infos : [
+        {title:"Flag", text:"mledoze github"},
+        {title:"Map", text:"Generated (in azimuthal projection) using matplotlib Basemap"},
+        // {title:"Outline", text:""},
+        {title:"Population", text:"World Bank indicator"},
+        {title:"Area", text:"World Bank indicator"},
+        {title:"Everything else", text:"mledoze github"},
+    ];
+    VerticalLayout {
+        padding: Sizes.padding;
+        spacing: 0;
+        TitleText {  
+            text: "Geo Quiz - Help";
+        }
+        Rectangle {height: 3* Sizes.spacing;}
+
+        // scroll := ScrollView {
+        //     VerticalLayout {
+        //         spacing: 0;
+        //         padding-left: Sizes.size_bar; 
+        RegularText {
+            text: "Geo quiz is a quiz app to help you learn more about the world's geography";
+            wrap: word-wrap;
+        }
+        Rectangle {height: 3* Sizes.spacing;}
+        TitleText {  
+            text: "Sources";
+            style: FontSettings.title-small;
+        }
+        for text_infos[i] in infos: Rectangle{
+            background: Math.mod(i,2) == 0 ? Palette.accent1 : Palette.background;
+            HorizontalBox {
+                padding: Sizes.padding;
+                spacing: 0;
+                RegularText {
+                    width: root.width/5;
+                    text: "\{text_infos.title}";
+                    vertical-alignment: center;
+                    horizontal-alignment: right;
+                    wrap: word-wrap;
+                    style: FontSettings.body-large-bold;
+                }
+                RegularText {
+                    vertical-alignment: center;
+                    text: ":";
+                    style: FontSettings.body-large-bold;
+                }
+                Rectangle {width: Sizes.spacing;}
+                RegularText {
+                    horizontal-stretch: 1;
+                    vertical-alignment: center;
+                    text: text_infos.text;
+                    wrap: word-wrap;
+                }
+            }
+        }
+        Rectangle {}
+        //     }
+        // }
+        RegularText {
+            text: "Contact: guilhem.geoquiz@gmail.com";
+            horizontal-alignment: center;
+        }
+        Rectangle {height: Sizes.spacing;}
+        RegularText {
+            text: "Copyright (c) 2025 Guilhem Mathieux";
+            horizontal-alignment: center;
+            color: Palette.regular_text.darker(0.5);
+        }
+    }
+}

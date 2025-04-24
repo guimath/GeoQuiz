@@ -98,16 +98,19 @@
 - [x] Add categories names to json / move to csv
 - [x] added Population
 - [x] added Area
+- [x] Add a help section with contact, sources & desc
 
 ## Priority 
-- [ ] Add a help section with contact, sources & desc
 - [ ] Add score to look up
+- [ ] Patch crash when at the end of a 4 choice
 
 ## Secondary
 - [ ] Try to find more precise country outlines 
 - [ ] See how to catch back button on android (https://docs.rs/android-activity/latest/android_activity/input/enum.Keycode.html#variant.TvMediaContextMenu)
 - [ ] Make proper icon
 - [ ] Add a Readme & LICENSE & Publish
+- [ ] Add python map generation
+- [ ] Add URL links
 
 
 ## Ideas to discuss

@@ -9,6 +9,7 @@ import { ChoicePlayScreen } from "screen-choice-play.slint";
 import { SelectPlayScreen } from "screen-select-play.slint";
 import { ScoreScreen } from "screen-score.slint";
 import { TextStyle, FontSettings, Palette, Sizes } from "styling.slint";
+import { HelpScreen } from "screen-help.slint";
 
 export component AppWindow inherits Window {
     title: "Geo quiz";
@@ -64,7 +65,7 @@ export component AppWindow inherits Window {
             root.screen = Screen.SelectChoicePlay;
         } else if root.screen == Screen.SelectChoicePlay {
             root.screen = Screen.SelectPlay
-        } else { // Score, SelectLookUp, SelectPlay
+        } else { // Score, SelectLookUp, SelectPlay, Help
             root.screen = Screen.Start
         }
     }
@@ -173,6 +174,14 @@ export component AppWindow inherits Window {
                     root.screen = Screen.Score;
                 }
             }
+            TextButton {
+                width_button: root.width/2;
+                height: root.height/10;
+                text: "Help";
+                clicked => {
+                    root.screen = Screen.Help;
+                }
+            }
             Rectangle {}
             Rectangle {}
         }
@@ -181,7 +190,9 @@ export component AppWindow inherits Window {
     // ***************************************************************** //
     //                            OTHER SCREENS
     // ***************************************************************** //
-
+    w_help := HelpScreen {
+        visible: root.screen == Screen.Help;
+    }
     w_score := ScoreScreen {
         visible: root.screen == Screen.Score;
         sub_categories_name: root.sub_categories_name;

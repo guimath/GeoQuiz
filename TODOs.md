@@ -87,17 +87,17 @@
   - [x] See how to use files to reduce size of executable
 - [x] Give number of words in hints like for UK: U... ...  and better hints
 - [x] Add Region Selection somehow
+- [x] Revamp Score
+  - [x] Score in a separate window 
+  - [x] Add stats
+  - [x] Remove cca3
+  - [x] Add "Score reset" pop up verif
+  - [x] Add Multi profile
 
 ## Priority 
 - [ ] Add More of test of sorts like choices but stops after 3 wrong guess 
 - [ ] Add a help section with contact, sources & desc
-- [ ] Revamp Score
-  - [x] Score in a separate window 
-  - [x] Add stats
-  - [x] Remove cca3
-  - [ ] Change fonts and layout for better readability
-  - [ ] Add "Score reset" pop up verif
-  - [ ] Add Multi profile
+- [ ] Change fonts and layout in Score for better readability
 - [ ] Add score to look up
 
 ## Secondary

@@ -34,13 +34,13 @@ pub struct AppLogic {
 }
 
 #[derive(Default)]
-pub struct ScoreStats{
+pub struct ScoreStats {
     pub main_avg: [i32; 6],
     pub main_last: [i32; 6],
     pub choice_avg: [i32; 5],
     pub choice_last: [i32; 5],
-    pub main_max:  i32,
-    pub choice_max : i32,
+    pub main_max: i32,
+    pub choice_max: i32,
 }
 
 fn get_score_key(country: &CountryInfos) -> String {
@@ -72,16 +72,19 @@ impl AppLogic {
         ];
         s.search_names = s.all_names.iter().map(|x| x.to_lowercase()).collect();
         s.score_folder = score_path.join("scores/User 1");
+        let v = s.list_users();
+        if v.len() == 0 {
+            info_parse::init_score_folder(s.score_folder.clone());
+        } else {
+            s.score_folder.pop();
+            s.score_folder.push(v[0].clone());
+        }
         s.data_path = score_path.join("data");
-        info_parse::init_score_folder(s.score_folder.clone());
         s
     }
 
-    pub fn set_config(
-        &mut self,
-        conf: PlaySelectParams,
-    ) {
-        self.score_path = if conf.play_type { 
+    pub fn set_config(&mut self, conf: PlaySelectParams) {
+        self.score_path = if conf.play_type {
             self.score_folder.join("score_main.json")
         } else {
             self.score_folder.join("score_choice.json")
@@ -432,10 +435,40 @@ impl AppLogic {
         }
     }
 
-    pub fn score_folder_changed(&mut self, new_folder: String){
-        panic!("Not implemented")
+    pub fn score_user_selected(&mut self, name: String) {
+        self.score_folder.pop();
+        self.score_folder.push(name);
     }
-    pub fn score_filter_changed(&mut self, all:bool) {
+    pub fn score_user_change(&mut self, name: String, delete: bool) {
+        let mut f = self.score_folder.clone();
+        f.pop();
+        f.push(name.clone());
+        if delete {
+            info_parse::delete_score(f.clone());
+            let mut v = self.list_users();
+            v.retain(|x| *x != name.clone());
+            if v.len() == 0 {
+                self.score_folder.pop();
+                self.score_folder.push("User 1");
+                info_parse::init_score_folder(self.score_folder.clone());
+            } else {
+                self.score_folder.pop();
+                self.score_folder.push(v[0].clone());
+            }
+        } else {
+            info_parse::init_score_folder(f.clone());
+            self.score_folder = f.clone();
+        }
+    }
+    pub fn score_rename_user(&mut self, name1: String, name2: String) {
+        self.score_folder.pop();
+        let mut p1 = self.score_folder.clone();
+        p1.push(name1);
+        self.score_folder.push(name2);
+        info_parse::rename_score_folder(p1, self.score_folder.clone())
+    }
+
+    pub fn score_filter_changed(&mut self, all: bool) {
         self.all_countries = if !all {
             self.all_countries_order
                 .clone()
@@ -446,7 +479,7 @@ impl AppLogic {
             self.all_countries_order.clone()
         };
     }
-    pub fn score_sub_cat_changed(&self, sub_cat_idx:usize) -> ScoreStats {
+    pub fn score_sub_cat_changed(&self, sub_cat_idx: usize) -> ScoreStats {
         let filtered_countries: Vec<String> = if sub_cat_idx == 0 {
             self.all_countries
                 .clone()
@@ -472,7 +505,7 @@ impl AppLogic {
             let s = main_scores.get(&country_name).unwrap();
             stat.main_last[s.last_score as usize] += 1;
             if s.time_played > 0 {
-                let avg = ((s.total_score as f32)/(s.time_played as f32)).round() as usize;
+                let avg = ((s.total_score as f32) / (s.time_played as f32)).round() as usize;
                 stat.main_avg[avg] += 1;
             } else {
                 stat.main_avg[0] += 1;
@@ -480,16 +513,27 @@ impl AppLogic {
             let s = choice_scores.get(&country_name).unwrap();
             stat.choice_last[s.last_score as usize] += 1;
             if s.time_played > 0 {
-                let avg = ((s.total_score as f32)/(s.time_played as f32)).round() as usize;
+                let avg = ((s.total_score as f32) / (s.time_played as f32)).round() as usize;
                 stat.choice_avg[avg] += 1;
             } else {
                 stat.choice_avg[0] += 1;
             }
         }
-        stat.main_max   =   stat.main_avg.iter().max().unwrap().max(stat.main_last.iter().max().unwrap()).clone();
-        stat.choice_max = stat.choice_avg.iter().max().unwrap().max(stat.choice_last.iter().max().unwrap()).clone();
+        stat.main_max = stat
+            .main_avg
+            .iter()
+            .max()
+            .unwrap()
+            .max(stat.main_last.iter().max().unwrap())
+            .clone();
+        stat.choice_max = stat
+            .choice_avg
+            .iter()
+            .max()
+            .unwrap()
+            .max(stat.choice_last.iter().max().unwrap())
+            .clone();
         stat
-
     }
 
     fn load_img(&self, image_link: &ImageLink) -> Image {
@@ -503,12 +547,21 @@ impl AppLogic {
             }
         }
     }
-
+    pub fn get_active_user(&self) -> String {
+        self.score_folder
+            .file_name()
+            .unwrap()
+            .to_str()
+            .unwrap()
+            .to_string()
+    }
+    pub fn list_users(&self) -> Vec<String> {
+        let mut f = self.score_folder.clone();
+        f.pop();
+        info_parse::list_folders(f)
+    }
     pub fn save_scores(&self) {
         info_parse::save(&self.scores, self.score_path.clone());
-    }
-    pub fn reset_score(&self) {
-        info_parse::reset_score(self.score_folder.clone())
     }
     fn is_info_txt(&self, i: usize) -> bool {
         i >= self.img_cat_names.len()

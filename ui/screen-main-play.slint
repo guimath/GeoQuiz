@@ -13,7 +13,7 @@ export component MainPlayScreen inherits Rectangle {
     property <TxtOrImg> info: {
         is_txt: false,
         txt: "Jamaica",
-        img: @image-url("../data/flags/jam.svg"),
+        img: @image-url("../sources/flags/jam.svg"),
     };
     public function update_screen(info: MainPlayUpdate, cat: [CatInfo]) {
         w_score.score = info.score;

@@ -1,6 +1,7 @@
 /target
 # temp
 data/
+sources/
 .vscode/
 scores/
 

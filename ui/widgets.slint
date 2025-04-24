@@ -384,60 +384,62 @@ export component BarGraph {
     in property <[int]> last: [100, 9, 31, 47, 44, 52];
     height: root.bar_height;
     Rectangle {
-    width: root.bar_width*root.names.length + Sizes.spacing*(root.names.length - 1);
-    height: root.bar_height;
-    for val[i] in root.names : Rectangle {
-        width: root.bar_width;
-        height: 100%;
-        x: i*(bar_width+Sizes.spacing);
-        y: 0;
-        TitleText {
-            vertical-alignment: top;
-            text:val;
-            width: 100%;
-            y: root.bar_height;
-            style: FontSettings.title-small;
-        }
-        Rectangle {
-            x : 0;
-            y: root.bar_height - root.avg[i]/root.max_num*root.bar_height;
-            height:  root.avg[i]/root.max_num*root.bar_height;
-            width: root.half_bar_width;
-            background: white;
-        }
-        Text {
-            x: 0;
-            y: root.bar_height - root.avg[i]/root.max_num*root.bar_height  - 20px;
-            width: root.half_bar_width;
-            horizontal-alignment: center;
-            text:root.avg[i];
-            visible: root.last[i] != root.avg[i];
-        }
-        Rectangle {
-            x : root.half_bar_width;
-            y: root.bar_height - root.last[i]/root.max_num*root.bar_height;
-            height:  root.last[i]/root.max_num*root.bar_height;
-            width: root.half_bar_width;
-            background: green;
-        }
-        Text {
-            x : root.half_bar_width;
-            y: root.bar_height - root.last[i]/root.max_num*root.bar_height  - 20px;
-            width: root.half_bar_width;
-            horizontal-alignment: center;
-            text:root.last[i];
-            visible: root.last[i] != root.avg[i];
-        }
-        Text {
-            x : 0;
-            y: root.bar_height - root.last[i]/root.max_num*root.bar_height  - 20px;
+        width: root.bar_width*root.names.length + Sizes.spacing*(root.names.length - 1);
+        height: root.bar_height;
+        for val[i] in root.names : Rectangle {
             width: root.bar_width;
-            horizontal-alignment: center;
-            text:root.last[i];
-            visible: root.last[i] == root.avg[i];
+            height: 100%;
+            x: i*(bar_width+Sizes.spacing);
+            y: 0;
+            TitleText {
+                vertical-alignment: top;
+                text:val;
+                width: 100%;
+                y: root.bar_height;
+                style: FontSettings.title-small;
+            }
+            Rectangle {
+                x : 0;
+                y: root.bar_height - root.avg[i]/root.max_num*root.bar_height;
+                height:  root.avg[i]/root.max_num*root.bar_height;
+                width: root.half_bar_width;
+                background: white;
+            }
+            Text {
+                x: 0;
+                y: root.bar_height - root.avg[i]/root.max_num*root.bar_height  - 20px;
+                width: root.half_bar_width;
+                horizontal-alignment: center;
+                text:root.avg[i];
+                visible: root.last[i] != root.avg[i];
+            }
+            Rectangle {
+                x : root.half_bar_width;
+                y: root.bar_height - root.last[i]/root.max_num*root.bar_height;
+                height:  root.last[i]/root.max_num*root.bar_height;
+                width: root.half_bar_width;
+                background: green;
+            }
+            Text {
+                x : root.half_bar_width;
+                y: root.bar_height - root.last[i]/root.max_num*root.bar_height  - 20px;
+                width: root.half_bar_width;
+                horizontal-alignment: center;
+                text:root.last[i];
+                visible: root.last[i] != root.avg[i];
+            }
+            Text {
+                x : 0;
+                y: root.bar_height - root.last[i]/root.max_num*root.bar_height  - 20px;
+                width: root.bar_width;
+                horizontal-alignment: center;
+                text:root.last[i];
+                visible: root.last[i] == root.avg[i];
+            }
         }
-    }
 
+    }
 }
-    
-}
+
+
+

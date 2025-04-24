@@ -94,27 +94,29 @@
   - [x] Add "Score reset" pop up verif
   - [x] Add Multi profile
 - [x] Change fonts and layout in Score for better readability
+- [x] Add support for png/jpeg
+- [x] Add categories names to json / move to csv
+- [x] added Population
+- [x] added Area
 
 ## Priority 
-- [ ] Add More of test of sorts like choices but stops after 3 wrong guess 
 - [ ] Add a help section with contact, sources & desc
 - [ ] Add score to look up
 
 ## Secondary
 - [ ] Try to find more precise country outlines 
 - [ ] See how to catch back button on android (https://docs.rs/android-activity/latest/android_activity/input/enum.Keycode.html#variant.TvMediaContextMenu)
-- [ ] Add a Readme & LICENSE & Publish
 - [ ] Make proper icon
+- [ ] Add a Readme & LICENSE & Publish
 
 
 ## Ideas to discuss
 - [ ] What other infos could be added 
-  - [x] Population
   - [ ] Outline (only if a more detailed outline is available)
 - [ ] Data agnostic -> so that we can create different quizzes
-  - [x] Add support for png/jpeg
-  - [x] Add categories names to json / move to csv
   - [ ] Move independent to "harder difficulty" or something
 - [ ] Animate (WIP)
   - [ ] Better scrolling on categories : maybe use timer to snap to center? 
   - [ ] Animate between screens? 
+- [ ] Add More of test of sorts like choices but stops after 3 wrong guess 
+- [ ] Add a zoomed in version of the map that user can toggle

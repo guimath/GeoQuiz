@@ -45,6 +45,13 @@ struct PopulationStat {
     population: u64,
 }
 
+#[derive(Debug, Deserialize)]
+struct AreaStat {
+    #[serde(rename = "Country Code")]
+    cca3: String,
+    #[serde(rename = "2022")]
+    area: f64,
+}
 use geo_quiz::info_parse::{AllInfos, Category, CountryInfos, ImageLink};
 
 fn hint_from_name(s: String) -> String {
@@ -56,14 +63,23 @@ fn hint_from_name(s: String) -> String {
     hint
 }
 
-const JSON_DATA: &str = include_str!("../data/countries.json"); 
-const POP_DATA: &str = include_str!("../data/pop_last.csv"); 
+const JSON_DATA: &str = include_str!("../sources/countries.json"); 
+const POP_DATA: &str = include_str!("../sources/world_bank_pop.csv"); 
+const AREA_DATA: &str = include_str!("../sources/world_bank_area.csv"); 
 fn main() {
     let mut rdr = csv::Reader::from_reader(POP_DATA.as_bytes());
     let mut cca_to_pop: HashMap<String, u64> = HashMap::new();
     for result in rdr.deserialize() {
+        if result.is_err() {continue;}
         let r: PopulationStat = result.unwrap();
         cca_to_pop.insert(r.cca3, r.population);
+    }
+    let mut rdr = csv::Reader::from_reader(AREA_DATA.as_bytes());
+    let mut cca_to_area: HashMap<String, f64> = HashMap::new();
+    for result in rdr.deserialize() {
+        if result.is_err() {continue;}
+        let r: AreaStat = result.unwrap();
+        cca_to_area.insert(r.cca3, r.area);
     }
     let  raw: Vec<CountryStat> = serde_json::from_str(JSON_DATA).unwrap();
     let mut cca3_to_name = HashMap::new();
@@ -127,7 +143,7 @@ fn main() {
                 hint: Some(hint.join(", ")),
             });
             // POPULATION 
-            let pop_string = if let Some(pop) = cca_to_pop.get(&x.cca3.to_string()) {
+            let value_string = if let Some(val) = cca_to_pop.get(&x.cca3.to_string()) {
                 // if *pop > 10_000_000 {
                 //     let pop_m = pop/1_000_000;
                 //     let mut s = pop_m.to_formatted_string(&Locale::en);
@@ -135,28 +151,36 @@ fn main() {
                 //     s
                 // } else {
                 // }
-                pop.to_formatted_string(&Locale::fr)
+                val.to_formatted_string(&Locale::fr)
             } else {
                 "".to_string()
             };
-            println!("{}", pop_string.clone());
             infos.push(Category {
-                full: pop_string,
+                full: value_string,
+                hint: None,
+            });
+            // AREA 
+            let value_string = if let Some(val) = cca_to_area.get(&x.cca3.to_string()) {
+                if *val > 100.0 {
+                    let v = val.round() as u64;
+                    format!("{} km²",v.to_formatted_string(&Locale::fr))
+                } else {
+                    format!("{} km²",val)
+                }
+            } else {
+                "".to_string()
+            };
+            println!("{}", value_string);
+            infos.push(Category {
+                full: value_string,
                 hint: None,
             });
             
-            // YEM
-            // 63,212,384
-            // ZAF
-            // 20,723,965
-            // ZMB
-            // 16,340,822
-            // ZWE
 
 
             let mut images: Vec<ImageLink> = Vec::new();
             // SVG_FLAG
-            let svg_path_o = format!("data/flags/{}.svg", x.cca3.to_lowercase());
+            let svg_path_o = format!("sources/flags/{}.svg", x.cca3.to_lowercase());
             let svg_path = Path::new(&svg_path_o);
             images.push(ImageLink::EmbeddedSVG(fs::read_to_string(svg_path).unwrap()));
             // SVG_OUTLINE
@@ -181,6 +205,7 @@ fn main() {
             "Region".to_string(),
             "Borders".to_string(),
             "Population".to_string(),
+            "Area".to_string(),
         ],
         image_names: vec![
             "Flag".to_string(),

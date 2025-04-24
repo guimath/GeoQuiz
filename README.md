@@ -15,5 +15,6 @@ A quiz app to help you learn more about the world's geography.
 
 ## Contact
 
-github : guimath
+- mail: [guilhem.geoquiz@gmail.com](mailto:guilhem.geoquiz@gmail.com)
+- github : [guimath](https://github.com/guimath)
 

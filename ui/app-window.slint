@@ -91,6 +91,10 @@ export component AppWindow inherits Window {
 
     public function set_active_user(name: string) {
         w_score.set_active_user(name);
+        w_look_up.user = name;
+    }
+    public function set_active_user_look_up(name: string) {
+        w_look_up.user = name;
     }
 
     forward-focus: my-key-handler;

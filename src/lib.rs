@@ -47,7 +47,8 @@ fn init(path: PathBuf) -> Result<(), Box<dyn Error>> {
         ui.set_all_categories_name(vec_to_model(&logic_lock.all_cat_names));
         ui.set_txt_categories_name(vec_to_model(&logic_lock.txt_cat_names));
         ui.set_sub_categories_name(vec_to_model(&logic_lock.sub_cat_names));
-        ui.set_users(vec_to_model(&logic_lock.list_users()))
+        ui.set_users(vec_to_model(&logic_lock.list_users()));
+        ui.invoke_set_active_user_look_up(logic_lock.get_active_user().into());
     }
 
     ui.on_look_up_search_changed({

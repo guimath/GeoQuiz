@@ -100,9 +100,9 @@
 - [x] added Area
 - [x] Add a help section with contact, sources & desc
 - [x] Patch crash when at the end of play
+- [x] Add score to look up
 
 ## Priority 
-- [ ] Add score to look up
 
 ## Secondary
 - [ ] Try to find more precise country outlines 
@@ -115,6 +115,7 @@
 
 
 ## Ideas to discuss
+- [ ] Add a score recap at the end ?
 - [ ] What other infos could be added 
   - [ ] Outline (only if a more detailed outline is available)
 - [ ] Data agnostic -> so that we can create different quizzes

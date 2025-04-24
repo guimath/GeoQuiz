@@ -8,6 +8,8 @@ use std::{cmp::Ordering, path::PathBuf};
 
 slint::include_modules!();
 
+const MAIN_SCORE_NAME: &str = "score_main.json";
+const CHOICE_SCORE_NAME: &str = "score_choice.json";
 #[derive(Default)]
 pub struct AppLogic {
     order_type: u32,
@@ -85,9 +87,9 @@ impl AppLogic {
 
     pub fn set_config(&mut self, conf: PlaySelectParams) {
         self.score_path = if conf.play_type {
-            self.score_folder.join("score_main.json")
+            self.score_folder.join(MAIN_SCORE_NAME)
         } else {
-            self.score_folder.join("score_choice.json")
+            self.score_folder.join(CHOICE_SCORE_NAME)
         };
         self.all_countries = if !conf.include_hard {
             self.all_countries_order
@@ -428,11 +430,25 @@ impl AppLogic {
                 });
             }
         }
-
+        let mut paths = [
+            self.score_folder.clone(),
+            self.score_folder.clone(),
+        ];
+        paths[0].push(MAIN_SCORE_NAME);
+        paths[1].push(CHOICE_SCORE_NAME);
+        println!("{:?}", paths[0]);
+        let mut val = [0;2];
+        for i in 0..2 {
+            let s= info_parse::read(&self.all_countries_order, paths[i].clone());
+            let score = s.get(&name).unwrap();
+            val[i] = score.last_score as i32;
+        }
         FullInfo {
             name: name.into(),
             text_infos: text_infos.as_slice().into(),
             image_infos: image_infos.as_slice().into(),
+            score_free_play: val[0],
+            score_choice_play: val[1],
         }
     }
 
@@ -496,8 +512,8 @@ impl AppLogic {
                 .collect()
         };
 
-        let score_path_main = self.score_folder.join("score_main.json");
-        let score_path_choice = self.score_folder.join("score_choice.json");
+        let score_path_main = self.score_folder.join(MAIN_SCORE_NAME);
+        let score_path_choice = self.score_folder.join(CHOICE_SCORE_NAME);
         let main_scores = info_parse::read(&self.all_countries_order, score_path_main);
         let choice_scores = info_parse::read(&self.all_countries_order, score_path_choice);
 

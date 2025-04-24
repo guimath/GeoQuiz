@@ -89,6 +89,7 @@ component ToggleStar inherits TouchArea {
 }
 
 export component FiveStarScore {
+    in property <bool> user_modifiable : true;
     in-out property <int> score:0;
     in-out property <int> prev_score:2;
     callback score_changed(score: int);
@@ -99,6 +100,9 @@ export component FiveStarScore {
             padding: 0;
             for i in [0, 1, 2, 3, 4] : ToggleStar {
                 clicked => {
+                    if !user_modifiable {
+                        return;
+                    }
                     root.score = i+1;
                     root.prev_score = i+1;
                     score_changed(i+1);

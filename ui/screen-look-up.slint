@@ -1,5 +1,5 @@
 import { ScrollView, LineEdit, HorizontalBox, VerticalBox } from "std-widgets.slint";
-import { ChoiceElem, RegularText, TitleText } from "widgets.slint";
+import { ChoiceElem, RegularText, TitleText, FiveStarScore } from "widgets.slint";
 import { FullInfo } from "structs.slint";
 import { TextStyle, FontSettings, Palette, Sizes } from "styling.slint";
 
@@ -49,6 +49,7 @@ export component LookUpScreen inherits Rectangle {
     public function reset() {
         scroll.viewport-y = 0;
     }
+    in property <string> user: "User 1";
     in property <FullInfo> infos: {
         name: "Jamaica", 
         text-infos:[
@@ -62,7 +63,10 @@ export component LookUpScreen inherits Rectangle {
         image-infos:[
             {title:"Flag", image:@image-url("../sources/flags/jam.svg")},
             // {title:"Outline", image:@image-url("../data/position2/jam.svg")}
-        ]};
+        ],
+        score_free_play: 3,
+        score_choice_play: 0,
+    };
     
     VerticalLayout {
         padding: 0;
@@ -118,6 +122,89 @@ export component LookUpScreen inherits Rectangle {
                             wrap: word-wrap;
                         }
                     }
+                }
+                Rectangle {
+                    height: Sizes.spacing/2;
+                    background: Palette.regular_text;
+
+                }
+                TitleText {
+                    text: "Last scores (\{root.user})";
+                    style: FontSettings.title-small;
+
+                }
+                HorizontalBox {
+                    padding: 0;
+                    spacing: 0;
+                    RegularText {
+                        vertical-alignment: center;
+                        text: "Free play:";
+                        width: ch_text.width;
+                    }
+                    Rectangle {width: Sizes.spacing;}
+                    Rectangle {
+                        padding: 0;
+                        HorizontalBox {
+                            padding: 0;
+                            FiveStarScore {
+                                visible: infos.score-free-play != 0;
+                                user_modifiable: false;
+                                prev_score: 0;
+                                score: infos.score-free-play;
+                            }
+                        }
+                        HorizontalBox {
+                            padding: 0;
+                            RegularText {
+                                visible: infos.score-free-play == 0;
+                                text: "Not played";
+                                vertical-alignment: center;
+                            }
+                        }
+
+                    }
+                    Rectangle {}
+                }
+                Rectangle {height: Sizes.spacing;}
+                HorizontalBox {
+                    padding: 0;
+                    spacing: Sizes.spacing;
+                    ch_text := RegularText {
+                        vertical-alignment: center;
+                        text: "4 choices:";
+                    }
+                    holder := Rectangle {
+                        HorizontalBox {
+                            padding: 0;
+                            spacing: Sizes.spacing;
+                            for i in [0, 1, 2, 3] : Rectangle {
+                                visible: infos.score-choice-play != 0 && 4 - infos.score-choice-play >= i;
+                                background: i == 4 - infos.score-choice-play ? Palette.correct: Palette.wrong;
+                                width: Sizes.title_height;
+                                height: Sizes.title_height;
+                                border-radius: Sizes.title_height/2;
+                            }
+                        }
+                        RegularText {
+                            x: (5 - infos.score-choice-play) * (Sizes.spacing + Sizes.title_height);
+                            visible: infos.score-choice-play != 0;
+                            text: infos.score-choice-play == 4 ? "(found without mistakes)" : 
+                             infos.score-choice-play == 3 ? "(found after 1 mistake)":
+                             "(found after \{4 - infos.score-choice-play} mistakes)";
+                            vertical-alignment: center;
+                            wrap: word-wrap;
+                            width: scroll.width - self.x - holder.x - Sizes.spacing - Sizes.padding;
+                        }
+                        HorizontalBox {
+                            padding: 0;
+                            RegularText {
+                                visible: infos.score-choice-play == 0;
+                                text: "Not played";
+                                vertical-alignment: center;
+                            }
+                        }
+                    }
+                    Rectangle {}
                 }
                 Rectangle {}
             }

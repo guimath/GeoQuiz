@@ -47,6 +47,7 @@ fn init(path: PathBuf) -> Result<(), Box<dyn Error>> {
         ui.set_all_categories_name(vec_to_model(&logic_lock.all_cat_names));
         ui.set_txt_categories_name(vec_to_model(&logic_lock.txt_cat_names));
         ui.set_sub_categories_name(vec_to_model(&logic_lock.sub_cat_names));
+        ui.set_users(vec_to_model(&logic_lock.list_users()))
     }
 
     ui.on_look_up_search_changed({
@@ -139,6 +140,35 @@ fn init(path: PathBuf) -> Result<(), Box<dyn Error>> {
         }
     });
     // SCORE
+    ui.on_score_user_selected({
+        let logic_ref = logic.clone();
+        move |name| {
+            let mut logic = logic_ref.lock().unwrap();
+            logic.score_user_selected(name.into());
+        }
+    });
+    ui.on_score_user_change({
+        let ui_handle = ui.as_weak();
+        let logic_ref = logic.clone();
+        move |name, delete| {
+            let ui = ui_handle.unwrap();
+            let mut logic = logic_ref.lock().unwrap();
+            logic.score_user_change(name.into(), delete);
+            ui.set_users(vec_to_model(&logic.list_users()));
+            ui.invoke_set_active_user(logic.get_active_user().into());
+        }
+    });
+    ui.on_score_rename_user({
+        let ui_handle = ui.as_weak();
+        let logic_ref = logic.clone();
+        move |name1, name2| {
+            let ui = ui_handle.unwrap();
+            let mut logic = logic_ref.lock().unwrap();
+            logic.score_rename_user(name1.into(), name2.into());
+            ui.set_users(vec_to_model(&logic.list_users()));
+            ui.invoke_set_active_user(logic.get_active_user().into());
+        }
+    });
     ui.on_score_filter_changed({
         let logic_ref = logic.clone();
         move |all| {
@@ -152,28 +182,19 @@ fn init(path: PathBuf) -> Result<(), Box<dyn Error>> {
         move |sub_cat_idx| {
             let ui = ui_handle.unwrap();
             let logic = logic_ref.lock().unwrap();
-            let stat = logic.score_sub_cat_changed(sub_cat_idx as usize) ;
+            let stat = logic.score_sub_cat_changed(sub_cat_idx as usize);
 
-            ui.invoke_update_score(ScoreStatSlint{
-                    main_avg: stat.main_avg.into(),
-                    main_last: stat.main_last.into(),
-                    choice_avg: stat.choice_avg.into(),
-                    choice_last: stat.choice_last.into(),
-                    main_max: stat.main_max.into(),
-                    choice_max: stat.choice_max.into(),
-                }
-            );
+            ui.invoke_update_score(ScoreStatSlint {
+                main_avg: stat.main_avg.into(),
+                main_last: stat.main_last.into(),
+                choice_avg: stat.choice_avg.into(),
+                choice_last: stat.choice_last.into(),
+                main_max: stat.main_max.into(),
+                choice_max: stat.choice_max.into(),
+            });
         }
     });
 
-
-    ui.on_reset_score({
-        let logic_ref = logic.clone();
-        move || {
-            let logic = logic_ref.lock().unwrap();
-            logic.reset_score();
-        }
-    });
     ui.on_save_score({
         let logic_ref = logic.clone();
         move || {

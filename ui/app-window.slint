@@ -24,6 +24,7 @@ export component AppWindow inherits Window {
     in property <[string]> all_categories_name: ["Flag", "Outline", "Country", "Capital", "Languages", "Borders", "Region", "Currencies"];
     in property <[string]> txt_categories_name: ["Country", "Capital", "Languages", "Borders", "Region", "Currencies"];
     in property <[string]> sub_categories_name: ["World", "Africa", "Americas", "Asia", "Europe", "Oceania"];
+    in property <[string]> users: ["User 0"];
     
     // ***************************************************************** //
     //                            CALLBACKS
@@ -32,7 +33,6 @@ export component AppWindow inherits Window {
     callback look_up_selected(num: int);
     callback set_play_config(params:PlaySelectParams);
     callback close();
-    callback reset_score();
     callback save_score();
     callback prep_look_up();
     // main 
@@ -43,9 +43,11 @@ export component AppWindow inherits Window {
     callback choice_start_play(int, int);
     callback choice_changed([bool], bool, bool);
     // score
+    callback score_user_selected(name:string);
     callback score_filter_changed(bool);
     callback score_sub_cat_changed(int);
-
+    callback score_user_change(name:string, delete:bool);
+    callback score_rename_user(name1:string, name2:string);
 
     // ***************************************************************** //
     //                            UI LOGIC
@@ -84,6 +86,10 @@ export component AppWindow inherits Window {
 
     public function update_score(stat: ScoreStatSlint) {
         w_score.stat = stat;
+    }
+
+    public function set_active_user(name: string) {
+        w_score.set_active_user(name);
     }
 
     forward-focus: my-key-handler;
@@ -179,8 +185,13 @@ export component AppWindow inherits Window {
     w_score := ScoreScreen {
         visible: root.screen == Screen.Score;
         sub_categories_name: root.sub_categories_name;
+        users: root.users;
         filter_changed(all) => {score_filter_changed(all)}
         category_changed(idx) => {score_sub_cat_changed(idx)}
+        user_selected(name) => {score_user_selected(name);}
+        user_change(name, delete) => {score_user_change(name, delete);}
+        rename_user(name1, name2) => {score_rename_user(name1, name2);}
+        reset_focus() => {root.focus();}
     }
 
     w_select_play := SelectPlayScreen {

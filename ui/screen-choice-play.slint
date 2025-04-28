@@ -8,28 +8,29 @@ export component ChoicePlayScreen inherits Rectangle {
     property <TxtOrImg> info: {
         is_txt: false,
         txt: "Kingston",
-        img: @image-url("../data/positions2/jam.svg"),
+        // img: @image-url("../sources/flags/jam.svg"),
+        img: @image-url("../data/outlines/jam.svg"),
     };
     property <[TxtOrImg]> guesses : [
         {
-            is_txt : true,
-            txt: "Singapore", 
-            img: @image-url("../sources/flags/fra.svg")
+            is_txt : false,
+            txt: "New Zealand", 
+            img: @image-url("../data/outlines/nzl.svg")
         },
         {
             is_txt : true,
             txt: "Jamaica", 
-            img: @image-url("../sources/flags/jam.svg")
+            img: @image-url("../data/outlines/jam.svg")
         },
         {
             is_txt : true,
             txt: "France", 
-            img: @image-url("../sources/flags/fra.svg")
+            img: @image-url("../data/outlines/fra.svg")
         },
         {
             is_txt : true,
             txt: "Brazil", 
-            img: @image-url("../sources/flags/fra.svg")
+            img: @image-url("../data/outlines/bra.svg")
         },
     ];
     property <int> correct_guess : 1;

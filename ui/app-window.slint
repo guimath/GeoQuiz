@@ -26,7 +26,7 @@ export component AppWindow inherits Window {
     in property <[string]> txt_categories_name: ["Country", "Capital", "Languages", "Borders", "Region", "Currencies"];
     in property <[string]> sub_categories_name: ["World", "Africa", "Americas", "Asia", "Europe", "Oceania"];
     in property <[string]> users: ["User 0"];
-    
+    property <int> last_num;
     // ***************************************************************** //
     //                            CALLBACKS
     // ***************************************************************** //
@@ -36,6 +36,7 @@ export component AppWindow inherits Window {
     callback close();
     callback save_score();
     callback prep_look_up();
+    callback link(string);
     // main 
     callback next(int);
     callback prev();
@@ -118,6 +119,20 @@ export component AppWindow inherits Window {
                     choice_play_s.collect_changed(false, false);
                 } else if event.text == Key.RightArrow {
                     choice_play_s.collect_changed(true, false);
+                }
+            }
+            if root.screen == Screen.LookUp {
+                if event.text == Key.LeftArrow {
+                    if root.last_num > 0 {
+                        root.last_num -= 1;
+                        look_up_selected(root.last_num);
+                    }
+                    
+                } else if event.text == Key.RightArrow {
+                    if root.last_num < search_all_countries.length - 1 {
+                        root.last_num += 1;
+                        look_up_selected(root.last_num);
+                    }
                 }
             }
             accept
@@ -229,6 +244,7 @@ export component AppWindow inherits Window {
             look_up_search_changed(search)
         }
         selected(num) => {
+            root.last_num = num;
             look_up_selected(num) 
         }
     }

@@ -21,10 +21,10 @@ export component SelectPlayScreen inherits Rectangle {
                 padding: Sizes.spacing;
                 spacing: Sizes.spacing;
                 w_hard := MultiChoice {
-                    choices: ["Independent only", "All territories"];
+                    choices: ["UN members only", "All territories"];
                 }
                 RegularText {
-                    text: w_hard.not_default?  "Show all territories (250 different)" : "Show only independent countries (194 different)" ;
+                    text: w_hard.not_default?  "Show all territories (250 different)" : "Show only United Nation Members (194 different)" ;
                     horizontal-alignment: center;
                     vertical-alignment: center;
                     width: 100%;

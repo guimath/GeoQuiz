@@ -1,7 +1,8 @@
 /target
 # temp
 data/
-sources/
+sources/*
+!sources/*.py
 .vscode/
 scores/
 

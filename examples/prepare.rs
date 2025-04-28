@@ -95,19 +95,18 @@ fn main() {
         .iter()
         .map(|x: &CountryStat| {
             let mut infos: Vec<Category> = Vec::new();
-            // NAME
+            // ---------- COUNTRY ----------
             let full = x.name.common.clone();
             infos.push(Category {
                 full: full.clone(),
                 hint: Some(hint_from_name(full)),
             });
-            // CAPITAL
+            // ---------- CAPITAL ----------
             let hint: Vec<String> = x
                 .capital
                 .iter()
                 .map(|s| hint_from_name(s.clone()))
                 .collect();
-
             let cat = if x.capital.len() == 0 {
                 Category {
                     full: "No data".to_string(),
@@ -120,47 +119,7 @@ fn main() {
                 }
             };
             infos.push(cat);
-            // LANGUAGES
-            let full: Vec<String> = x.languages.values().map(|v| v.to_string()).collect();
-            let hint: Vec<String> = full.iter().map(|s| hint_from_name(s.clone())).collect();
-            let cat = if full.len() == 0 {
-                Category {
-                    full: "No data".to_string(),
-                    hint: Some("No data".to_string()),
-                }
-            } else {
-                Category {
-                    full: full.join(", "),
-                    hint: Some(hint.join(", ")),
-                }
-            };
-            infos.push(cat);
-            // CURRENCIES
-            let mut full = Vec::new();
-            if let Some(c) = x.currencies.clone() {
-                if let CurrencyType::PRESENT(currencies) = c {
-                    for (code, currency) in currencies {
-                        full.push(format!("{} ({}, {})", currency.name, code, currency.symbol));
-                        // Euro (EUR, €)
-                    }
-                }
-            }
-            let cat = if full.len() == 0 {
-                Category {
-                    full: "No data".to_string(),
-                    hint: None,
-                }
-            } else {
-                Category {
-                    full: full.join(", "),
-                    hint: None,
-                }
-            };
-            infos.push(cat);
-            // REGION
-            let full = format!("{} ({})", x.subregion, x.region.clone());
-            infos.push(Category { full, hint: None });
-            // BORDERS
+            // ---------- BORDERS ----------
             let full: Vec<String> = x
                 .borders
                 .iter()
@@ -179,25 +138,7 @@ fn main() {
                 }
             };
             infos.push(cat);
-            // POPULATION
-            let value_string = if let Some(val) = cca_to_pop.get(&x.cca3.to_string()) {
-                // if *pop > 10_000_000 {
-                //     let pop_m = pop/1_000_000;
-                //     let mut s = pop_m.to_formatted_string(&Locale::en);
-                //     s.push_str(" M");
-                //     s
-                // } else {
-                // }
-                val.to_formatted_string(&Locale::fr)
-            } else {
-                // println!("{} - empty population",x.name.common.clone());
-                "No data".to_string()
-            };
-            infos.push(Category {
-                full: value_string,
-                hint: None,
-            });
-            // AREA
+            // ---------- AREA ----------
             let value_string = if let Some(val) = cca_to_area.get(&x.cca3.to_string()) {
                 if *val > 100.0 {
                     let v = val.round() as u64;
@@ -206,26 +147,80 @@ fn main() {
                     format!("{} km²", val)
                 }
             } else {
-                // println!("{} - empty area",x.name.common.clone());
+                //// println!("{} - empty area",x.name.common.clone());
                 "No data".to_string()
             };
             infos.push(Category {
                 full: value_string,
                 hint: None,
             });
+            // ---------- POPULATION ----------
+            let value_string = if let Some(val) = cca_to_pop.get(&x.cca3.to_string()) {
+                val.to_formatted_string(&Locale::fr)
+            } else {
+                //// println!("{} - empty population",x.name.common.clone());
+                "No data".to_string()
+            };
+            infos.push(Category {
+                full: value_string,
+                hint: None,
+            });
+            // ---------- LANGUAGES ----------
+            let full: Vec<String> = x.languages.values().map(|v| v.to_string()).collect();
+            let hint: Vec<String> = full.iter().map(|s| hint_from_name(s.clone())).collect();
+            let cat = if full.len() == 0 {
+                Category {
+                    full: "No data".to_string(),
+                    hint: Some("No data".to_string()),
+                }
+            } else {
+                Category {
+                    full: full.join(", "),
+                    hint: Some(hint.join(", ")),
+                }
+            };
+            infos.push(cat);
+            // ---------- CURRENCIES ----------
+            let mut full = Vec::new();
+            if let Some(c) = x.currencies.clone() {
+                if let CurrencyType::PRESENT(currencies) = c {
+                    for (code, currency) in currencies {
+                        full.push(format!("{} ({}, {})", currency.name, code, currency.symbol));
+                        //// Euro (EUR, €)
+                    }
+                }
+            }
+            let cat = if full.len() == 0 {
+                Category {
+                    full: "No data".to_string(),
+                    hint: None,
+                }
+            } else {
+                Category {
+                    full: full.join(", "),
+                    hint: None,
+                }
+            };
+            infos.push(cat);
+            // ---------- REGION ----------
+            let full = format!("{} ({})", x.subregion, x.region.clone());
+            infos.push(Category { full, hint: None });
 
-            // println!("{}",x.cca3.clone());
+
+
+
+            //// println!("{}",x.cca3.clone());
             let mut images: Vec<ImageLink> = Vec::new();
-            // SVG_FLAG
+            // ---------- FLAG ----------
             let svg_path_o = format!("sources/flags/{}.svg", x.cca3.to_lowercase());
             let svg_path = Path::new(&svg_path_o);
             images.push(ImageLink::EmbeddedSVG(
                 fs::read_to_string(svg_path).unwrap(),
             ));
-            // MAP
+            // ---------- MAP ----------
             let svg_path_o = format!("maps/{}.svg", x.cca3.to_lowercase());
             images.push(ImageLink::FilePath(svg_path_o));
-            // OUTLINE
+            // ---------- OUTLINE ----------
             let svg_path_o = format!("outlines/{}.svg", x.cca3.to_lowercase());
             images.push(ImageLink::FilePath(svg_path_o));
             CountryInfos {
@@ -241,17 +236,17 @@ fn main() {
         info_names: vec![
             "Country".to_string(),
             "Capital".to_string(),
-            "Language".to_string(),
-            "Currencies".to_string(),
-            "Region".to_string(),
             "Borders".to_string(),
-            "Population".to_string(),
             "Area".to_string(),
+            "Population".to_string(),
+            "Language".to_string(),
+            "Currency".to_string(),
+            "Region".to_string(),
         ],
         image_names: vec![
             "Flag".to_string(),
             "Map".to_string(),
-            "Outlines".to_string(),
+            "Outline".to_string(),
         ],
     };
     let out_json = serde_json::to_string(&converted).unwrap();

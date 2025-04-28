@@ -379,6 +379,8 @@ export component TextButton inherits HorizontalBox {
 }
 
 export component BarGraph {
+    in property <color> color_1: Palette.regular_text;
+    in property <color> color_2: Palette.correct;
     in property <length> bar_width: 80px;
     property <length> half_bar_width: bar_width/2;
     in property <length> bar_height: 200px;
@@ -407,7 +409,7 @@ export component BarGraph {
                 y: root.bar_height - root.avg[i]/root.max_num*root.bar_height;
                 height:  root.avg[i]/root.max_num*root.bar_height;
                 width: root.half_bar_width;
-                background: Palette.regular_text;
+                background: root.color_1;
             }
             RegularText {
                 x: 0;
@@ -423,7 +425,7 @@ export component BarGraph {
                 y: root.bar_height - root.last[i]/root.max_num*root.bar_height;
                 height:  root.last[i]/root.max_num*root.bar_height;
                 width: root.half_bar_width;
-                background: Palette.correct;
+                background: root.color_2;
             }
             RegularText {
                 x : root.half_bar_width;
@@ -440,7 +442,7 @@ export component BarGraph {
                 width: root.bar_width;
                 horizontal-alignment: center;
                 text:root.last[i];
-                visible: root.last[i] == root.avg[i];
+                visible: root.last[i] == root.avg[i] && root.last[i]!=0;
                 style: FontSettings.body-small;
             }
         }

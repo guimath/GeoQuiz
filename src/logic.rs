@@ -454,6 +454,19 @@ impl AppLogic {
                 });
             }
         }
+        let inde = if country.independent {
+            if country.infos[0].full == "Vatican City" {
+                SharedString::from("Non-member but permanent observer state")
+            } else {
+                SharedString::from("Yes")
+            }
+        } else {
+            SharedString::from("No")
+        };
+        text_infos.push(TextWithTitle {
+            title: SharedString::from("UN Member"),
+            text: inde,
+        });
         let mut paths = [
             self.score_folder.clone(),
             self.score_folder.clone(),

@@ -12,15 +12,19 @@ from tqdm import tqdm
 
 MAP_RATIO = 16/9
 LAND_COLOR = '#ffffff' 
-if False : #DARK
+if True : #DARK
     LAKE_COLOR = '#2a282d'
+    LINES_COLOR = '#ffffff'
     BACKGROUND = '#00000000'
 else :
     LAKE_COLOR = '#90e0ef'
+    LINES_COLOR = '#000000'
     BACKGROUND = '#90e0ef'
 SELECT_COLOR = '#146d00'
-MAP_QUALITY = 'i' # c < i < h
+MAP_QUALITY = 'h' # c < i < h
 PROJECTION = 'aeqd'
+
+
 
 TRANSPARENT = BACKGROUND[-2:] == '00' 
 LON = 0
@@ -72,16 +76,18 @@ def gen_patches_from_geojson(geojson_data, m):
     
 
 def main():
-    folder = Path('data/flags')     
-    folder2 = Path('data/positions2')
+    FIG_SIZE = 20
+    folder = Path('sources/flags')     
+    folder2 = Path('sources')
     ext_detect = '.geo.json'
     files = os.listdir(folder)
     files = list(filter(lambda x : x[-len(ext_detect):] == ext_detect, files))
     files.sort()
     # special_cases = ["ata","cok","cpv","fsm","gmb","gum","hmd","iot","jam","kir","lbn","mdv","mhl","mnp","mus","niu","pcn","pse","pyf","qat","rus","sgs","stp","tkl","ton","tto","tuv","wlf","wsm"]
     # files = [f'{s}.geo.json' for s in special_cases]
+    files = ['ata.geo.json']
     for file in tqdm(files):
-        fig = plt.figure(figsize=(10, 10/MAP_RATIO))#
+        fig = plt.figure(figsize=(FIG_SIZE, FIG_SIZE/MAP_RATIO))#
         ax = fig.add_subplot(111)
         name = file[:-len(ext_detect)]
         # print(f'{name} --------------------')
@@ -192,14 +198,14 @@ def main():
             width= width,
             height= height,
             )
-        m.fillcontinents(color=LAND_COLOR, lake_color=LAKE_COLOR) # 2a282d
+        # m.fillcontinents(color=LAND_COLOR, lake_color=LAKE_COLOR) # 2a282d
         m.drawmapboundary(fill_color=BACKGROUND)
-        m.drawcoastlines(linewidth=0.25)
-        m.drawcountries(linewidth=0.25)
-        parallels = np.arange(-90., 91., 10.)
-        m.drawparallels(parallels, labels=[0, 0, 0, 0])
-        meridians = np.arange(-180., 181., 10.)
-        m.drawmeridians(meridians, labels=[0, 0, 0, 0])
+        # m.drawcoastlines(linewidth=0.25)
+        # m.drawcountries(linewidth=0.25)
+        # parallels = np.arange(-90., 91., 10.)
+        # m.drawparallels(parallels, labels=[0, 0, 0, 0], color=LINES_COLOR)
+        # meridians = np.arange(-180., 181., 10.)
+        # m.drawmeridians(meridians, labels=[0, 0, 0, 0], color=LINES_COLOR)
         pc, centers = gen_patches_from_geojson(geojson_data, lambda lon, lat : m(lon, lat))
         ax.add_collection(pc)
         # print(f"{name} - {area}")
@@ -244,7 +250,7 @@ def main():
             hspace=0.0,
             wspace=0.0
         )
-        plt.savefig(folder2/(name+".svg"), format='svg', transparent=TRANSPARENT)
+        plt.savefig(folder2/(name+".png"), format='png', transparent=TRANSPARENT)
         # plt.show()
         plt.close('all')
 if __name__ == "__main__" : main()

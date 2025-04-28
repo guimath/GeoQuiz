@@ -11,10 +11,10 @@ import util
 def main():
     FIG_SIZE = 20
     l = util.list_geojson_files()
-    # special_cases = ['rus', 'kir', 'fji']
+    # special_cases = ['nzl']
     # l = [(s, util.FOLDER_GEOJSON/f'{s}.geo.json') for s in special_cases]
     for (cca, file) in tqdm(l):
-        fig = plt.figure(figsize=(FIG_SIZE, FIG_SIZE/util.MAP_RATIO))#
+        fig = plt.figure()#figsize=(FIG_SIZE, FIG_SIZE/util.MAP_RATIO))#
         ax = fig.add_subplot(111)
         with open(file, 'r') as f:
             geojson_data = json.load(f)
@@ -28,12 +28,18 @@ def main():
             max_lon = -66.57
         elif cca == 'chl': # ignoring western most islands
             min_lon = -75.38
+        elif cca == 'nzl': # ignoring small islands
+            min_lon = 166
+            max_lat = -34
+            min_lat = -48
+
 
         if cca == 'ata': # antartica doesn't make sens in merc so using aeqd instead
             m = Basemap(
                 projection='aeqd', 
                 resolution='c',
                 lat_0= -90,
+                lon_0= 0,
                 width= 5_600_000,
                 height= 4_500_000,
             )
@@ -107,7 +113,7 @@ def main():
             wspace=0.0
         )
         # plt.show()
-        plt.savefig((util.OUT_FOLDER_OUTLINES)/f"{cca}.svg", format='svg', transparent=True)
+        plt.savefig((util.OUT_FOLDER_OUTLINES)/f"{cca}.svg", format='svg', transparent=True, bbox_inches='tight')
         plt.close('all')
 
 if __name__ == '__main__' :

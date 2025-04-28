@@ -1,97 +1,34 @@
 import matplotlib.pyplot as plt
 from mpl_toolkits.basemap import Basemap # type: ignore
 import geopandas as gpd
-import os
-from pathlib import Path
 import json
-from matplotlib.patches import Polygon, Circle
-from matplotlib.collections import PatchCollection
+import shapely.geometry as sg
+import shapely.ops as so
 import numpy as np
 from haversine import haversine
 from tqdm import tqdm
+import util as util
 
-MAP_RATIO = 16/9
-LAND_COLOR = '#ffffff' 
-if True : #DARK
-    LAKE_COLOR = '#2a282d'
-    LINES_COLOR = '#ffffff'
-    BACKGROUND = '#00000000'
-else :
-    LAKE_COLOR = '#90e0ef'
-    LINES_COLOR = '#000000'
-    BACKGROUND = '#90e0ef'
-SELECT_COLOR = '#146d00'
-MAP_QUALITY = 'h' # c < i < h
+MAP_QUALITY = 'i' # c < i < h
 PROJECTION = 'aeqd'
 
-
-
-TRANSPARENT = BACKGROUND[-2:] == '00' 
-LON = 0
-LAT = 1
-EARTH_RADIUS = 6371000
+LON = util.LON
+LAT = util.LAT
 
 def calc_dist(center, point):
     return haversine((center[LAT], center[LON]), (point[LAT],point[LON]), unit='m')
 
-def gen_patches_from_geojson(geojson_data, m):
-    patches = []
-    centers = []
-    if geojson_data['type'] == 'FeatureCollection':
-        for feature in geojson_data['features']:
-            if feature['geometry']['type'] == 'Polygon':
-                for polygon in feature['geometry']['coordinates']:
-                    points = np.array([m(lon, lat) for lon, lat in polygon])
-                    try : 
-                        polygon = Polygon(points, closed=True)
-                        patches.append(polygon)
-                    except:
-                        pass
-                    
-            elif feature['geometry']['type'] == 'MultiPolygon':
-                for multipolygon in feature['geometry']['coordinates']:
-                    for polygon in multipolygon:
-                        med = [0,0]
-                        for lon, lat in polygon:
-                            med[LON] += lon
-                            med[LAT] += lat
-                        med[LON]/=len(polygon)
-                        med[LAT]/=len(polygon)
-                        centers.append(med)
-                        points = np.array([m(lon, lat) for lon, lat in polygon])
-                        try : 
-                            polygon = Polygon(points, closed=True)
-                            patches.append(polygon)
-                        except:
-                            pass
-    return (PatchCollection(
-            patches, 
-            facecolor=SELECT_COLOR, 
-            edgecolor='black', 
-            linewidth=0,
-            zorder=2
-        ),
-        centers,
-    )
-    
-
 def main():
     FIG_SIZE = 20
-    folder = Path('sources/flags')     
-    folder2 = Path('sources')
-    ext_detect = '.geo.json'
-    files = os.listdir(folder)
-    files = list(filter(lambda x : x[-len(ext_detect):] == ext_detect, files))
-    files.sort()
-    # special_cases = ["ata","cok","cpv","fsm","gmb","gum","hmd","iot","jam","kir","lbn","mdv","mhl","mnp","mus","niu","pcn","pse","pyf","qat","rus","sgs","stp","tkl","ton","tto","tuv","wlf","wsm"]
-    # files = [f'{s}.geo.json' for s in special_cases]
-    files = ['ata.geo.json']
-    for file in tqdm(files):
-        fig = plt.figure(figsize=(FIG_SIZE, FIG_SIZE/MAP_RATIO))#
+    l = util.list_geojson_files()
+    # special_cases = ["ata","cok","cpv","fsm","gmb","gum","hmd","iot","jam","kir","lbn","mdv","mhl","mnp","mus","niu","pcn","pse","pyf","qat","rus","sgs","stp","tkl","ton","tto","tuv","wlf","wsm", "syc"]
+    special_cases = ['pri']
+    l = [(s, util.FOLDER_GEOJSON/f'{s}.geo.json') for s in special_cases]
+
+    for cca, file in tqdm(l):
+        fig = plt.figure(figsize=(FIG_SIZE, FIG_SIZE/util.MAP_RATIO))#
         ax = fig.add_subplot(111)
-        name = file[:-len(ext_detect)]
-        # print(f'{name} --------------------')
-        with open(folder/file, 'r') as f:
+        with open(file, 'r') as f:
             geojson_data = json.load(f)
         gdf = gpd.GeoDataFrame.from_features(geojson_data)
         
@@ -103,76 +40,79 @@ def main():
         min = [min_lon, min_lat]
         max = [max_lon, max_lat]
         map_center = center.copy()
-        
+        # print(map_center)
         # print(f'lon : {min[LON]}, {center[LON]}, {max[LON]}')
         # print(f'lat : {min[LAT]}, {center[LAT]}, {max[LAT]}')
         width = 5_000_000
         height = 1
-        if name == 'umi':
-            pass # default because on the edge so calc fail
-        elif name == 'ata' :
-            width = 10_000_000
+        if cca == 'ata' :
+            width = 9_000_000
             map_center[LON]= 0
             map_center[LAT]= -90
-        elif name == 'cck' :
+        elif cca == 'cck' :
             width = 7_000_000
             map_center[LON]= 110
             map_center[LAT]= -10
-        elif name == 'cok' : 
+        elif cca == 'cok' : 
             width = 12_000_000
             map_center[LON]= -170
-        elif name == 'fsm':
+        elif cca == 'fsm':
             width = 6_000_000
             map_center[LON]= 145
             map_center[LAT]= 0
-        elif name == 'gum' :
+        elif cca == 'gum' :
             width = 7_000_000
             map_center[LON]= 135
-        elif name == 'hmd' :
+        elif cca == 'hmd' :
             width = 12_000_000
             map_center[LON]= 65
             map_center[LAT]= -40
-        elif name == 'iot' :
+        elif cca == 'iot' :
             width = 7_000_000
             map_center[LAT]= 5
-        elif name == 'kir':
+        elif cca == 'kir':
             width = 12_000_000
             map_center[LON]= 170
             map_center[LAT]= -18
-        elif name == 'mdv':
-            width = 8_000_000
-        elif name == 'mhl':
+        elif cca == 'mhl':
             width = 10_000_000
             map_center[LON]= 150
-        elif name == 'mnp':
-            width = 10_000_000
-        elif name == 'niu':
+        elif cca == 'niu':
             width = 10_000_000
             map_center[LON]= 170
-        elif name == 'nru':
-            width = 10_000_000
-        elif name == 'pcn':
+        elif cca == 'pcn':
             width = 13_000_000
             map_center[LON]= -100
-        elif name == 'pyf':
+        elif cca == 'pyf':
             width = 13_000_000
             map_center[LON]= 170
-        elif name == 'rus' :
+        elif cca == 'rus' :
             width = 10_000_000
             map_center[LAT]= 70
-        elif name == 'sgs' :
-            width = 8_000_000
-        elif name == 'tkl': 
+        elif cca == 'tkl': 
             width = 10_000_000
             map_center[LON]= 170
-        elif name == 'ton': 
-            width = 10_000_000
-        elif name == 'tuv':
-            width = 10_000_000
-        elif name == 'wlf':
-            width = 10_000_000
-        elif name == 'wsm':
-            width = 10_000_000
+        elif cca == 'usa':
+            width = 12_000_000
+            map_center[LAT]= 50
+        elif cca == 'atf' :
+            width = 13_000_000
+            map_center[LON]= 40
+            map_center[LAT]= -30
+        elif cca == 'umi':
+            width = 14_000_000
+            map_center[LON] = -130
+            map_center[LAT] = 20
+        elif cca == 'mdv': width = 8_000_000
+        elif cca == 'sgs': width = 8_000_000
+        elif cca == 'aus': width = 9_000_000
+        elif cca == 'mnp': width = 10_000_000
+        elif cca == 'ton': width = 10_000_000
+        elif cca == 'tuv': width = 10_000_000
+        elif cca == 'nru': width = 10_000_000
+        elif cca == 'wlf': width = 10_000_000
+        elif cca == 'wsm': width = 10_000_000
+        elif cca == 'bvt': width = 10_000_000
         else : 
             a = haversine((center[LAT], center[LON]), (center[LAT],min[LON]), unit='m')*2*1.1
             b = haversine((center[LAT], center[LON]), (center[LAT],max[LON]), unit='m')*2*1.1
@@ -181,14 +121,11 @@ def main():
             b = haversine((center[LAT], center[LON]), (max[LAT],center[LON]), unit='m')*2*1.1
             height = np.max((a,b))
 
-        if width/height < MAP_RATIO :
-            width = height*MAP_RATIO
+        if width/height < util.MAP_RATIO :
+            width = height*util.MAP_RATIO
         else : 
-            height = width/MAP_RATIO
+            height = width/util.MAP_RATIO
         # print(f"width: {width}, height: {height}")
-
-        
-        
 
         m = Basemap(
             projection=PROJECTION, 
@@ -197,60 +134,54 @@ def main():
             lon_0=map_center[LON],
             width= width,
             height= height,
-            )
-        # m.fillcontinents(color=LAND_COLOR, lake_color=LAKE_COLOR) # 2a282d
-        m.drawmapboundary(fill_color=BACKGROUND)
+        )
+        m.fillcontinents(color=util.LAND_COLOR, lake_color=util.BACKGROUND_COLOR)
+        m.drawmapboundary(fill_color=util.BACKGROUND_COLOR)
         # m.drawcoastlines(linewidth=0.25)
-        # m.drawcountries(linewidth=0.25)
-        # parallels = np.arange(-90., 91., 10.)
-        # m.drawparallels(parallels, labels=[0, 0, 0, 0], color=LINES_COLOR)
-        # meridians = np.arange(-180., 181., 10.)
-        # m.drawmeridians(meridians, labels=[0, 0, 0, 0], color=LINES_COLOR)
-        pc, centers = gen_patches_from_geojson(geojson_data, lambda lon, lat : m(lon, lat))
+        m.drawcountries(linewidth=0.25)
+        parallels = np.arange(-90., 91., 10.)
+        m.drawparallels(parallels, labels=[0, 0, 0, 0], color=util.LAT_LON_LINES_COLOR)
+        meridians = np.arange(-180., 181., 10.)
+        m.drawmeridians(meridians, labels=[0, 0, 0, 0], color=util.LAT_LON_LINES_COLOR)
+        pc, centers = util.gen_patches_from_geojson(geojson_data, lambda lon, lat : m(lon, lat), util.SELECT_COLOR)
         ax.add_collection(pc)
-        # print(f"{name} - {area}")
+        # print(f"{cca} - {area}")
         if area < 1 :
-            center = [m(center[LON], center[LAT])]
-            radius = [100000]
-            if name == 'fsm' : 
-                centers = [centers[0], centers[1], centers[2], centers[3], centers[7], centers[8], centers[14], centers[15], centers[18]]
-                center = [m(c[LON], c[LAT]) for c in centers]
-                radius = [80000 for _ in centers]
-            elif name == 'cpv' :
-                radius = [250000]
-            elif name in ['gmb', 'jam', 'lbn', 'pse', 'qat', 'tto']:
-                center=[]
-            elif name == 'hmd' :
-                radius= [200000]
-            elif name in ['kir', 'pyf', 'stp', 'wlf']: 
-                center = [m(c[LON], c[LAT]) for c in centers]
-                radius = [80000 for _ in centers]
-            elif name in ['mus', 'pcn', 'sgs' 'cok']:
-                center = [m(c[LON], c[LAT]) for c in centers]
-                radius = [100000 for _ in centers]
-            elif name == 'tkl' : 
-                radius = [200000]
-            elif name == 'ton':
-                centers = [centers[0], centers[2], centers[9], centers[-1]]
-                center = [m(c[LON], c[LAT]) for c in centers]
-                radius = [100000 for _ in center]
-            elif name == 'tuv' : 
-                radius = [270000]
-            elif name == 'wsm' : 
-                radius = [200000]
-            for i in range(len(center)):
-                circle = Circle(center[i], radius[i], ls="solid", lw=4, color="#146d00", fill = False)
-                ax.add_patch(circle)
+            center = [m(c[LON], c[LAT]) for c in centers]
+            radius = 100_000
+            if cca in ['gmb', 'jam', 'lbn', 'pse', 'qat', 'tto', 'pri']:
+                center=[] # no circle
+            elif cca == 'tuv' : radius = 50_000
+            elif cca == 'fsm' : radius = 80_000
+            elif cca in ['kir', 'pyf', 'stp', 'wlf']: radius = 80_000
+            elif cca == 'pcn' : radius = 150_000
+            elif cca == 'hmd' : radius = 200_000
+            elif cca == 'tkl' : radius = 200_000
+            elif cca == 'wsm' : radius = 200_000
+            elif cca == 'cpv' : radius = 250_000
+
+            if len(center) > 0 :
+                # using shapely to get union of circles
+                circles = [sg.Point(c).buffer(radius) for c in center]
+                union = so.unary_union(circles)
+                if union.geom_type =="MultiPolygon":
+                    shapes = list(union.geoms)
+                else : 
+                    shapes = [union]
+                for shape in shapes:
+                    xs, ys = shape.exterior.xy
+                    ax.fill(xs, ys, fc="#00000000", ec=util.SELECT_COLOR, lw=4)
+
         ax.axis('off')
         plt.subplots_adjust(
             top=1.0,
-            bottom=0, #0.06,
-            left=0, #0.06,
+            bottom=0,
+            left=0,
             right=1.0,
             hspace=0.0,
             wspace=0.0
         )
-        plt.savefig(folder2/(name+".png"), format='png', transparent=TRANSPARENT)
-        # plt.show()
+        plt.savefig(util.OUT_FOLDER_MAPS/f'{cca}.svg', format='svg', transparent=True)
+        plt.show()
         plt.close('all')
 if __name__ == "__main__" : main()

@@ -1,5 +1,5 @@
 import { Button, HorizontalBox, VerticalBox } from "std-widgets.slint";
-import { TitleText, RegularText, MultiChoice, TextButton, ScrollChoice } from "widgets.slint";
+import { TitleText, RegularText, MultiChoice, TextButton, ScrollChoice, BarGraph } from "widgets.slint";
 import { CatInfo, MainPlayUpdate, Screen, FullInfo, ChoicePlayUpdate, PlaySelectParams, ScoreStatSlint } from "structs.slint";
 import { SelectLookUpScreen, LookUpScreen } from "screen-look-up.slint";
 import { SelectMainPlayScreen } from "screen-select-main-play.slint";
@@ -27,6 +27,8 @@ export component AppWindow inherits Window {
     in property <[string]> sub_categories_name: ["World", "Africa", "Americas", "Asia", "Europe", "Oceania"];
     in property <[string]> users: ["User 0"];
     property <int> last_num;
+    property <int> play_score_max : 5;
+    property <[int]> play_score_val : [1, 2, 5, 1, 5, 2];
     // ***************************************************************** //
     //                            CALLBACKS
     // ***************************************************************** //
@@ -44,6 +46,7 @@ export component AppWindow inherits Window {
     // choice
     callback choice_start_play(int, int);
     callback choice_changed([bool], bool, bool);
+    callback get_play_scores(choice_play: bool);
     // score
     callback score_user_selected(name:string);
     callback score_filter_changed(bool);
@@ -98,6 +101,11 @@ export component AppWindow inherits Window {
         w_look_up.user = name;
     }
 
+    public function show_play_scores(val:[int], max:int) {
+        root.play_score_max = max;
+        root.play_score_val = val;
+        play_scores_popup.show();
+    }
     forward-focus: my-key-handler;
     my-key-handler := FocusScope {
         key-pressed(event) => {
@@ -154,6 +162,23 @@ export component AppWindow inherits Window {
 
         clicked => {
             back();
+        }
+    }
+    TouchArea {
+        visible: root.screen == Screen.ChoicePlay || 
+                 root.screen == Screen.MainPlay;
+        x: root.width - Sizes.padding - Sizes.title_height;
+        y: Sizes.padding;
+        width: Sizes.title_height;
+        height: Sizes.title_height;
+        Image {
+            source: @image-url("graph.svg");
+            height: Sizes.title_height;
+        }
+
+        clicked => {
+            get_play_scores(root.screen == Screen.ChoicePlay);
+            // play_scores_popup.show();
         }
     }
     // ***************************************************************** //
@@ -287,6 +312,57 @@ export component AppWindow inherits Window {
     }
     choice_play_s := ChoicePlayScreen {
         visible: root.screen == Screen.ChoicePlay;
-        changed(was_guessed, next, found) => {choice_changed(was_guessed, next, found)}
+        changed(was_guessed, next, found) => {
+            choice_changed(was_guessed, next, found)
+        }
+    }
+
+
+    // On top of everything current play scores
+    play_scores_popup := PopupWindow{
+        width: root.width;
+        height: root.height;
+        Rectangle {
+            VerticalBox {
+                padding: Sizes.padding;
+                Rectangle {}
+                Rectangle {
+                    vertical-stretch: 0;
+                    background: Palette.background.transparentize(0.1);
+                    border-color: Palette.buttons;
+                    border-radius: 10px;
+                    border-width: 4px;
+                    VerticalBox {
+                        padding: Sizes.padding;
+                        padding-bottom: Sizes.padding + 2*Sizes.spacing;
+                        spacing: Sizes.spacing + 20px;
+                        t_pop := RegularText {
+                            style: FontSettings.title-small;
+                            horizontal-alignment: center;
+                            text: root.screen == Screen.ChoicePlay ?
+                                "Number of countries per wrong guesses":
+                                "Number of countries per star rating";
+                            width: root.width - 4*Sizes.padding;
+                            wrap: word-wrap;
+                        }
+                        BarGraph {
+                            bar_height: root.height/7;
+                            bar_width: root.screen == Screen.ChoicePlay ? 
+                                (t_pop.width - 4*Sizes.spacing - 2*Sizes.padding)/5:
+                                (t_pop.width - 5*Sizes.spacing - 2*Sizes.padding)/6;
+                            max_num: root.play_score_max;
+                            avg: root.play_score_val;
+                            last: root.play_score_val;
+                            names: root.screen == Screen.ChoicePlay ? 
+                                ["Skip", 4, 3, 2, 1]:
+                                ["Skip", 1, 2, 3, 4, 5];
+                            color_2: Palette.regular_text;
+                        }
+                    }
+                }
+                Rectangle {}
+            }
+        }
+
     }
 }

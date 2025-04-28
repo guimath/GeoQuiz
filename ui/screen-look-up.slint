@@ -62,7 +62,7 @@ export component LookUpScreen inherits Rectangle {
         ], 
         image-infos:[
             {title:"Flag", image:@image-url("../sources/flags/jam.svg")},
-            // {title:"Outline", image:@image-url("../data/position2/jam.svg")}
+            {title:"Outline", image:@image-url("../data/outlines/jam.svg")}
         ],
         score_free_play: 3,
         score_choice_play: 0,
@@ -92,11 +92,18 @@ export component LookUpScreen inherits Rectangle {
                     padding: 0;
                     spacing: 0;
                     width: 100%;
-                    Image {
-                        width: s.width;
-                        height: s.width*(image_infos.image.height/image-infos.image.width);
-                        image-fit: contain;
-                        source: image_infos.image;
+                    Rectangle {
+                        vertical-stretch: 0;
+                        horizontal-stretch: 0;
+                        
+                        height: Math.min((scroll.width - 2*Sizes.size_bar)*(image_infos.image.height/image-infos.image.width), root.height/2);
+                        Image {
+                            height : 100%;
+                            width: self.height/(image_infos.image.height/image-infos.image.width);
+                            // width: 100%;
+                            image-fit: contain;
+                            source: image_infos.image;
+                        }
                     }
                     RegularText {
                         text: image_infos.title;

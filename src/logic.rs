@@ -16,6 +16,7 @@ pub struct AppLogic {
     current: usize,
     results: Vec<u32>,
     scores: HashMap<String, Score>,
+    last_scores: HashMap<String, usize>,
     all_countries: Vec<CountryInfos>,
     all_countries_order: Vec<CountryInfos>,
     pub all_names: Vec<SharedString>,
@@ -135,6 +136,7 @@ impl AppLogic {
         self.scores = scores;
         self.choice_prev_guesses = Default::default();
         self.choice_index_guesses = Default::default();
+        self.last_scores = Default::default();
     }
 
     pub fn prepare_main_play(&mut self, info_type: usize, guess_types: [usize; 3]) {
@@ -160,8 +162,11 @@ impl AppLogic {
             score.last_score = result;
             self.results[self.current] = result;
             self.save_scores(); // TODO ONLY SAVE WHEN LEAVING APP OR BACK TO MENU
+            self.last_scores.insert(get_score_key(&self.all_countries[self.current]), result as usize);
+        } else if self.results[self.current] == 0 {
+            self.last_scores.insert(get_score_key(&self.all_countries[self.current]), 0);
         }
-        if self.current < self.all_countries.len() - 1 {
+        if !self.is_at_end() {
             self.current += 1;
             return Some(self.get_stat());
         }
@@ -224,6 +229,23 @@ impl AppLogic {
         (update, infos)
     }
 
+    pub fn get_play_scores(&self, choice_play:bool) -> (Vec<i32>, i32){
+        let mut v = [0;6];
+        for s in self.last_scores.values(){
+            v[*s] += 1;
+        }
+        let choice_max = v
+            .iter()
+            .max()
+            .unwrap()
+            .clone();
+        if choice_play {
+            (v[0..5].to_vec(), choice_max)
+        } else {
+            (v.to_vec(), choice_max)
+        }
+
+    }
     pub fn prepare_choice_play(&mut self, info_type: usize, guess_type: usize) {
         self.choice_guess_type = guess_type;
         self.choice_info_type = info_type;
@@ -249,13 +271,15 @@ impl AppLogic {
             score.last_score = (5 - guess_num) as u32;
             score.total_score += (5 - guess_num) as u32;
             self.save_scores();
+            self.last_scores.insert(get_score_key(&self.all_countries[self.current]), (5 - guess_num) as usize);
+        } else {
+            self.last_scores.insert(get_score_key(&self.all_countries[self.current]), 0);
         }
 
         if next {
-            if self.current < self.all_countries.len() - 1 {
+            if !self.is_at_end() {
                 self.current += 1;
             } else {
-                println!("here");
                 return None;
             }
         } else {
@@ -436,7 +460,6 @@ impl AppLogic {
         ];
         paths[0].push(MAIN_SCORE_NAME);
         paths[1].push(CHOICE_SCORE_NAME);
-        println!("{:?}", paths[0]);
         let mut val = [0;2];
         for i in 0..2 {
             let s= info_parse::read(&self.all_countries_order, paths[i].clone());
@@ -588,5 +611,8 @@ impl AppLogic {
     }
     fn to_txt_idx(&self, i: usize) -> usize {
         i - self.img_cat_names.len()
+    }
+    pub fn is_at_end(&self) -> bool {
+        !(self.current < self.all_countries.len() - 1)
     }
 }

@@ -101,6 +101,9 @@ fn init(path: PathBuf) -> Result<(), Box<dyn Error>> {
             let mut logic = logic_ref.lock().unwrap();
             if let Some((update, cat)) = logic.next(result as u32) {
                 ui.invoke_update_screen(update, cat.into());
+            } else if logic.is_at_end() {
+                let (v, max) = logic.get_play_scores(false);
+                ui.invoke_show_play_scores(v.as_slice().into(), max);
             }
         }
     });
@@ -137,6 +140,9 @@ fn init(path: PathBuf) -> Result<(), Box<dyn Error>> {
             // let v: Vec<bool> = down_ref.iter().collect();
             if let Some(info) = logic.choice_changed(guesses, next, found) {
                 ui.invoke_update_choice(info);
+            } else if logic.is_at_end() {
+                let (v, max) = logic.get_play_scores(true);
+                ui.invoke_show_play_scores(v.as_slice().into(), max);
             }
         }
     });
@@ -195,7 +201,16 @@ fn init(path: PathBuf) -> Result<(), Box<dyn Error>> {
             });
         }
     });
-
+    ui.on_get_play_scores({
+        let ui_handle = ui.as_weak();
+        let logic_ref = logic.clone();
+        move |choice_play| {
+            let ui = ui_handle.unwrap();
+            let logic = logic_ref.lock().unwrap();
+            let (v, max) = logic.get_play_scores(choice_play);
+            ui.invoke_show_play_scores(v.as_slice().into(), max);
+        }
+    });
     ui.on_save_score({
         let logic_ref = logic.clone();
         move || {
@@ -203,7 +218,12 @@ fn init(path: PathBuf) -> Result<(), Box<dyn Error>> {
             logic.save_scores();
         }
     });
-
+    ui.on_link({
+        move | url | {
+            // TODO fix for android
+            open::that(url.as_str()).unwrap();
+        }
+    });
     ui.on_close({
         // let logic_ref = logic.clone();
         move || {

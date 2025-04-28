@@ -22,8 +22,8 @@ def main():
     FIG_SIZE = 20
     l = util.list_geojson_files()
     # special_cases = ["ata","cok","cpv","fsm","gmb","gum","hmd","iot","jam","kir","lbn","mdv","mhl","mnp","mus","niu","pcn","pse","pyf","qat","rus","sgs","stp","tkl","ton","tto","tuv","wlf","wsm", "syc"]
-    special_cases = ['pri']
-    l = [(s, util.FOLDER_GEOJSON/f'{s}.geo.json') for s in special_cases]
+    # special_cases = ['pri']
+    # l = [(s, util.FOLDER_GEOJSON/f'{s}.geo.json') for s in special_cases]
 
     for cca, file in tqdm(l):
         fig = plt.figure(figsize=(FIG_SIZE, FIG_SIZE/util.MAP_RATIO))#
@@ -182,6 +182,6 @@ def main():
             wspace=0.0
         )
         plt.savefig(util.OUT_FOLDER_MAPS/f'{cca}.svg', format='svg', transparent=True)
-        plt.show()
+        # plt.show()
         plt.close('all')
 if __name__ == "__main__" : main()

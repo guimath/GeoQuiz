@@ -94,7 +94,7 @@ export component ChoicePlayScreen inherits Rectangle {
        
         RegularText {
             visible: root.found;
-            text: root.default_info == "" ? "Guess N°\{root.guess_num}": "Guess N°\{root.guess_num} (\{root.default_info})";
+            text: root.default_info == "" ? "Guessed in \{root.guess_num}": "Guessed in \{root.guess_num} (\{root.default_info})";
             horizontal-alignment: center;
         }
         Rectangle {

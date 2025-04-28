@@ -170,7 +170,6 @@ fn main() {
             } else {
                 "".to_string()
             };
-            println!("{}", value_string);
             infos.push(Category {
                 full: value_string,
                 hint: None,
@@ -178,14 +177,17 @@ fn main() {
             
 
 
+            println!("{}",x.cca3.clone());
             let mut images: Vec<ImageLink> = Vec::new();
             // SVG_FLAG
             let svg_path_o = format!("sources/flags/{}.svg", x.cca3.to_lowercase());
             let svg_path = Path::new(&svg_path_o);
             images.push(ImageLink::EmbeddedSVG(fs::read_to_string(svg_path).unwrap()));
-            // SVG_OUTLINE
-            println!("{}",x.cca3.clone());
-            let svg_path_o = format!("positions2/{}.svg", x.cca3.to_lowercase());
+            // MAP
+            let svg_path_o = format!("maps/{}.svg", x.cca3.to_lowercase());
+            images.push(ImageLink::FilePath(svg_path_o));
+            // OUTLINE
+            let svg_path_o = format!("outlines/{}.svg", x.cca3.to_lowercase());
             images.push(ImageLink::FilePath(svg_path_o));
             CountryInfos {
                 region: x.region.clone(),
@@ -210,6 +212,7 @@ fn main() {
         image_names: vec![
             "Flag".to_string(),
             "Map".to_string(),
+            "Outlines".to_string(),
         ]
     };
     let out_json = serde_json::to_string(&converted).unwrap();

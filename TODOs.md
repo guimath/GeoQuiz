@@ -101,27 +101,21 @@
 - [x] Add a help section with contact, sources & desc
 - [x] Patch crash when at the end of play
 - [x] Add score to look up
+- [x] Added outline 
+- [x] Try to find more precise country outlines (still could be improved for small islands)
 
 ## Priority 
 
 ## Secondary
-- [ ] Try to find more precise country outlines 
 - [ ] See how to catch back button on android (https://docs.rs/android-activity/latest/android_activity/input/enum.Keycode.html#variant.TvMediaContextMenu)
 - [ ] Make proper icon
 - [ ] Add a Readme & LICENSE & Publish
-- [ ] Add python map generation
-- [ ] Add URL links
 - [ ] Add screenshots to readme
-
+- [ ] Add URL links
+- [ ] Commit data
 
 ## Ideas to discuss
 - [ ] Add a score recap at the end ?
-- [ ] What other infos could be added 
-  - [ ] Outline (only if a more detailed outline is available)
-- [ ] Data agnostic -> so that we can create different quizzes
-  - [ ] Move independent to "harder difficulty" or something
-- [ ] Animate (WIP)
-  - [ ] Better scrolling on categories : maybe use timer to snap to center? 
-  - [ ] Animate between screens? 
-- [ ] Add More of test of sorts like choices but stops after 3 wrong guess 
+- [ ] Better scrolling on categories : maybe use timer to snap to center? 
 - [ ] Add a zoomed in version of the map that user can toggle
+- [ ] Add a swipe to next for look up

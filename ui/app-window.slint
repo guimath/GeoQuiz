@@ -19,11 +19,10 @@ export component AppWindow inherits Window {
     //                            PROPERTIES
     // ***************************************************************** //
     in-out property <Screen> screen: Screen.Start;
-    // for select look up 
     in property <[string]> search_all_countries : ["Jamaica"]; 
     in property <[bool]> search_countries_mask: [true];
-    in property <[string]> all_categories_name: ["Flag", "Outline", "Country", "Capital", "Languages", "Borders", "Region", "Currencies"];
-    in property <[string]> txt_categories_name: ["Country", "Capital", "Languages", "Borders", "Region", "Currencies"];
+    in property <[string]> all_categories_name: ["Flag",  "Map", "Outline", "Country", "Capital", "Borders", "Area", "Population", "Languages", "Currency", "Region",];
+    in property <[string]> txt_categories_name: ["Country", "Capital", "Borders", "Area", "Population", "Languages", "Currency", "Region",];
     in property <[string]> sub_categories_name: ["World", "Africa", "Americas", "Asia", "Europe", "Oceania"];
     in property <[string]> users: ["User 0"];
     property <int> last_num;

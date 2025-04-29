@@ -7,5 +7,5 @@ sources/*
 scores/
 
 # TEMP
-ui/icon.png
-ui/icon.svg
+ui/img/icon.png
+ui/img/icon.svg

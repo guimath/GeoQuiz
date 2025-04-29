@@ -81,7 +81,7 @@ component ToggleStar inherits TouchArea {
     im := Image {
         height: Sizes.title_height;
         width: Sizes.title_height;
-        source: @image-url("star.svg");
+        source: @image-url("img/star.svg");
         colorize: on? Palette.gold:
             root.semi? @radial-gradient(circle, white 0%, Palette.gold 100%):
             white;
@@ -200,7 +200,7 @@ export component HiddenText inherits TouchArea {
         x : root.size_hint == 0 ? root.width - Sizes.size_hint/2 - Sizes.spacing : root.width - Sizes.size_hint - Sizes.spacing;
         height: root.size_hint;
         width: root.size_hint;
-        source: @image-url("hint.svg");
+        source: @image-url("img/hint.svg");
         animate height, width, x {
             duration: 250ms;
         }
@@ -234,7 +234,7 @@ export component ScrollChoice inherits HorizontalLayout {
         Image {
             height: 100%;
             width: 100%;
-            source: @image-url("arrow_left.svg");
+            source: @image-url("img/arrow_left.svg");
             colorize: root.choice_num == 0 ? white.transparentize(0.5) : white;
         }
         clicked => {
@@ -289,7 +289,7 @@ export component ScrollChoice inherits HorizontalLayout {
         Image {
             height: 100%;
             width: 100%;
-            source: @image-url("arrow_left.svg");
+            source: @image-url("img/arrow_left.svg");
             rotation-angle: -180deg;
             colorize: root.choice_num == choices.length - 1 ? white.transparentize(0.5): white;
         }

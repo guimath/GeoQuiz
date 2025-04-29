@@ -7,7 +7,7 @@ export component HelpScreen inherits Rectangle {
             
     property <[TextWithTitle]> infos : [
         {title:"Flag", text:"mledoze github"},
-        {title:"Map", text:"Generated (in azimuthal projection) using matplotlib Basemap"},
+        {title:"Map", text:"Natural earth & mledoze github"},
         // {title:"Outline", text:""},
         {title:"Population", text:"World Bank indicator"},
         {title:"Area", text:"World Bank indicator"},
@@ -19,12 +19,12 @@ export component HelpScreen inherits Rectangle {
         TitleText {  
             text: "Geo Quiz - Help";
         }
-        Rectangle {height: 3* Sizes.spacing;}
-
-        // scroll := ScrollView {
-        //     VerticalLayout {
-        //         spacing: 0;
-        //         padding-left: Sizes.size_bar; 
+        
+        scroll := ScrollView {
+            VerticalLayout {
+                spacing: 0;
+                padding-left: Sizes.size_bar; 
+                Rectangle {height: 3* Sizes.spacing;}
         RegularText {
             text: "Geo quiz is a quiz app to help you learn more about the world's geography";
             wrap: word-wrap;
@@ -61,9 +61,36 @@ export component HelpScreen inherits Rectangle {
                 }
             }
         }
+        Rectangle {height: Sizes.spacing;}
+
+        TitleText {  
+            text: "Disclaimer";
+            style: FontSettings.title-small;
+        }
+        RegularText {
+            text: "The information shown in this app is an aggregate of different sources. Some infos might be missing, other might be a simplified version, others might just be incorrect. Please use only as a learning tool, and check Wikipedia!";
+            // horizontal-alignment: center;
+            wrap: word-wrap;
+        }
+        Rectangle {height: Sizes.spacing;}
+        TitleText {  
+            text: "Tips";
+            style: FontSettings.title-small;
+        }
+        RegularText {
+            text: "Swip action: You can skip a country or go back to the previous one by swiping on the info shown";
+            // horizontal-alignment: center;
+            wrap: word-wrap;
+        }
+        Rectangle {height: Sizes.spacing;}
+        RegularText {
+            text: "Different users: You can select, add & edit users in the scores screen";
+            // horizontal-alignment: center;
+            wrap: word-wrap;
+        }
         Rectangle {}
-        //     }
-        // }
+            }
+        }
         RegularText {
             text: "Contact: guilhem.geoquiz@gmail.com";
             horizontal-alignment: center;

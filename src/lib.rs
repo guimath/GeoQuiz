@@ -26,9 +26,10 @@ pub fn main() {
 #[unsafe(no_mangle)]
 pub fn android_main(app: slint::android::AndroidApp) {
     let path = app.external_data_path().unwrap();
-    slint::android::init_with_event_listener(app, |event| eprintln!("got event {event:?}"))
-        .unwrap();
-    eprintln!("{:?}", path.clone());
+    slint::android::init(app).unwrap();
+    // slint::android::init_with_event_listener(app, |event| eprintln!("got event {event:?}"))
+    //     .unwrap();
+    // eprintln!("{:?}", path.clone());
     init(path).unwrap()
 }
 

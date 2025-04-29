@@ -189,8 +189,15 @@ export component AppWindow inherits Window {
             padding: Sizes.padding;
             spacing: Sizes.spacing;
             // padding-left : root.width/10;
-            TitleText {
-                text: "Geo Quiz";
+            // TitleText {
+            //     text: "Geo Quiz";
+            // }
+            Rectangle {
+                // height: Sizes.title_height;
+            }
+            Image {
+                source: @image-url("img/logo.svg");
+                height: root.height/4;
             }
             Rectangle {}
             TextButton {

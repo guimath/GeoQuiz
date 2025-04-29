@@ -104,18 +104,19 @@
 - [x] Added outline 
 - [x] Try to find more precise country outlines (still could be improved for small islands)
 - [x] Add a score recap at the end / toggle
+- [x] Make proper icon
 
 ## Priority 
-- [ ] Make proper icon
 - [ ] Add a Readme & LICENSE & Publish
 - [ ] Add screenshots to readme
-- [ ] Commit data
 
 ## Secondary
 - [ ] See how to catch back button on android (https://docs.rs/android-activity/latest/android_activity/input/enum.Keycode.html#variant.TvMediaContextMenu)
 - [ ] Add URL links to app
+- [ ] Add a swipe to next for look up
+- [ ] Add a look up info shortcut once play is complete
 
 ## Ideas to discuss
 - [ ] Better scrolling on categories : maybe use timer to snap to center? 
 - [ ] Add a zoomed in version of the map that user can toggle
-- [ ] Add a swipe to next for look up
+- [ ] Commit data

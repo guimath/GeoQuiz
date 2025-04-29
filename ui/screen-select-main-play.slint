@@ -14,8 +14,10 @@ export component SelectMainPlayScreen inherits Rectangle {
     in property <[string]> info_type_names;
     in property <[string]> guess_type_names;
     property <bool> custom : false;
+    property <length> preset_btn_length: (root.width - 2*Sizes.padding - 3*Sizes.spacing)/4;
     VerticalBox {
         padding: Sizes.padding;
+        spacing: Sizes.spacing;
         TitleText{
             text: "Free Play";
         }
@@ -53,116 +55,121 @@ export component SelectMainPlayScreen inherits Rectangle {
             height: 2px;
             background: white;
         } 
-
-        TitleText {
-            text: "Playing Categories";
-            style: FontSettings.title-small;
-        }
-        Rectangle {
+        VerticalBox {
+            padding: 0;
+            spacing: Sizes.spacing;
+            RegularText {
+                text: "Presets";
+                style: FontSettings.title-small;
+                horizontal-alignment: center;
+                vertical-stretch: 0;
+            }
             HorizontalBox {
                 visible: !root.custom;
                 alignment: center;
+                spacing: Sizes.spacing;
                 padding: 0;
                 TextButton {
-                    height: root.height/10;
-                    width: root.width / 4;
+                    border_radius: Sizes.std_radius;
+                    height: Sizes.height_multi_choice;
+                    width: root.preset_btn_length;
                     text: "Flags";
                     clicked => {
-                        play(
-                            [0, 1, 4], 
-                            0,
-                            w_play_mode.choice_num
-                        );
+                        cat_im.set_choice_num(0);
+                        cat1.set_choice_num(0);
+                        cat2.set_choice_num(1);
+                        cat3.set_choice_num(4);
                     }
                 }
-    
+
                 TextButton {
-                    height: root.height/10;
-                    width: root.width / 4;
+                    border_radius: Sizes.std_radius;
+                    height: Sizes.height_multi_choice;
+                    width: root.preset_btn_length;
                     text: "Maps";
                     clicked => {
-                        play(
-                            [0, 2, 3], 
-                            1,
-                            w_play_mode.choice_num
-                        );
+                        cat_im.set_choice_num(1);
+                        cat1.set_choice_num(0);
+                        cat2.set_choice_num(2);
+                        cat3.set_choice_num(3);
                     }
                 }
                 TextButton {
-                    height: root.height/10;
-                    width: root.width / 4;
-                    text: "Custom";
+                    border_radius: Sizes.std_radius;
+                    height: Sizes.height_multi_choice;
+                    width: root.preset_btn_length;
+                    text: "Outlines";
                     clicked => {
-                        root.custom = true;
+                        cat_im.set_choice_num(2);
+                        cat1.set_choice_num(7);
+                        cat2.set_choice_num(2);
+                        cat3.set_choice_num(0);
+                    }
+                }
+                TextButton {
+                    border_radius: Sizes.std_radius;
+                    height: Sizes.height_multi_choice;
+                    width: root.preset_btn_length;
+                    text: "Country";
+                    clicked => {
+                        cat_im.set_choice_num(3);
+                        cat1.set_choice_num(1);
+                        cat2.set_choice_num(5);
+                        cat3.set_choice_num(6);
                     }
                 }
             }
+            
+            RegularText {
+                text: "Info shown";
+                width:  100%;
+                horizontal-alignment: center;
+                style: FontSettings.title-small;
+            }
+            // Rectangle {height: Sizes.spacing;}
+            cat_im := ScrollChoice {
+                choices: root.info_type_names;
+                width:  100%;
+            }
+            RegularText {
+                text: "Info to guess";
+                width:  100%;
+                horizontal-alignment: center;
+                style: FontSettings.title-small;
+            }
 
-            VerticalBox {
+            VerticalLayout {
                 padding: 0;
-                visible: root.custom;
-                HorizontalBox {
-                    alignment: center;
-                    padding: 0;
-                    TextButton {
-                        height: root.height/10;
-                        width: root.width / 3;
-                        text: "Back to default";
-                        clicked => {
-                            root.custom = false;
-                        }
-                    }
-        
-                    TextButton {
-                        height: root.height/10;
-                        width: root.width / 3;
-                        text: "Play";
-                        clicked => {
-                            invoke_play()
-                        }
+                // spacing: Sizes.spacing - Sizes.size_bar;
+                cat1 := ScrollChoice {
+                    width: 100%;
+                    choices: root.guess_type_names;
+                }
+
+                cat2 := ScrollChoice {
+                    width: 100%;
+                    choices: root.guess_type_names;
+                    choice_num: 1;
+                }
+
+                cat3 := ScrollChoice {
+                    width: 100%;
+                    choices: root.guess_type_names;
+                    choice_num: 2;
+                }
+            }
+            HorizontalBox {
+                padding: 0;
+                alignment: center;
+                TextButton {
+                    height: root.height / 10;
+                    width: root.width / 2;
+                    text: "Play";
+                    clicked => {
+                        invoke_play()
                     }
                 }
-                
-                VerticalBox {
-                    padding: 0;
-                    
-                    RegularText {
-                        text: "Info shown";
-                        width:  100%;
-                        horizontal-alignment: center;
-                    }
-                    cat_im := ScrollChoice {
-                        choices: root.info_type_names;
-                        width:  100%;
-                    }
-                    RegularText {
-                        text: "Info to guess";
-                        width:  100%;
-                        horizontal-alignment: center;
-                    }
-    
-                    VerticalLayout {
-                        padding: 0;
-                        spacing: 2*Sizes.spacing - Sizes.size_bar;
-                        cat1 := ScrollChoice {
-                            width: 100%;
-                            choices: root.guess_type_names;
-                        }
-    
-                        cat2 := ScrollChoice {
-                            width: 100%;
-                            choices: root.guess_type_names;
-                            choice_num: 1;
-                        }
-    
-                        cat3 := ScrollChoice {
-                            width: 100%;
-                            choices: root.guess_type_names;
-                            choice_num: 2;
-                        }
-                    }
-                }
-            }        
+            }
         }
         Rectangle {}
     }

@@ -217,6 +217,10 @@ export component ScrollChoice inherits HorizontalLayout {
     in property <length> height_elem: Sizes.height_multi_choice;
     property <length> Width_w_spacing : root.spacing_i + root.width_per_elem;
 
+    public function set_choice_num(i:int) {
+        root.choice_num = i;
+        scroll.viewport-x= set_x();
+    }
     function set_x() -> length {
         return - (root.choice_num* (root.width_per_elem+ root.spacing_i));
     }
@@ -234,8 +238,8 @@ export component ScrollChoice inherits HorizontalLayout {
             colorize: root.choice_num == 0 ? white.transparentize(0.5) : white;
         }
         clicked => {
-            if root.choice_num > 0 {root.choice_num -= 1;}
-            scroll.viewport-x= set_x();
+            
+            if root.choice_num > 0 {set_choice_num(root.choice_num -1)}
         }
     }
 
@@ -290,8 +294,7 @@ export component ScrollChoice inherits HorizontalLayout {
             colorize: root.choice_num == choices.length - 1 ? white.transparentize(0.5): white;
         }
         clicked => {
-            if root.choice_num < (choices.length - 1) {root.choice_num += 1;}
-            scroll.viewport-x= set_x();
+            if root.choice_num < (choices.length - 1) {set_choice_num(root.choice_num + 1)}
         }
     }
 }

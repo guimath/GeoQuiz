@@ -281,6 +281,10 @@ export component ScrollChoice inherits HorizontalLayout {
                 root.choice_num += 1;
             }
         }
+        animate viewport-x {
+            duration: 300ms;
+            easing: ease-in-out;
+        }
     }
     TouchArea {
         height: root.height_elem;

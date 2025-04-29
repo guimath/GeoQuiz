@@ -5,7 +5,4 @@ sources/*
 !sources/*.py
 .vscode/
 scores/
-
-# TEMP
-ui/img/icon.png
-ui/img/icon.svg
+ui/img/inkscape

@@ -7,6 +7,9 @@ use std::{
     sync::{Arc, Mutex},
 };
 
+#[cfg(target_os = "android")]
+use slint::android::android_activity::AndroidApp;
+ 
 use slint::{ComponentHandle, LogicalSize, Model, ModelRc, SharedString, VecModel};
 
 use logic::{AppLogic, AppWindow, ScoreStatSlint};
@@ -24,11 +27,59 @@ pub fn main() {
 
 #[cfg(target_os = "android")]
 #[unsafe(no_mangle)]
-pub fn android_main(app: slint::android::AndroidApp) {
+pub fn android_main(app: AndroidApp) {
+    // use slint::android::android_activity::{InputStatus, MainEvent, PollEvent};
+    // use slint::android::android_activity::input::{InputEvent, KeyAction, Keycode};
+
     let path = app.external_data_path().unwrap();
     slint::android::init(app).unwrap();
-    // slint::android::init_with_event_listener(app, |event| eprintln!("got event {event:?}"))
-    //     .unwrap();
+    // slint::android::init_with_event_listener(app.clone(), move |event| {
+    //     if let PollEvent::Main(main_event) = event{
+    //         // if *main_event != MainEvent::InputAvailable{
+    //         //     return;
+    //         // }
+    //         match main_event {
+    //             MainEvent::InputAvailable { .. } => {
+    //                 // redraw_pending = true;
+    //                 match app.input_events_iter() {
+    //                     Ok(mut iter) => {
+    //                         loop {
+    //                             // info!("loop");
+    //                             let read_input = iter.next(|event| {
+    //                                 let handled = match event {
+    //                                     InputEvent::KeyEvent(key_event) => {
+    //                                         // info!("{:?}", key_event);
+    //                                         if key_event.key_code() == Keycode::Back {
+    //                                             if key_event.action() == KeyAction::Down {
+    //                                                 eprintln!("back arrow detected");
+    //                                             }
+    //                                             InputStatus::Handled
+    //                                         } else {
+    //                                             InputStatus::Unhandled
+    //                                         }
+    //                                     }
+    //                                     _ => {
+    //                                         InputStatus::Unhandled
+    //                                     }
+    //                                 };
+    //                                 handled
+    //                             });
+                    
+    //                             if !read_input {
+    //                                 // info!("stop loop");
+    //                                 break;
+    //                             }
+    //                         }
+    //                     }
+    //                     Err(err) => {
+    //                         eprintln!("Failed to get input events iterator: {err:?}");
+    //                     }
+    //                 }
+    //             },
+    //             _ => (),
+    //         }
+    //     }
+    // }).unwrap();
     // eprintln!("{:?}", path.clone());
     init(path).unwrap()
 }

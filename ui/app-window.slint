@@ -108,6 +108,17 @@ export component AppWindow inherits Window {
     forward-focus: my-key-handler;
     my-key-handler := FocusScope {
         key-pressed(event) => {
+            if event.text == Key.Home { 
+                // Home made binding to catch back button on android otherwise always closes app
+                // modification file: slint/internal/backends/android-activity/androidwindowadapter.rs:542
+                // Keycode::Back => Some(Key::Home.into()),
+                if root.screen == Screen.Start {
+                    close();
+                } else {
+                    back();
+                    return accept;
+                }
+            }
             if event.text == Key.Escape && !event.repeat {
                 root.close();
             } 
@@ -142,7 +153,9 @@ export component AppWindow inherits Window {
                     }
                 }
             }
+            // accept
             accept
+            
         }
     }
     // ***************************************************************** //

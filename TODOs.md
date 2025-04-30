@@ -105,9 +105,9 @@
 - [x] Try to find more precise country outlines (still could be improved for small islands)
 - [x] Add a score recap at the end / toggle
 - [x] Make proper icon
+- [x] Add a Readme & LICENSE & Publish
 
 ## Project 
-- [ ] Add a Readme & LICENSE & Publish
 - [ ] Add screenshots to readme
 - [ ] Commit data
 
@@ -120,7 +120,9 @@
 - [ ] Add a zoomed in version of the map that user can toggle
 
 ## Android features
-- [ ] See how to catch back button on android (https://docs.rs/android-activity/latest/android_activity/input/enum.Keycode.html#variant.TvMediaContextMenu)
+- [ ] back button
+  - [x] Temp fix 
+  - [ ] Actual Fix once [issue](https://github.com/slint-ui/slint/issues/8323) is solved
 - [ ] Add URL links to app
 
 ## Improvements

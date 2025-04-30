@@ -106,17 +106,22 @@
 - [x] Add a score recap at the end / toggle
 - [x] Make proper icon
 
-## Priority 
+## Project 
 - [ ] Add a Readme & LICENSE & Publish
 - [ ] Add screenshots to readme
+- [ ] Commit data
 
-## Secondary
-- [ ] See how to catch back button on android (https://docs.rs/android-activity/latest/android_activity/input/enum.Keycode.html#variant.TvMediaContextMenu)
-- [ ] Add URL links to app
+## Bug fixes
+
+
+## New features
 - [ ] Add a swipe to next for look up
 - [ ] Add a look up info shortcut once play is complete
-
-## Ideas to discuss
-- [ ] Better scrolling on categories : maybe use timer to snap to center? 
 - [ ] Add a zoomed in version of the map that user can toggle
-- [ ] Commit data
+
+## Android features
+- [ ] See how to catch back button on android (https://docs.rs/android-activity/latest/android_activity/input/enum.Keycode.html#variant.TvMediaContextMenu)
+- [ ] Add URL links to app
+
+## Improvements
+- [ ] Better scrolling on categories : need way to deactivate inertia of scroll area

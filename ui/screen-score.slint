@@ -26,6 +26,9 @@ export component ScoreScreen inherits Rectangle {
         user_sel.current-value = name;
         timer.running = true;
     }
+    public function refresh() {
+        timer.running = true;
+    }
 
     function close_popup() {
         popup_type = PopupType.Off;

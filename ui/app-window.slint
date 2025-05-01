@@ -243,8 +243,7 @@ export component AppWindow inherits Window {
                 height: root.height/10;
                 text: "Score";
                 clicked => {
-                    score_filter_changed(false);
-                    score_sub_cat_changed(0);
+                    w_score.refresh();
                     root.screen = Screen.Score;
                 }
             }

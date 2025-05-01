@@ -150,11 +150,9 @@ impl AppLogic {
     }
 
     pub fn next(&mut self, result: u32) -> Option<(MainPlayUpdate, [CatInfo; 3])> {
+        let score_key = get_score_key(&self.all_countries[self.current]);
         if result != 0 {
-            let score = self
-                .scores
-                .get_mut(&get_score_key(&self.all_countries[self.current]))
-                .unwrap();
+            let score = self.scores.get_mut(&score_key).unwrap();
             if self.results[self.current] == 0 {
                 score.time_played += 1;
             }
@@ -162,9 +160,9 @@ impl AppLogic {
             score.last_score = result;
             self.results[self.current] = result;
             self.save_scores(); // TODO ONLY SAVE WHEN LEAVING APP OR BACK TO MENU
-            self.last_scores.insert(get_score_key(&self.all_countries[self.current]), result as usize);
+            self.last_scores.insert(score_key, result as usize);
         } else if self.results[self.current] == 0 {
-            self.last_scores.insert(get_score_key(&self.all_countries[self.current]), 0);
+            self.last_scores.insert(score_key, 0);
         }
         if !self.is_at_end() {
             self.current += 1;
@@ -229,22 +227,17 @@ impl AppLogic {
         (update, infos)
     }
 
-    pub fn get_play_scores(&self, choice_play:bool) -> (Vec<i32>, i32){
-        let mut v = [0;6];
-        for s in self.last_scores.values(){
+    pub fn get_play_scores(&self, choice_play: bool) -> (Vec<i32>, i32) {
+        let mut v = [0; 6];
+        for s in self.last_scores.values() {
             v[*s] += 1;
         }
-        let choice_max = v
-            .iter()
-            .max()
-            .unwrap()
-            .clone();
+        let choice_max = v.iter().max().unwrap().clone();
         if choice_play {
             (v[0..5].to_vec(), choice_max)
         } else {
             (v.to_vec(), choice_max)
         }
-
     }
     pub fn prepare_choice_play(&mut self, info_type: usize, guess_type: usize) {
         self.choice_guess_type = guess_type;
@@ -260,20 +253,20 @@ impl AppLogic {
     ) -> Option<ChoicePlayUpdate> {
         self.choice_prev_guesses
             .insert(self.current, was_guessed.clone());
+        let score_key = get_score_key(&self.all_countries[self.current]);
         if found {
             let down_ref: &VecModel<bool> = was_guessed.as_any().downcast_ref().unwrap();
             let guess_num = down_ref.iter().filter(|&x| x).count();
-            let score = self
-                .scores
-                .get_mut(&get_score_key(&self.all_countries[self.current]))
-                .unwrap();
+            let score = self.scores.get_mut(&score_key).unwrap();
             score.time_played += 1;
             score.last_score = (5 - guess_num) as u32;
             score.total_score += (5 - guess_num) as u32;
             self.save_scores();
-            self.last_scores.insert(get_score_key(&self.all_countries[self.current]), (5 - guess_num) as usize);
+            self.last_scores.insert(score_key, (5 - guess_num) as usize);
         } else {
-            self.last_scores.insert(get_score_key(&self.all_countries[self.current]), 0);
+            if !self.last_scores.contains_key(&score_key) && next {
+                self.last_scores.insert(score_key, 0);
+            }
         }
 
         if next {
@@ -442,7 +435,7 @@ impl AppLogic {
         let country = self.all_countries_order[num].clone();
         self.get_full_info_country(country)
     }
-    fn get_full_info_country(&self, country: CountryInfos)-> FullInfo {
+    fn get_full_info_country(&self, country: CountryInfos) -> FullInfo {
         let name = country.infos[0].full.clone();
         let mut text_infos: Vec<TextWithTitle> = Vec::new();
         let mut image_infos: Vec<ImageWithTitle> = Vec::new();
@@ -473,15 +466,12 @@ impl AppLogic {
             title: SharedString::from("UN Member"),
             text: inde,
         });
-        let mut paths = [
-            self.score_folder.clone(),
-            self.score_folder.clone(),
-        ];
+        let mut paths = [self.score_folder.clone(), self.score_folder.clone()];
         paths[0].push(MAIN_SCORE_NAME);
         paths[1].push(CHOICE_SCORE_NAME);
-        let mut val = [0;2];
+        let mut val = [0; 2];
         for i in 0..2 {
-            let s= info_parse::read(&self.all_countries_order, paths[i].clone());
+            let s = info_parse::read(&self.all_countries_order, paths[i].clone());
             let score = s.get(&name).unwrap();
             val[i] = score.last_score as i32;
         }

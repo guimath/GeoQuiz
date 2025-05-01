@@ -108,13 +108,13 @@
 - [x] Add a Readme & LICENSE & Publish
 - [x] Add a look up info shortcut once play is complete
 - [x] `BUGFIX` Scores doesn't properly track current config when opening score screen
+- [x] `BUGFIX` play score keep track in 4 choices gets reset
 
 ## Project 
 - [ ] Add screenshots to readme
 - [ ] Commit data
 
 ## Bug fixes
-- [ ] play score keep track in 4 choices gets reset
 
 ## New features
 - [ ] Add a swipe to next for look up

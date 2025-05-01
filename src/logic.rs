@@ -434,9 +434,15 @@ impl AppLogic {
             .map(|x| x.contains(search))
             .collect()
     }
-
+    pub fn look_up_current(&self) -> FullInfo {
+        let country = self.all_countries[self.current].clone();
+        self.get_full_info_country(country)
+    }
     pub fn look_up_selected(&self, num: usize) -> FullInfo {
         let country = self.all_countries_order[num].clone();
+        self.get_full_info_country(country)
+    }
+    fn get_full_info_country(&self, country: CountryInfos)-> FullInfo {
         let name = country.infos[0].full.clone();
         let mut text_infos: Vec<TextWithTitle> = Vec::new();
         let mut image_infos: Vec<ImageWithTitle> = Vec::new();

@@ -106,6 +106,7 @@
 - [x] Add a score recap at the end / toggle
 - [x] Make proper icon
 - [x] Add a Readme & LICENSE & Publish
+- [x] Add a look up info shortcut once play is complete
 
 ## Project 
 - [ ] Add screenshots to readme
@@ -116,7 +117,6 @@
 
 ## New features
 - [ ] Add a swipe to next for look up
-- [ ] Add a look up info shortcut once play is complete
 - [ ] Add a zoomed in version of the map that user can toggle
 
 ## Android features
@@ -127,3 +127,7 @@
 
 ## Improvements
 - [ ] Better scrolling on categories : need way to deactivate inertia of scroll area
+
+## Sources
+- add data that is missing
+- Improve contrast for maps

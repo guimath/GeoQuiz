@@ -6,6 +6,7 @@ import { TextStyle, FontSettings, Palette, Sizes } from "styling.slint";
 export component MainPlayScreen inherits Rectangle {
     callback prev();
     callback next(score: int);
+    callback look_up_current();
     in-out property <int> play_mode: 1;
     in-out property <int> num:0;
     in-out property <int> out_of:110;
@@ -24,6 +25,7 @@ export component MainPlayScreen inherits Rectangle {
         root.num = info.num;
         root.out_of = info.out_of;
         root.info = info.info;
+        info_btn.visible = info.seen;
     }
 
     function prep_next(score: int) {
@@ -70,7 +72,8 @@ export component MainPlayScreen inherits Rectangle {
             alignment: center;
             w_score := FiveStarScore {  
                 score_changed(score) => {
-                    prep_next(score)
+                    info_btn.visible = true;
+                    prep_next(score);
                 }
             }
         }
@@ -96,6 +99,28 @@ export component MainPlayScreen inherits Rectangle {
             first_letter: "E..., J...";
         }
 
+        Rectangle {}
+        HorizontalLayout {
+            alignment: center;
+            padding: 0;
+            
+            info_btn := TouchArea {
+                visible: false;
+                width: Sizes.title_height*2;
+                height: Sizes.title_height*2;
+                Image {
+                    source: @image-url("img/info.svg");
+                    height: 100%;
+                }
+                
+                clicked => {
+                    look_up_current();
+                }
+            }
+        }
+        Rectangle{
+
+        }
         Rectangle { } // spacing
     }
 }

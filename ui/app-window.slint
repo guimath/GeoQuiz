@@ -19,6 +19,7 @@ export component AppWindow inherits Window {
     //                            PROPERTIES
     // ***************************************************************** //
     in-out property <Screen> screen: Screen.Start;
+    in-out property <Screen> previous_screen: Screen.Start;
     in property <[string]> search_all_countries : ["Jamaica"]; 
     in property <[bool]> search_countries_mask: [true];
     in property <[string]> all_categories_name: ["Flag",  "Map", "Outline", "Country", "Capital", "Borders", "Area", "Population", "Languages", "Currency", "Region",];
@@ -33,6 +34,7 @@ export component AppWindow inherits Window {
     // ***************************************************************** //
     callback look_up_search_changed(search: string);
     callback look_up_selected(num: int);
+    callback look_up_current();
     callback set_play_config(params:PlaySelectParams);
     callback close();
     callback save_score();
@@ -63,7 +65,12 @@ export component AppWindow inherits Window {
         } else if root.screen == Screen.SelectMainPlay {
             root.screen = Screen.SelectPlay
         } else if root.screen == Screen.LookUp {
-            root.screen = Screen.SelectLookUp;
+            if root.previous_screen == Screen.Start {
+                root.screen = Screen.SelectLookUp;
+            } else {
+                root.screen = root.previous_screen;
+                root.previous_screen = Screen.Start;
+            }
         } else if root.screen == Screen.ChoicePlay {
             root.screen = Screen.SelectChoicePlay;
         } else if root.screen == Screen.SelectChoicePlay {
@@ -73,6 +80,10 @@ export component AppWindow inherits Window {
         }
     }
 
+    public function update_look_up_current(infos: FullInfo) {
+        root.previous_screen = root.screen;
+        update_look_up_selected(infos)
+    }
     public function update_look_up_selected(infos: FullInfo) {
         w_look_up.infos = infos;
         w_look_up.reset();
@@ -315,6 +326,7 @@ export component AppWindow inherits Window {
         visible: root.screen == Screen.MainPlay;
         next(score) => {next(score)}
         prev() => {prev()}
+        look_up_current() => {look_up_current()}
     }
 
     sel_choice_play_s := SelectChoicePlayScreen {
@@ -334,6 +346,7 @@ export component AppWindow inherits Window {
         changed(was_guessed, next, found) => {
             choice_changed(was_guessed, next, found)
         }
+        look_up_current() => {look_up_current()}
     }
 
 

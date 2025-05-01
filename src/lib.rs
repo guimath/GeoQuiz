@@ -121,6 +121,15 @@ fn init(path: PathBuf) -> Result<(), Box<dyn Error>> {
             ui.invoke_update_look_up_selected(logic.look_up_selected(search as usize));
         }
     });
+    ui.on_look_up_current({
+        let ui_handle = ui.as_weak();
+        let logic_ref = logic.clone();
+        move || {
+            let ui = ui_handle.unwrap();
+            let logic = logic_ref.lock().unwrap();
+            ui.invoke_update_look_up_current(logic.look_up_current());
+        }
+    });
 
     ui.on_set_play_config({
         let logic_ref = logic.clone();

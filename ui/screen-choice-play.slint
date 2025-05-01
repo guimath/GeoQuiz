@@ -5,6 +5,7 @@ import { TextStyle, FontSettings, Palette, Sizes } from "styling.slint";
 
 export component ChoicePlayScreen inherits Rectangle {
     callback changed(was_guessed:[bool], next:bool, found:bool);
+    callback look_up_current();
     property <TxtOrImg> info: {
         is_txt: false,
         txt: "Kingston",
@@ -84,7 +85,7 @@ export component ChoicePlayScreen inherits Rectangle {
         TitleText {
             text: "\{root.num + 1} / \{root.out_of}";
         }
-        SwipeInfo {
+        sw_info := SwipeInfo {
             info : root.info;
             handle-swipe-right: root.num > 0;
             handle-swipe-left: root.num < root.out_of - 1;
@@ -93,12 +94,15 @@ export component ChoicePlayScreen inherits Rectangle {
             next => {collect_changed(true, false)}
         }
        
-        RegularText {
+        text_guess_num := RegularText {
             visible: root.found;
             text: root.default_info == "" ? "Guessed in \{root.guess_num}": "Guessed in \{root.guess_num} (\{root.default_info})";
             horizontal-alignment: center;
         }
-        Rectangle {
+        img_rect := Rectangle {
+            // height: root.height /2 + Sizes.spacing;
+            height: root.height - (Sizes.title_height + sw_info.height + Sizes.title_height + info_btn.height + 6*Sizes.spacing);
+
             VerticalLayout {
                 visible: root.guesses[0].is_txt;
                 padding: 0;
@@ -128,7 +132,7 @@ export component ChoicePlayScreen inherits Rectangle {
                 padding: 0;
                 for t[i] in root.guesses : ImageChoice {
                     state: guess_states[i];
-                    height: root.height /4;
+                    height: (img_rect.height - Sizes.spacing) /2;
                     width: (root.width - (Sizes.padding*2 + Sizes.spacing))/2; 
                     x: i==0 || i == 2 ? 0: self.width + Sizes.spacing;
                     y: i==0 || i == 1 ? 0: self.height + Sizes.spacing;
@@ -150,6 +154,25 @@ export component ChoicePlayScreen inherits Rectangle {
             }
         }
         
+        Rectangle {}
+        HorizontalLayout {
+            alignment: center;
+            padding: 0;
+            
+            info_btn := TouchArea {
+                visible: root.found;
+                width: Sizes.title_height*2;
+                height: Sizes.title_height*2;
+                Image {
+                    source: @image-url("img/info.svg");
+                    height: 100%;
+                }
+                
+                clicked => {
+                    look_up_current();
+                }
+            }
+        }
         Rectangle{
 
         }

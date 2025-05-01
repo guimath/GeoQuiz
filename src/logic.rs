@@ -96,7 +96,7 @@ impl AppLogic {
             self.all_countries_order
                 .clone()
                 .into_iter()
-                .filter(|country| country.independent)
+                .filter(|country| country.un_member)
                 .collect()
         } else {
             self.all_countries_order.clone()
@@ -453,7 +453,7 @@ impl AppLogic {
                 });
             }
         }
-        let inde = if country.independent {
+        let status = if country.un_member {
             if country.infos[0].full == "Vatican City" {
                 SharedString::from("Non-member but permanent observer state")
             } else {
@@ -464,7 +464,7 @@ impl AppLogic {
         };
         text_infos.push(TextWithTitle {
             title: SharedString::from("UN Member"),
-            text: inde,
+            text: status,
         });
         let mut paths = [self.score_folder.clone(), self.score_folder.clone()];
         paths[0].push(MAIN_SCORE_NAME);
@@ -522,7 +522,7 @@ impl AppLogic {
             self.all_countries_order
                 .clone()
                 .into_iter()
-                .filter(|country| country.independent)
+                .filter(|country| country.un_member)
                 .collect()
         } else {
             self.all_countries_order.clone()

@@ -21,7 +21,7 @@ pub struct AllInfos {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct CountryInfos {
     pub region: String,
-    pub independent: bool,
+    pub un_member: bool,
     pub infos: Vec<Category>,
     pub images: Vec<ImageLink>,
 }

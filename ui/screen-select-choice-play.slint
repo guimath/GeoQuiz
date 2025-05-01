@@ -8,6 +8,10 @@ export component SelectChoicePlayScreen inherits Rectangle {
         play(info_cat.choice_num, guess_cat.choice_num);
     }
     in property <[string]> info_types;
+    property <[int]> preset_1: [0,1,2,3];
+    property <[int]> preset_2: [3,3,3,4];
+
+
     VerticalLayout {
         padding: Sizes.padding;
         spacing: Sizes.spacing;
@@ -15,7 +19,42 @@ export component SelectChoicePlayScreen inherits Rectangle {
             text: "4 Choices";
         }
         Rectangle {}
-        
+        RegularText {
+            text: "Presets";
+            style: FontSettings.title-small;
+            horizontal-alignment: center;
+            vertical-stretch: 0;
+        }
+        for _a[i] in preset_1: HorizontalLayout{
+            padding: 0;
+            spacing: Sizes.spacing;
+            alignment: center;
+            TextButton {
+                border_radius: Sizes.std_radius;
+                height: Sizes.height_multi_choice*1.5;
+                width: root.width*0.4;
+                text: info_types[preset_2[i]]== "Country" ? 
+                "1 \{info_types[preset_1[i]]}\n4 Countries":
+                "1 \{info_types[preset_1[i]]}\n4 \{info_types[preset_2[i]]}s";
+                clicked => {
+                    info_cat.set_choice_num(preset_1[i]);
+                    guess_cat.set_choice_num(preset_2[i]);
+                }
+            }
+            TextButton {
+                border_radius: Sizes.std_radius;
+                height: Sizes.height_multi_choice*1.5;
+                width: root.width*0.4;
+                text: info_types[preset_1[i]]== "Country" ? 
+                    "1 \{info_types[preset_2[i]]}\n4 Countries":
+                    "1 \{info_types[preset_2[i]]}\n4 \{info_types[preset_1[i]]}s";
+                clicked => {
+                    info_cat.set_choice_num(preset_2[i]);
+                    guess_cat.set_choice_num(preset_1[i]);
+                }
+            }
+            
+        }
         
         TitleText {
             text: "Info shown";

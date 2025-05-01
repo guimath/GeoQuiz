@@ -338,17 +338,20 @@ export component ImageChoice inherits TouchArea {
     in property <image> image;
     in property <ChoiceState> state : ChoiceState.NotClicked;
     in property <color> background_elem: 
-        root.state == ChoiceState.NotClicked?  Palette.accent1:
+        root.state == ChoiceState.NotClicked?  Palette.slight_highlight:
         root.state == ChoiceState.Correct?  Palette.correct:
         Palette.wrong;
     in property <length> radius: Sizes.std_radius;
    
     Rectangle {
+        // border-width: 3px;
+        // border-color: Palette.buttons;
         border-radius: root.radius;
         background: root.background_elem;
     }
     HorizontalBox {
-        padding: Sizes.padding;
+        padding: 0;
+        // padding: Sizes.padding;
         Image {
             source: root.image;
             image-fit: contain;

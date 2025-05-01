@@ -109,6 +109,7 @@
 - [x] Add a look up info shortcut once play is complete
 - [x] `BUGFIX` Scores doesn't properly track current config when opening score screen
 - [x] `BUGFIX` play score keep track in 4 choices gets reset
+- [x] `SOURCES` add data that is missing -> mostly there, still a few missing but edge cases are ok 
 
 ## Project 
 - [ ] Add screenshots to readme
@@ -127,8 +128,8 @@
 - [ ] Add URL links to app
 
 ## Improvements
-- [ ] Better scrolling on categories : need way to deactivate inertia of scroll area
+- [ ] `UI` Better scrolling on categories : need way to deactivate inertia of scroll area
+- [ ] `UI` Add special buttons with icons
 
 ## Sources
-- add data that is missing
-- Improve contrast for maps
+- [ ] Improve contrast for maps

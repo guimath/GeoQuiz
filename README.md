@@ -7,9 +7,8 @@ A quiz app to help you learn more about the world's geography.
 |type| source | last update| Place to put sources|
 |- | - | - | - |
 | Geo json files | combined [mledoze github](https://github.com/mledoze/countries) and [Natural Earth](https://www.naturalearthdata.com/downloads/10m-cultural-vectors/) data via [datahub](https://datahub.io/core/geo-countries)  |  28/04/2025 |  [sources/countries.geojson](sources/countries.geojson) &  [sources/flags](sources/flags) folder
-| Population | [World Bank](https://data.worldbank.org/indicator/SP.POP.TOTL) | 15/04/2025 | [sources/world_bank_pop.csv](sources/world_bank_pop.csv) |
-| Area | [World Bank](https://data.worldbank.org/indicator/AG.LND.TOTL.K2) | 15/04/2025 | [sources/world_bank_area.csv](sources/world_bank_area.csv) |
-| Everything else | [open source database : mledoze github](https://github.com/mledoze/countries) | 10/03/2025 | [sources/countries.json](sources/countries.json) & [sources/flags](sources/flags) folder|
+| Population & Area | [United Nations](https://population.un.org/wpp/) via  [World Population Review](https://worldpopulationreview.com/)| 01/05/2025 | [sources/world_pop.csv](sources/worl_pop.csv) |
+| Everything else | [mledoze github](https://github.com/mledoze/countries) | 10/03/2025 | [sources/countries.json](sources/countries.json) & [sources/flags](sources/flags) folder|
 
 
 ## Contact

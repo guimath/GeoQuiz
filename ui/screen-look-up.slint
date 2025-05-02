@@ -6,6 +6,10 @@ import { TextStyle, FontSettings, Palette, Sizes } from "styling.slint";
 export component SelectLookUpScreen inherits Rectangle {
     callback search_changed(search: string);
     callback selected(num: int);
+    public function reset_search(){
+        search_edit.text = "";
+        search_changed("");
+    }
     in property <[string]> all: ["Albania", "Argentina", "Australia", "Barbados"];
     in-out property <[bool]> on: [true, true, true, true];
     VerticalLayout {
@@ -14,7 +18,7 @@ export component SelectLookUpScreen inherits Rectangle {
         TitleText {  
             text: "Look Up";
         }
-        LineEdit {
+        search_edit := LineEdit {
             placeholder-text: "Search";
             edited(text) => {scroll.viewport-y=0; search_changed(text)}
         }

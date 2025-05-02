@@ -77,7 +77,8 @@ export component AppWindow inherits Window {
         } else if root.screen == Screen.SelectChoicePlay {
             root.screen = Screen.SelectPlay
         } else { // Score, SelectLookUp, SelectPlay, Help
-            root.screen = Screen.Start
+            root.screen = Screen.Start;
+            root.focus();
         }
     }
 
@@ -233,6 +234,7 @@ export component AppWindow inherits Window {
                 text: "Look Up Infos";
                 icon: @image-url("img/info.svg");
                 clicked => {
+                    w_sel_look_up.reset_search();
                     root.screen = Screen.SelectLookUp
                 }
             }

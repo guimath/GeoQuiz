@@ -159,6 +159,7 @@ def main():
             elif cca == 'tkl' : radius = 200_000
             elif cca == 'wsm' : radius = 200_000
             elif cca == 'cpv' : radius = 250_000
+            elif cca == 'cyp' : radius = 170_000
 
             if len(center) > 0 :
                 # using shapely to get union of circles
@@ -170,7 +171,7 @@ def main():
                     shapes = [union]
                 for shape in shapes:
                     xs, ys = shape.exterior.xy
-                    ax.fill(xs, ys, fc="#00000000", ec=util.SELECT_COLOR, lw=4)
+                    ax.fill(xs, ys, fc="#00000000", ec=util.SELECT_COLOR, lw=5)
 
         ax.axis('off')
         plt.subplots_adjust(

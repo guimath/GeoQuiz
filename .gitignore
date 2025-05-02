@@ -3,6 +3,7 @@
 data/
 sources/*
 !sources/*.py
+!sources/wiki_names.json
 .vscode/
 scores/
 ui/img/inkscape

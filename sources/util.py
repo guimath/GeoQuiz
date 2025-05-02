@@ -8,9 +8,11 @@ from matplotlib.collections import PatchCollection
 
 ABS_PATH = Path(__file__).parent
 
+# BACKGROUND_COLOR = '#2a282d' 
+# 146d00
 BACKGROUND_COLOR = '#2a282d' 
 '''Color, same as app background'''
-SELECT_COLOR = '#146d00'
+SELECT_COLOR = '#26bd05'
 '''Highlight color for maps (green)'''
 LAND_COLOR = '#ffffff'
 '''Color of land'''
@@ -61,6 +63,8 @@ def combine_files():
         "som",
         "esh",
         "mar",
+        "cyp",
+        "nld"
     ]
     os.makedirs(FOLDER_GEOJSON, exist_ok=True)
     with open(FILE_MAIN_INFOS, 'r') as f:

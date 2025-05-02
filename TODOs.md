@@ -115,6 +115,7 @@
 - [x] `UI` Add special buttons with icons
 - [x] `BUGFIX` Remove selected text when editing username
 - [x] `UI` Score in a single screen
+- [x] `SOURCES` Improve contrast for maps -> Some what but could probably be improved
 
 
 ## Project 
@@ -135,4 +136,3 @@
 - [ ] `UI` Better scrolling on categories : need way to deactivate inertia of scroll area
 
 ## Sources
-- [ ] Improve contrast for maps

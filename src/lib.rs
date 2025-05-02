@@ -9,7 +9,6 @@ use std::{
 
 #[cfg(target_os = "android")]
 use slint::android::android_activity::AndroidApp;
- 
 use slint::{ComponentHandle, LogicalSize, Model, ModelRc, SharedString, VecModel};
 
 use logic::{AppLogic, AppWindow, ScoreStatSlint, HyperLinkClick};
@@ -23,6 +22,52 @@ fn vec_to_model(vec: &Vec<String>) -> ModelRc<SharedString> {
 pub fn main() {
     let path = PathBuf::from_str(env!("CARGO_MANIFEST_DIR")).unwrap();
     init(path).unwrap();
+}
+
+#[cfg(target_os = "android")]
+fn start_android_action_view(
+    url: String,
+) -> Result<(), Box<dyn std::error::Error>> {
+    use jni::objects::{JObject, JValue};
+    // use ndk::native_activity::NativeActivity;
+    // Create a VM for executing Java calls
+    let ctx = ndk_context::android_context();
+    let vm = unsafe { jni::JavaVM::from_raw(ctx.vm() as _) }?;
+    let activity = unsafe { jni::objects::JObject::from_raw(ctx.context() as _) };
+    // let context = unsafe { jni::objects::JObject::from_raw(ctx.context().cast()) };
+    let mut env = vm.attach_current_thread()?;
+    
+    // activity 
+    let intent_class = env.find_class("android/content/Intent")?;
+    let action_view = env.get_static_field(&intent_class, "ACTION_VIEW", "Ljava/lang/String;")?;
+
+    // Create Uri object
+    let uri_class = env.find_class("android/net/Uri")?;
+    let url = env.new_string(url)?;
+    let uri = env.call_static_method(
+        &uri_class,
+        "parse",
+        "(Ljava/lang/String;)Landroid/net/Uri;",
+        &[JValue::Object(&JObject::from(url))],
+    )?;
+    // Create new ACTION_VIEW intent with the uri
+    let intent = env.alloc_object(&intent_class)?;
+    env.call_method(
+        &intent,
+        "<init>",
+        "(Ljava/lang/String;Landroid/net/Uri;)V",
+        &[action_view.borrow(), uri.borrow()],
+    )?;
+
+    // Start the intent activity.
+    env.call_method(
+        &activity,
+        "startActivity",
+        "(Landroid/content/Intent;)V",
+        &[JValue::Object(&intent)],
+    )?;
+
+    Ok(())
 }
 
 #[cfg(target_os = "android")]
@@ -280,8 +325,9 @@ fn init(path: PathBuf) -> Result<(), Box<dyn Error>> {
         }
     });
     ui.global::<HyperLinkClick>().on_hl_clicked(|url|{
-        if webbrowser::open(url.as_str()).is_err(){
-            println!("URL open failed (not http)");
+        if webbrowser::open(url.as_str()).is_err(){ // only works on http for android
+            #[cfg(target_os = "android")]
+            start_android_action_view(url.to_string()).unwrap();
         }
     });
     ui.on_close({

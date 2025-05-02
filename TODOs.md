@@ -118,6 +118,7 @@
 - [x] `SOURCES` Improve contrast for maps -> Some what but could probably be improved
 - [x] `FEATURE` Add wiki link in look up
 - [x] `BUGFIX` reset select look up
+- [x] `ANDROID` open mailto links 
 
 
 ## Project 
@@ -132,7 +133,6 @@
 
 ## Android features
 - [ ] follow [issue](https://github.com/slint-ui/slint/issues/8323) to patch back button
-- [ ] open mailto links 
 
 ## Improvements
 - [ ] `UI` Better scrolling on categories : need way to deactivate inertia of scroll area

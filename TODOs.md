@@ -116,6 +116,7 @@
 - [x] `BUGFIX` Remove selected text when editing username
 - [x] `UI` Score in a single screen
 - [x] `SOURCES` Improve contrast for maps -> Some what but could probably be improved
+- [x] `FEATURE` Add wiki link in look up
 
 
 ## Project 

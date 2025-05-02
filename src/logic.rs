@@ -481,6 +481,7 @@ impl AppLogic {
             image_infos: image_infos.as_slice().into(),
             score_free_play: val[0],
             score_choice_play: val[1],
+            wiki_link: country.wiki_link.into(),
         }
     }
 

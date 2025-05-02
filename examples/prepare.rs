@@ -201,6 +201,7 @@ impl CategoryCreator {
 }
 
 const JSON_DATA: &str = include_str!("../sources/countries.json");
+const WIKI_NAMES: &str = include_str!("../sources/wiki_names.json");
 const OTHER_DATA: &str = include_str!("../sources/world_pop.csv");
 
 fn main() {
@@ -217,6 +218,7 @@ fn main() {
         cca3_to_area.insert(r.cca3.clone(), r.area);
         cca3_to_pop.insert(r.cca3.clone(), r.population);
     }
+    let cca3_to_wiki: HashMap<String, String> = serde_json::from_str(WIKI_NAMES).unwrap();
     let raw: Vec<CountryStat> = serde_json::from_str(JSON_DATA).unwrap();
     for country in raw.clone() {
         cca3_to_name.insert(country.cca3, country.name.common);
@@ -246,11 +248,16 @@ fn main() {
             images.push(cat.get_map(x));
             images.push(cat.get_outline(x));
             
+            println!("{}", x.cca3.to_string());
+            let wiki_name = cca3_to_wiki.get(&x.cca3.to_string()).unwrap();
+            let wiki_link = format!("https://en.wikipedia.org/wiki/{}", wiki_name.replace(" ", "_"));
+            println!("{}",wiki_link);
             CountryInfos {
                 region: x.region.clone(),
                 un_member: x.un_member,
                 infos,
                 images,
+                wiki_link,
             }
         })
         .collect();

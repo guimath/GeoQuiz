@@ -1,5 +1,5 @@
 import { ScrollView, LineEdit, HorizontalBox, VerticalBox } from "std-widgets.slint";
-import { ChoiceElem, RegularText, TitleText, FiveStarScore } from "widgets.slint";
+import { ChoiceElem, RegularText, TitleText, FiveStarScore, HyperLinkClick } from "widgets.slint";
 import { FullInfo } from "structs.slint";
 import { TextStyle, FontSettings, Palette, Sizes } from "styling.slint";
 
@@ -64,6 +64,7 @@ export component LookUpScreen inherits Rectangle {
             {title:"Flag", image:@image-url("../sources/flags/jam.svg")},
             {title:"Outline", image:@image-url("../data/outlines/jam.svg")}
         ],
+        wiki_link: "https://en.wikipedia.org/wiki/Jamaica",
         score_free_play: 3,
         score_choice_play: 0,
     };
@@ -127,6 +128,21 @@ export component LookUpScreen inherits Rectangle {
                             vertical-alignment: center;
                             text: text_infos.text;
                             wrap: word-wrap;
+                        }
+                    }
+                }
+                HorizontalLayout {
+                    padding: Sizes.spacing; // using as spacing
+                    alignment: center;
+                    TouchArea {
+                        height: 2*Sizes.title_height;
+                        Image {
+                            source: @image-url("img/Wikipedia-logo-v2.svg");
+                            height: 100%;
+                        }
+                
+                        clicked => {
+                            HyperLinkClick.hl_clicked(root.infos.wiki_link);
                         }
                     }
                 }

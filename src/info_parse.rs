@@ -24,6 +24,7 @@ pub struct CountryInfos {
     pub un_member: bool,
     pub infos: Vec<Category>,
     pub images: Vec<ImageLink>,
+    pub wiki_link : String,
 }
 #[derive(Deserialize, Serialize, Debug, Clone, Default)]
 pub struct Score {

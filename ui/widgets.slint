@@ -372,10 +372,10 @@ export component TextButton inherits HorizontalBox {
     padding: 0;
     spacing: 0;
     Rectangle {}
-    TouchArea {
+    ta := TouchArea {
         height: root.height_button;
         width: root.width_button;
-        Rectangle {
+        back_rect := Rectangle {
             background: Palette.buttons;
             border-radius: root.border_radius;
         }
@@ -390,6 +390,14 @@ export component TextButton inherits HorizontalBox {
         clicked() => {root.clicked()}
     }
     Rectangle {}
+    states [
+        has-hvr when ta.has-hover: {
+            back_rect.color: Palette.buttons.brighter(0.3);
+        }
+        not-hvr when !ta.has-hover: {
+            back_rect.color: Palette.buttons;
+        }
+    ]
 }
 
 export component TextButtonWithIcon inherits HorizontalBox {
@@ -402,16 +410,16 @@ export component TextButtonWithIcon inherits HorizontalBox {
     padding: 0;
     spacing: 0;
     Rectangle {}
-    TouchArea {
+    ta := TouchArea {
         height: root.height_button;
         width: root.width_button;
-        Rectangle {
+        back_rect := Rectangle {
             background: Palette.buttons;
             border-radius: root.border_radius;
         }
         HorizontalLayout {
             padding: Sizes.padding;
-            padding-right: Sizes.padding + root.border_radius;
+            padding-right: root.border_radius; // makes it look more centered
             spacing: 0;
             Image {
                 source: root.icon;
@@ -429,6 +437,14 @@ export component TextButtonWithIcon inherits HorizontalBox {
         clicked() => {root.clicked()}
     }
     Rectangle {}
+    states [
+        has_hover when ta.has_hover: {
+            back_rect.color: Palette.buttons.brighter(0.3);
+        }
+        not_hover when !ta.has_hover: {
+            back_rect.color: Palette.buttons;
+        }
+    ]
 }
 
 export component BarGraph {
@@ -503,30 +519,27 @@ export component BarGraph {
     }
 }
 
+
+// Adapted from https://github.com/Vadoola/Tomotroid
 export global HyperLinkClick {
-    pure callback hl-clicked(string);
+    pure callback hl_clicked(url:string);
 }
 
 export component HyperLink inherits RegularText {
-    callback link(url:string);
-    in property<string> link_text;
     in property<string> url;
     in property<color> link_color:Palette.link_color;
-    in property<color> hvr-color:Palette.regular_text;
+    in property<color> hvr_color:Palette.regular_text;
 
-    text: root.link_text;
-
-    hl-ta := TouchArea {
-        clicked => { HyperLinkClick.hl-clicked(root.url)}
+    ta := TouchArea {
+        clicked => { HyperLinkClick.hl_clicked(root.url)}
     }
     
-
     states [
-        has-hvr when hl-ta.has-hover: {
-            color: root.hvr-color;
+        has_hover when ta.has_hover: {
+            color: root.hvr_color;
         }
-        not-hvr when !hl-ta.has-hover: {
-            color: root.link-color;
+        not_hover when !ta.has_hover: {
+            color: root.link_color;
         }
     ]
 

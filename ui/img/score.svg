@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="62.267719mm"
+   height="62.267719mm"
+   viewBox="0 0 62.267719 62.267719"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
+   sodipodi:docname="score.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#505050"
+     bordercolor="#eeeeee"
+     borderopacity="1"
+     inkscape:pageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="1.9846521"
+     inkscape:cx="77.847397"
+     inkscape:cy="169.04726"
+     inkscape:window-width="2256"
+     inkscape:window-height="1423"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="text2962"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0" />
+  <defs
+     id="defs2" />
+  <g
+     inkscape:label="Calque 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-53.625715,-81.624548)">
+    <circle
+       style="fill:none;stroke:#fdfffe;stroke-width:2.26772;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:10.2047;stroke-opacity:1"
+       id="path846"
+       cx="84.759575"
+       cy="112.75841"
+       r="30" />
+    <g
+       aria-label="i"
+       id="text2962"
+       style="font-size:63.5px;line-height:1.25;font-family:'EB Garamond';-inkscape-font-specification:'EB Garamond, Normal';font-variant-ligatures:none;fill:#ffffff;stroke-width:0.264583">
+      <g
+         inkscape:label="Calque 1"
+         id="layer1-1"
+         transform="translate(-16.994858,-6.0158997)">
+        <path
+           style="fill:#000000;stroke-width:0.264583"
+           id="path1529"
+           d="" />
+        <path
+           style="fill:#000000;stroke-width:0.264583"
+           id="path1365"
+           d="" />
+        <path
+           style="fill:#000000;stroke-width:0.264583"
+           id="path1345"
+           d="" />
+        <rect
+           style="fill:#ffffff;fill-opacity:1;stroke-width:0.933728;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:6.1"
+           id="rect1129"
+           width="8"
+           height="15"
+           x="86.754433"
+           y="118.77431" />
+        <rect
+           style="fill:#ffffff;fill-opacity:1;stroke-width:1.14331;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:6.1"
+           id="rect1129-0"
+           width="8"
+           height="22.489157"
+           x="97.754433"
+           y="111.28515" />
+        <rect
+           style="fill:#ffffff;fill-opacity:1;stroke-width:1.3205;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:6.1"
+           id="rect1129-0-9"
+           width="8"
+           height="30"
+           x="108.75443"
+           y="103.77431" />
+      </g>
+    </g>
+  </g>
+</svg>

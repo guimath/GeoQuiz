@@ -276,7 +276,7 @@ fn init(path: PathBuf) -> Result<(), Box<dyn Error>> {
         let logic_ref = logic.clone();
         move || {
             let logic = logic_ref.lock().unwrap();
-            loçgic.save_scores();
+            logic.save_scores();
         }
     });
     ui.global::<HyperLinkClick>().on_hl_clicked(|url|{

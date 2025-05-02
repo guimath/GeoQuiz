@@ -18,7 +18,7 @@ export component ChoiceElem inherits TouchArea {
     in property <string> text;
     in property <ChoiceState> state : ChoiceState.NotClicked;
     in property <color> background_elem: 
-        root.state == ChoiceState.NotClicked?  Palette.accent1:
+        root.state == ChoiceState.NotClicked?  Palette.highlight3:
         root.state == ChoiceState.Correct?  Palette.correct:
         Palette.wrong;
     in property <length> radius: Sizes.std_radius;
@@ -53,6 +53,7 @@ export component MultiChoice {
         spacing: root.spacing;
         alignment: center;
         for text[index] in root.choices : ChoiceElem {
+            background_elem: Palette.highlight1;
             text: text;
             width: root.width_per_elem;
             height: root.height_elem;
@@ -61,7 +62,7 @@ export component MultiChoice {
     }
     highlight := Rectangle{
         x: (root.width - root.width_per_elem*root.choices.length - root.spacing*(root.choices.length - 1))/2 + (root.width_per_elem+root.spacing)*root.choice_num;
-        background: Palette.accent1;
+        background: Palette.highlight2;//Palette.highlight3;
         height: root.height_elem;
         width:root.width_per_elem;
         border-radius: Sizes.std_radius;
@@ -262,7 +263,7 @@ export component ScrollChoice inherits HorizontalLayout {
                 height: root.choice_num == index ? root.height_elem: root.height_elem - 5pt;
                 text: text;
                 width: root.width_per_elem;
-                background_elem: index == root.choice_num ? Palette.accent2 : Palette.accent1;
+                background_elem: index == root.choice_num ? Palette.highlight4 : Palette.highlight3;
                 clicked => {root.choice_num = index; scroll.viewport-x= set_x();}
                 animate height {
                     duration: 50ms;
@@ -338,7 +339,7 @@ export component ImageChoice inherits TouchArea {
     in property <image> image;
     in property <ChoiceState> state : ChoiceState.NotClicked;
     in property <color> background_elem: 
-        root.state == ChoiceState.NotClicked?  Palette.slight_highlight:
+        root.state == ChoiceState.NotClicked?  Palette.highlight1:
         root.state == ChoiceState.Correct?  Palette.correct:
         Palette.wrong;
     in property <length> radius: Sizes.std_radius;

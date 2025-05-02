@@ -115,7 +115,7 @@ export component LookUpScreen inherits Rectangle {
                 }
                 Rectangle {height: Sizes.spacing;}
                 for text_infos[i] in infos.text-infos: Rectangle{
-                    background: Math.mod(i,2) == 0 ? Palette.accent1 : Palette.background;
+                    background: Math.mod(i,2) == 0 ? Palette.highlight3 : Palette.background;
                     HorizontalBox {
                         RegularText {
                             text: "\{text_infos.title}:";

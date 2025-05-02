@@ -132,6 +132,7 @@
 
 ## Improvements
 - [ ] `UI` Better scrolling on categories : need way to deactivate inertia of scroll area
+- [ ] `UI` Score in a single screen ?
 
 ## Sources
 - [ ] Improve contrast for maps

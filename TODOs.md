@@ -110,7 +110,8 @@
 - [x] `BUGFIX` Scores doesn't properly track current config when opening score screen
 - [x] `BUGFIX` play score keep track in 4 choices gets reset
 - [x] `SOURCES` add data that is missing -> mostly there, still a few missing but edge cases are ok 
-
+- [x] `ANDROID` back button temp fix -> slint source modification
+- [x] `ANDROID` URL Links -> webbrowser
 ## Project 
 - [ ] Add screenshots to readme
 - [ ] Commit data
@@ -122,12 +123,8 @@
 - [ ] Add a zoomed in version of the map that user can toggle
 
 ## Android features
-- [ ] back button
-  - [x] Temp fix 
-  - [ ] Actual Fix once [issue](https://github.com/slint-ui/slint/issues/8323) is solved
-- [ ] Add URL links to app
-  - [x] Can open http with webbrowser 
-  - [ ] mailto ? 
+- [ ] follow [issue](https://github.com/slint-ui/slint/issues/8323) to patch back button
+- [ ] open mailto links 
 
 ## Improvements
 - [ ] `UI` Better scrolling on categories : need way to deactivate inertia of scroll area

@@ -460,5 +460,34 @@ export component BarGraph {
     }
 }
 
+export global HyperLinkClick {
+    pure callback hl-clicked(string);
+}
+
+export component HyperLink inherits RegularText {
+    callback link(url:string);
+    in property<string> link_text;
+    in property<string> url;
+    in property<color> link_color:Palette.link_color;
+    in property<color> hvr-color:Palette.regular_text;
+
+    text: root.link_text;
+
+    hl-ta := TouchArea {
+        clicked => { HyperLinkClick.hl-clicked(root.url)}
+    }
+    
+
+    states [
+        has-hvr when hl-ta.has-hover: {
+            color: root.hvr-color;
+        }
+        not-hvr when !hl-ta.has-hover: {
+            color: root.link-color;
+        }
+    ]
+
+}
+
 
 

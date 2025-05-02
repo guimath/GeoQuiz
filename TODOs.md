@@ -126,6 +126,8 @@
   - [x] Temp fix 
   - [ ] Actual Fix once [issue](https://github.com/slint-ui/slint/issues/8323) is solved
 - [ ] Add URL links to app
+  - [x] Can open http with webbrowser 
+  - [ ] mailto ? 
 
 ## Improvements
 - [ ] `UI` Better scrolling on categories : need way to deactivate inertia of scroll area

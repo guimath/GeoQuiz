@@ -12,7 +12,7 @@ use slint::android::android_activity::AndroidApp;
  
 use slint::{ComponentHandle, LogicalSize, Model, ModelRc, SharedString, VecModel};
 
-use logic::{AppLogic, AppWindow, ScoreStatSlint};
+use logic::{AppLogic, AppWindow, ScoreStatSlint, HyperLinkClick};
 
 fn vec_to_model(vec: &Vec<String>) -> ModelRc<SharedString> {
     let vc = vec.clone();
@@ -276,13 +276,12 @@ fn init(path: PathBuf) -> Result<(), Box<dyn Error>> {
         let logic_ref = logic.clone();
         move || {
             let logic = logic_ref.lock().unwrap();
-            logic.save_scores();
+            loçgic.save_scores();
         }
     });
-    ui.on_link({
-        move | url | {
-            // TODO fix for android
-            open::that(url.as_str()).unwrap();
+    ui.global::<HyperLinkClick>().on_hl_clicked(|url|{
+        if webbrowser::open(url.as_str()).is_err(){
+            println!("URL open failed (not http)");
         }
     });
     ui.on_close({

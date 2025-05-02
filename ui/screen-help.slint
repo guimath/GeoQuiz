@@ -1,5 +1,5 @@
 import { ScrollView, LineEdit, HorizontalBox, VerticalBox } from "std-widgets.slint";
-import { ChoiceElem, RegularText, TitleText } from "widgets.slint";
+import { ChoiceElem, RegularText, TitleText, HyperLink } from "widgets.slint";
 import { FullInfo, TextWithTitle } from "structs.slint";
 import { TextStyle, FontSettings, Palette, Sizes } from "styling.slint";
 
@@ -34,14 +34,42 @@ export component HelpScreen inherits Rectangle {
             text: "Sources";
             style: FontSettings.title-small;
         }
-        for text_infos[i] in infos: Rectangle{
-            background: Math.mod(i,2) == 0 ? Palette.accent1 : Palette.background;
+        // Rectangle{
+        //     background: Math.mod(0,2) == 0 ? Palette.accent1 : Palette.background;
+        //     HorizontalBox {
+        //         padding: Sizes.padding;
+        //         spacing: 0;
+        //         RegularText {
+        //             width: root.width/5;
+        //             text: "Flag";
+        //             vertical-alignment: center;
+        //             horizontal-alignment: right;
+        //             wrap: word-wrap;
+        //             style: FontSettings.body-large-bold;
+        //         }
+        //         RegularText {
+        //             vertical-alignment: center;
+        //             text: ":";
+        //             style: FontSettings.body-large-bold;
+        //         }
+        //         Rectangle {width: Sizes.spacing;}
+        //         HyperLink {
+        //             text: "mledoze github";
+        //             url: "https://github.com/mledoze/countries";
+        //             vertical-alignment: center;
+        //             wrap: word-wrap;
+        //         }
+        //         Rectangle {}
+        //     }
+        // }
+        Rectangle{
+            background: Math.mod(0,2) == 0 ? Palette.accent1 : Palette.background;
             HorizontalBox {
                 padding: Sizes.padding;
                 spacing: 0;
                 RegularText {
                     width: root.width/5;
-                    text: "\{text_infos.title}";
+                    text: "Map";
                     vertical-alignment: center;
                     horizontal-alignment: right;
                     wrap: word-wrap;
@@ -53,16 +81,98 @@ export component HelpScreen inherits Rectangle {
                     style: FontSettings.body-large-bold;
                 }
                 Rectangle {width: Sizes.spacing;}
-                RegularText {
-                    horizontal-stretch: 1;
+                HyperLink {
+                    text: "Natural earth";
+                    url: "https://www.naturalearthdata.com/downloads/10m-cultural-vectors/";
                     vertical-alignment: center;
-                    text: text_infos.text;
                     wrap: word-wrap;
                 }
+                RegularText {
+                    vertical-alignment: center;
+                    text:" & ";
+                }
+                HyperLink {
+                    text: "mledoze github";
+                    url: "https://github.com/mledoze/countries";
+                    vertical-alignment: center;
+                    wrap: word-wrap;
+                }
+                Rectangle {}
             }
         }
-        Rectangle {height: Sizes.spacing;}
+        Rectangle{
+            background: Math.mod(1,2) == 0 ? Palette.accent1 : Palette.background;
+            HorizontalBox {
+                padding: Sizes.padding;
+                spacing: 0;
+                RegularText {
+                    width: root.width/5;
+                    text: "Population & Area";
+                    vertical-alignment: center;
+                    horizontal-alignment: right;
+                    wrap: word-wrap;
+                    style: FontSettings.body-large-bold;
+                }
+                RegularText {
+                    vertical-alignment: center;
+                    text: ":";
+                    style: FontSettings.body-large-bold;
+                }
+                Rectangle {width: Sizes.spacing;}
+                HyperLink {
+                    text: "United Nations - World Population Prospects 2024";
+                    url: "https://population.un.org/wpp/";
+                    vertical-alignment: center;
+                    wrap: word-wrap;
+                }
+                Rectangle {}
+            }
+        }
+        Rectangle{
+            background: Math.mod(0,2) == 0 ? Palette.accent1 : Palette.background;
+            HorizontalBox {
+                padding: Sizes.padding;
+                spacing: 0;
+                RegularText {
+                    width: root.width/5;
+                    text: "Everything else";
+                    vertical-alignment: center;
+                    horizontal-alignment: right;
+                    wrap: word-wrap;
+                    style: FontSettings.body-large-bold;
+                }
+                RegularText {
+                    vertical-alignment: center;
+                    text: ":";
+                    style: FontSettings.body-large-bold;
+                }
+                Rectangle {width: Sizes.spacing;}
+                HyperLink {
+                    text: "mledoze github";
+                    url: "https://github.com/mledoze/countries";
+                    vertical-alignment: center;
+                    wrap: word-wrap;
+                }
+                Rectangle {}
+            }
+        }
 
+        Rectangle {height: Sizes.spacing;}
+        HorizontalBox {
+            padding: 0;
+            spacing: 0;
+            RegularText {
+                text:"App code is open source: ";
+            }
+            HyperLink {
+                text: "GeoQuiz github";
+                url: "https://github.com/guimath/GeoQuiz";
+                vertical-alignment: center;
+                wrap: word-wrap;
+            }
+            Rectangle {}
+        }
+        Rectangle {height: Sizes.spacing;}
         TitleText {  
             text: "Disclaimer";
             style: FontSettings.title-small;
@@ -91,9 +201,21 @@ export component HelpScreen inherits Rectangle {
         Rectangle {}
             }
         }
-        RegularText {
-            text: "Contact: guilhem.geoquiz@gmail.com";
-            horizontal-alignment: center;
+        HorizontalBox {
+            padding: 0;
+            spacing: 0;
+            Rectangle {}
+            RegularText {
+                text: "Contact: ";
+                horizontal-alignment: center;
+            }
+            HyperLink {
+                text: "guilhem.geoquiz@gmail.com";
+                url: "mailto:guilhem.geoquiz@gmail.com";
+                vertical-alignment: center;
+                wrap: word-wrap;
+            }
+            Rectangle {}
         }
         Rectangle {height: Sizes.spacing;}
         RegularText {

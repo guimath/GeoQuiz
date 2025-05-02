@@ -1,5 +1,5 @@
 import { Button, HorizontalBox, VerticalBox } from "std-widgets.slint";
-import { TitleText, RegularText, MultiChoice, TextButton, ScrollChoice, BarGraph } from "widgets.slint";
+import { RegularText, TextButton, BarGraph, HyperLinkClick } from "widgets.slint";
 import { CatInfo, MainPlayUpdate, Screen, FullInfo, ChoicePlayUpdate, PlaySelectParams, ScoreStatSlint } from "structs.slint";
 import { SelectLookUpScreen, LookUpScreen } from "screen-look-up.slint";
 import { SelectMainPlayScreen } from "screen-select-main-play.slint";
@@ -10,6 +10,9 @@ import { SelectPlayScreen } from "screen-select-play.slint";
 import { ScoreScreen } from "screen-score.slint";
 import { TextStyle, FontSettings, Palette, Sizes } from "styling.slint";
 import { HelpScreen } from "screen-help.slint";
+export { HyperLinkClick }
+
+
 
 export component AppWindow inherits Window {
     title: "Geo quiz";
@@ -39,7 +42,6 @@ export component AppWindow inherits Window {
     callback close();
     callback save_score();
     callback prep_look_up();
-    callback link(string);
     // main 
     callback next(int);
     callback prev();
@@ -54,7 +56,6 @@ export component AppWindow inherits Window {
     callback score_sub_cat_changed(int);
     callback score_user_change(name:string, delete:bool);
     callback score_rename_user(name1:string, name2:string);
-
     // ***************************************************************** //
     //                            UI LOGIC
     // ***************************************************************** //
@@ -212,10 +213,6 @@ export component AppWindow inherits Window {
         VerticalLayout {
             padding: Sizes.padding;
             spacing: Sizes.spacing;
-            // padding-left : root.width/10;
-            // TitleText {
-            //     text: "Geo Quiz";
-            // }
             Rectangle {
                 // height: Sizes.title_height;
             }

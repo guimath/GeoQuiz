@@ -1,5 +1,5 @@
 import { Button, VerticalBox, HorizontalBox } from "std-widgets.slint";
-import { MultiChoice, RegularText, TitleText, ScrollChoice, TextButton } from "widgets.slint";
+import { MultiChoice, RegularText, TitleText, ScrollChoice, TextButton, TextButtonWithIcon } from "widgets.slint";
 import { TextStyle, FontSettings, Palette, Sizes } from "styling.slint";
 
 export component SelectChoicePlayScreen inherits Rectangle {
@@ -30,7 +30,6 @@ export component SelectChoicePlayScreen inherits Rectangle {
             spacing: Sizes.spacing;
             alignment: center;
             TextButton {
-                border_radius: Sizes.std_radius;
                 height: Sizes.height_multi_choice*1.5;
                 width: root.width*0.4;
                 text: info_types[preset_2[i]]== "Country" ? 
@@ -42,7 +41,6 @@ export component SelectChoicePlayScreen inherits Rectangle {
                 }
             }
             TextButton {
-                border_radius: Sizes.std_radius;
                 height: Sizes.height_multi_choice*1.5;
                 width: root.width*0.4;
                 text: info_types[preset_1[i]]== "Country" ? 
@@ -74,9 +72,8 @@ export component SelectChoicePlayScreen inherits Rectangle {
             choice_num: 3;
         }
         Rectangle {height: Sizes.spacing;}
-        TextButton {
+        TextButtonWithIcon {
             height: root.height/10;
-            width_button: root.width/2;
             text: "Play";
             clicked => {invoke_play()}
         }

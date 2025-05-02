@@ -112,11 +112,15 @@
 - [x] `SOURCES` add data that is missing -> mostly there, still a few missing but edge cases are ok 
 - [x] `ANDROID` back button temp fix -> slint source modification
 - [x] `ANDROID` URL Links -> webbrowser
+- [x] `UI` Add special buttons with icons
+
+
 ## Project 
 - [ ] Add screenshots to readme
 - [ ] Commit data
 
 ## Bug fixes
+- [x] `BUGFIX` Remove selected text when editing username
 
 ## New features
 - [ ] Add a swipe to next for look up
@@ -128,7 +132,6 @@
 
 ## Improvements
 - [ ] `UI` Better scrolling on categories : need way to deactivate inertia of scroll area
-- [ ] `UI` Add special buttons with icons
 
 ## Sources
 - [ ] Improve contrast for maps

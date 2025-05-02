@@ -1,5 +1,5 @@
 import { Button, HorizontalBox, VerticalBox } from "std-widgets.slint";
-import { RegularText, TextButton, BarGraph, HyperLinkClick } from "widgets.slint";
+import { RegularText, BarGraph, HyperLinkClick, TextButtonWithIcon } from "widgets.slint";
 import { CatInfo, MainPlayUpdate, Screen, FullInfo, ChoicePlayUpdate, PlaySelectParams, ScoreStatSlint } from "structs.slint";
 import { SelectLookUpScreen, LookUpScreen } from "screen-look-up.slint";
 import { SelectMainPlayScreen } from "screen-select-main-play.slint";
@@ -221,33 +221,34 @@ export component AppWindow inherits Window {
                 height: root.height/4;
             }
             Rectangle {}
-            TextButton {
+            TextButtonWithIcon {
                 height: root.height/10;
-                width_button: root.width/2;
                 text: "Play";
                 clicked => {
                     root.screen = Screen.SelectPlay;
                 }
             }
-            TextButton {
-                width_button: root.width/2;
+            TextButtonWithIcon {
                 height: root.height/10;
                 text: "Look Up Infos";
-                clicked => {root.screen = Screen.SelectLookUp}
+                icon: @image-url("img/info.svg");
+                clicked => {
+                    root.screen = Screen.SelectLookUp
+                }
             }
-            TextButton {
-                width_button: root.width/2;
+            TextButtonWithIcon {
                 height: root.height/10;
                 text: "Score";
+                icon: @image-url("img/score.svg");
                 clicked => {
                     w_score.refresh();
                     root.screen = Screen.Score;
                 }
             }
-            TextButton {
-                width_button: root.width/2;
+            TextButtonWithIcon {
                 height: root.height/10;
                 text: "Help";
+                icon: @image-url("img/help.svg");
                 clicked => {
                     root.screen = Screen.Help;
                 }

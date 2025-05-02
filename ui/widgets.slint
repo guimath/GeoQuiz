@@ -17,6 +17,7 @@ export component TitleText inherits RegularText {
 export component ChoiceElem inherits TouchArea {
     in property <string> text;
     in property <ChoiceState> state : ChoiceState.NotClicked;
+    in property <color> text_color: Palette.regular_text; 
     in property <color> background_elem: 
         root.state == ChoiceState.NotClicked?  Palette.highlight3:
         root.state == ChoiceState.Correct?  Palette.correct:
@@ -36,6 +37,7 @@ export component ChoiceElem inherits TouchArea {
         vertical-alignment: center;
         wrap: word-wrap;
         text: root.text;
+        color: root.text_color;
     }
 }
 export component MultiChoice {
@@ -263,6 +265,7 @@ export component ScrollChoice inherits HorizontalLayout {
                 height: root.choice_num == index ? root.height_elem: root.height_elem - 5pt;
                 text: text;
                 width: root.width_per_elem;
+                text_color: index == root.choice_num ? Palette.regular_text : Palette.regular_text.darker(0.3);
                 background_elem: index == root.choice_num ? Palette.highlight4 : Palette.highlight3;
                 clicked => {root.choice_num = index; scroll.viewport-x= set_x();}
                 animate height {
@@ -362,7 +365,7 @@ export component ImageChoice inherits TouchArea {
 
 export component TextButton inherits HorizontalBox {
     callback clicked();
-    in property <length> border_radius : Sizes.button_radius;
+    in property <length> border_radius : Sizes.std_radius;
     in property <string> text : "Button";
     in property <length> width_button : root.width;
     in property <length> height_button: root.height;
@@ -383,6 +386,45 @@ export component TextButton inherits HorizontalBox {
             wrap: word-wrap;
             width : 100%;
             height : 100%;
+        }
+        clicked() => {root.clicked()}
+    }
+    Rectangle {}
+}
+
+export component TextButtonWithIcon inherits HorizontalBox {
+    callback clicked();
+    in property <length> border_radius : root.height/2;
+    in property <string> text : "Button";
+    in property <image> icon : @image-url("img/play.svg");
+    in property <length> width_button : root.width - 10*Sizes.padding;
+    in property <length> height_button: root.height;
+    padding: 0;
+    spacing: 0;
+    Rectangle {}
+    TouchArea {
+        height: root.height_button;
+        width: root.width_button;
+        Rectangle {
+            background: Palette.buttons;
+            border-radius: root.border_radius;
+        }
+        HorizontalLayout {
+            padding: Sizes.padding;
+            padding-right: Sizes.padding + root.border_radius;
+            spacing: 0;
+            Image {
+                source: root.icon;
+                height: root.height_button - 2*Sizes.padding ;
+                width: root.height_button - 2*Sizes.padding ;
+            }
+            RegularText {
+                style: FontSettings.title-small;
+                text: root.text;
+                horizontal-alignment: center;
+                vertical-alignment: center;
+                wrap: word-wrap;
+            }
         }
         clicked() => {root.clicked()}
     }

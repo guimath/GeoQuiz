@@ -1,5 +1,5 @@
 import { Button, VerticalBox, HorizontalBox } from "std-widgets.slint";
-import { MultiChoice, RegularText, TitleText, ScrollChoice, TextButton } from "widgets.slint";
+import { MultiChoice, RegularText, TitleText, ScrollChoice, TextButton, TextButtonWithIcon } from "widgets.slint";
 import { TextStyle, FontSettings, Palette, Sizes } from "styling.slint";
 
 export component SelectMainPlayScreen inherits Rectangle {
@@ -31,6 +31,7 @@ export component SelectMainPlayScreen inherits Rectangle {
                 spacing: Sizes.spacing;
                 RegularText {
                     text: "Difficulty";
+                    style: FontSettings.title-small;
                     horizontal-alignment: center;
                 }
 
@@ -70,7 +71,6 @@ export component SelectMainPlayScreen inherits Rectangle {
                 spacing: Sizes.spacing;
                 padding: 0;
                 TextButton {
-                    border_radius: Sizes.std_radius;
                     height: Sizes.height_multi_choice;
                     width: root.preset_btn_length;
                     text: "Flags";
@@ -83,7 +83,6 @@ export component SelectMainPlayScreen inherits Rectangle {
                 }
 
                 TextButton {
-                    border_radius: Sizes.std_radius;
                     height: Sizes.height_multi_choice;
                     width: root.preset_btn_length;
                     text: "Maps";
@@ -95,7 +94,6 @@ export component SelectMainPlayScreen inherits Rectangle {
                     }
                 }
                 TextButton {
-                    border_radius: Sizes.std_radius;
                     height: Sizes.height_multi_choice;
                     width: root.preset_btn_length;
                     text: "Outlines";
@@ -107,7 +105,6 @@ export component SelectMainPlayScreen inherits Rectangle {
                     }
                 }
                 TextButton {
-                    border_radius: Sizes.std_radius;
                     height: Sizes.height_multi_choice;
                     width: root.preset_btn_length;
                     text: "Country";
@@ -155,19 +152,14 @@ export component SelectMainPlayScreen inherits Rectangle {
                 cat3 := ScrollChoice {
                     width: 100%;
                     choices: root.guess_type_names;
-                    choice_num: 2;
+                    choice_num: 4;
                 }
             }
-            HorizontalBox {
-                padding: 0;
-                alignment: center;
-                TextButton {
-                    height: root.height / 10;
-                    width: root.width / 2;
-                    text: "Play";
-                    clicked => {
-                        invoke_play()
-                    }
+            TextButtonWithIcon {
+                height: root.height / 10;
+                text: "Play";
+                clicked => {
+                    invoke_play()
                 }
             }
         }

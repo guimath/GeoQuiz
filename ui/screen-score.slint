@@ -97,6 +97,7 @@ export component ScoreScreen inherits Rectangle {
                     popup_type = PopupType.Edit;
                     txt_input.text = user_sel.current-value;
                     txt_input.select-all();
+                    txt_input.clear-selection();
                     txt_input.focus();
                 }
             }
@@ -136,14 +137,14 @@ export component ScoreScreen inherits Rectangle {
                         padding: Sizes.spacing;
                         spacing: Sizes.spacing;
                         w_hard := MultiChoice {
-                            choices: ["Independent only", "All territories"];
+                            choices: ["UN members only", "All territories"];
                             changed not_default => {
                                 filter_changed(self.not_default);
                                 category_changed(sub_cat_choice.choice_num);
                             }
                         }
                         RegularText {
-                            text: w_hard.not_default?  "Score for all territories (250 different)" : "Score for only independent countries (194 different)" ;
+                            text: w_hard.not_default?  "Score for all territories (250 different)" : "Score for only United Nation Members (194 different)" ;
                             horizontal-alignment: center;
                             vertical-alignment: center;
                             width: 100%;

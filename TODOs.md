@@ -113,6 +113,7 @@
 - [x] `ANDROID` back button temp fix -> slint source modification
 - [x] `ANDROID` URL Links -> webbrowser
 - [x] `UI` Add special buttons with icons
+- [x] `BUGFIX` Remove selected text when editing username
 
 
 ## Project 
@@ -120,7 +121,6 @@
 - [ ] Commit data
 
 ## Bug fixes
-- [x] `BUGFIX` Remove selected text when editing username
 
 ## New features
 - [ ] Add a swipe to next for look up

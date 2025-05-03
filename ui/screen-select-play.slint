@@ -1,5 +1,5 @@
 import { Button, VerticalBox, HorizontalBox } from "std-widgets.slint";
-import { MultiChoice, RegularText, TitleText, ScrollChoice, TextButton, TextButtonWithIcon } from "widgets.slint";
+import { MultiChoice, RegularText, TitleText, ScrollChoice, TextButton, TextButtonWithIcon, SelectionFilters } from "widgets.slint";
 import { TextStyle, FontSettings, Palette, Sizes } from "styling.slint";
 import { PlaySelectParams } from "structs.slint";
 
@@ -14,26 +14,11 @@ export component SelectPlayScreen inherits Rectangle {
         }
         Rectangle {}
         
-        Rectangle {
-            background: Palette.highlight1;
-            border-radius: Sizes.std_radius;
-            VerticalBox {
-                padding: Sizes.spacing;
-                spacing: Sizes.spacing;
-                w_hard := MultiChoice {
-                    choices: ["UN members only", "All territories"];
-                }
-                RegularText {
-                    text: w_hard.not_default?  "Show all territories (250 different)" : "Show only United Nation Members (194 different)" ;
-                    horizontal-alignment: center;
-                    vertical-alignment: center;
-                    width: 100%;
-                    wrap: word-wrap;
-                    style: FontSettings.body-small;
-                }
-            }
+        RegularText {
+            text:"Play order";
+            style: FontSettings.title-small;
+            horizontal-alignment: center;
         }
-
         Rectangle {
             background: Palette.highlight1;
             border-radius: Sizes.std_radius;
@@ -46,10 +31,9 @@ export component SelectPlayScreen inherits Rectangle {
                 }
 
                 RegularText {
-                    text: 
-                        w_order.choice_num==0 ? "Start with better known countries (according to previous scores)" : 
-                        w_order.choice_num==1 ? "Random order\n ":
-                        "Start with lesser known countries (according to previous scores)";
+                    text: w_order.choice_num==0 ? "Start with better known countries (based on scores)" : 
+                        w_order.choice_num==1 ? "Random order":
+                        "Start with lesser known countries (based on scores)";
                     horizontal-alignment: center;
                     vertical-alignment: center;
                     width: 100%;
@@ -58,20 +42,26 @@ export component SelectPlayScreen inherits Rectangle {
                 }
             }
         }
-
-        sub_cat_choice := ScrollChoice {
-            width: 100%;
-            choices: root.sub_categories_name;
+        Rectangle {height: Sizes.spacing;}
+        RegularText {
+            text:"Filters";
+            style: FontSettings.title-small;
+            horizontal-alignment: center;
         }
+        filter := SelectionFilters {
+            sub_categories_name: root.sub_categories_name;
+        }
+        
+        Rectangle {height: Sizes.spacing;}
         TextButtonWithIcon {
             height: root.height/10;
             text: "Free Play";
             clicked => {
                 set_play_config(
                     {
-                        order:w_order.choice_num, 
-                        include_hard:w_hard.not_default, 
-                        region_idx:sub_cat_choice.choice_num, 
+                        order: w_order.choice_num, 
+                        include_hard: filter.hard, 
+                        region_idx: filter.sub_cat, 
                         play_type: true
                     }
                 );
@@ -85,14 +75,15 @@ export component SelectPlayScreen inherits Rectangle {
             clicked => {
                 set_play_config(
                     {
-                        order:w_order.choice_num, 
-                        include_hard:w_hard.not_default, 
-                        region_idx:sub_cat_choice.choice_num, 
+                        order: w_order.choice_num, 
+                        include_hard: filter.hard, 
+                        region_idx: filter.sub_cat, 
                         play_type: false
                     }
                 );
             }
         }
+        Rectangle {}
         Rectangle {}
     }
 }

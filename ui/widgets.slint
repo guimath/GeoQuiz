@@ -57,9 +57,14 @@ export component MultiChoice {
         for text[index] in root.choices : ChoiceElem {
             background_elem: Palette.highlight1;
             text: text;
+            text_color: index==root.choice_num ? Palette.regular_text : Palette.regular_text.darker(0.3); 
             width: root.width_per_elem;
             height: root.height_elem;
             clicked => {root.choice_num = index}
+            animate text_color {
+                duration: 300ms;
+                easing: ease-in-out;
+            }
         }
     }
     highlight := Rectangle{
@@ -545,5 +550,54 @@ export component HyperLink inherits RegularText {
 
 }
 
+export component SelectionFilters inherits VerticalLayout {
+    in property <[string]> sub_categories_name: ["World", "Africa", "Americas", "Asia", "Europe", "Oceania"];
+    out property <int> sub_cat;
+    out property <bool> hard;
+    in property <bool> tight: false;
+    
+    padding: 0;
+    spacing: Sizes.spacing;
+    public function get_hard() {
+        return w_hard.not_default;
+    }
+    public function get_sub_cat() {
+        return sub_cat_choice.choice_num;
+    }
+    Rectangle {
+        background: root.tight ? Palette.background : Palette.highlight1;
+        border-radius: Sizes.std_radius;
+        VerticalBox {
+            padding: root.tight ? 0: Sizes.spacing;
+            spacing: root.tight ? 0: Sizes.spacing;
+            w_hard := MultiChoice {
+
+                choices: ["UN members only", "All territories"];
+                changed not_default => {
+                    root.hard = self.not_default;
+                }
+            }
+            t:=RegularText {
+                text: root.tight ? "":
+                    w_hard.not_default?  "Show all territories (250 different)":
+                    "Show only United Nation Members (194 different)" ;
+                horizontal-alignment: center;
+                vertical-alignment: center;
+                width: 100%;
+                height: root.tight ? 0:Sizes.regular_text_height;
+                wrap: word-wrap;
+                style: FontSettings.body-small;
+            }
+        }
+    }
+    sub_cat_choice := ScrollChoice {
+        width: 100%;
+        choices: root.sub_categories_name;
+        changed choice_num => {
+            root.sub_cat = self.choice_num;
+        }
+    }
+
+}
 
 

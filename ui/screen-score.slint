@@ -1,5 +1,5 @@
 import { Button, VerticalBox, HorizontalBox, ComboBox, ScrollView, StandardButton } from "std-widgets.slint";
-import { MultiChoice, RegularText, TitleText, ScrollChoice, TextButton, BarGraph } from "widgets.slint";
+import { MultiChoice, RegularText, TitleText, ScrollChoice, TextButton, BarGraph, SelectionFilters } from "widgets.slint";
 import { TextStyle, FontSettings, Palette, Sizes } from "styling.slint";
 import { ScoreStatSlint, PopupType } from "structs.slint";
 
@@ -39,8 +39,8 @@ export component ScoreScreen inherits Rectangle {
         running: false;
         triggered() => {
             self.running = false;
-            filter_changed(w_hard.not_default);
-            category_changed(sub_cat_choice.choice_num);
+            filter_changed(filter.hard);
+            category_changed(filter.sub_cat);
         }
     }
     VerticalLayout {
@@ -63,8 +63,8 @@ export component ScoreScreen inherits Rectangle {
                 current-value: root.users[0];
                 selected(current-value) => {
                     user_selected(current-value);
-                    filter_changed(w_hard.not_default);
-                    category_changed(sub_cat_choice.choice_num);
+                    filter_changed(filter.hard);
+                    category_changed(filter.sub_cat);
                 }
             }
             TouchArea {
@@ -129,17 +129,16 @@ export component ScoreScreen inherits Rectangle {
             spacing: Sizes.spacing;
             padding: 0;
             // padding-left: Sizes.size_bar;
-            w_hard := MultiChoice {
-                choices: ["UN members only", "All territories"];
-                changed not_default => {
-                    filter_changed(self.not_default);
-                    category_changed(sub_cat_choice.choice_num);
+            filter := SelectionFilters {
+                sub_categories_name: root.sub_categories_name;
+                tight: true;
+                changed hard => {
+                    filter_changed(self.hard);
+                    category_changed(self.sub_cat);
                 }
-            }
-            sub_cat_choice := ScrollChoice {
-                width: 100%;
-                choices: root.sub_categories_name;
-                changed choice_num => {category_changed(self.choice_num)}
+                changed sub_cat => {
+                    category_changed(self.sub_cat);
+                }
             }
             HorizontalBox {
                 padding: 0;

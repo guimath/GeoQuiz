@@ -9,7 +9,7 @@ use std::{
 
 use slint::{ComponentHandle, LogicalSize, Model, ModelRc, SharedString, VecModel};
 
-use logic::{AppLogic, AppWindow, ScoreStatSlint, HyperLinkClick};
+use logic::{AppLogic, AppWindow, HyperLinkClick, ScoreStatSlint};
 
 fn vec_to_model(vec: &Vec<String>) -> ModelRc<SharedString> {
     let vc = vec.clone();
@@ -23,9 +23,7 @@ pub fn main() {
 }
 
 #[cfg(target_os = "android")]
-fn start_android_action_view(
-    url: String,
-) -> Result<(), Box<dyn std::error::Error>> {
+fn start_android_action_view(url: String) -> Result<(), Box<dyn std::error::Error>> {
     use jni::objects::{JObject, JValue};
     // Create a VM for executing Java calls
     let ctx = ndk_context::android_context();
@@ -33,8 +31,8 @@ fn start_android_action_view(
     let activity = unsafe { jni::objects::JObject::from_raw(ctx.context() as _) };
     // let context = unsafe { jni::objects::JObject::from_raw(ctx.context().cast()) };
     let mut env = vm.attach_current_thread()?;
-    
-    // activity 
+
+    // activity
     let intent_class = env.find_class("android/content/Intent")?;
     let action_view = env.get_static_field(&intent_class, "ACTION_VIEW", "Ljava/lang/String;")?;
 
@@ -75,7 +73,6 @@ pub fn android_main(app: slint::android::android_activity::AndroidApp) {
     // eprintln!("{:?}", path.clone());
     // path = storage/emulated/0/Android/data/com.example.geo_quiz/files
     init(path).unwrap()
-
 }
 
 fn init(path: PathBuf) -> Result<(), Box<dyn Error>> {
@@ -273,8 +270,9 @@ fn init(path: PathBuf) -> Result<(), Box<dyn Error>> {
             logic.save_scores();
         }
     });
-    ui.global::<HyperLinkClick>().on_hl_clicked(|url|{
-        if webbrowser::open(url.as_str()).is_err(){ // only works on http for android
+    ui.global::<HyperLinkClick>().on_hl_clicked(|url| {
+        if webbrowser::open(url.as_str()).is_err() {
+            // webbrowser only works on http for android
             #[cfg(target_os = "android")]
             start_android_action_view(url.to_string()).unwrap();
         }

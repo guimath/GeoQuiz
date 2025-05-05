@@ -24,7 +24,7 @@ pub struct CountryInfos {
     pub un_member: bool,
     pub infos: Vec<Category>,
     pub images: Vec<ImageLink>,
-    pub wiki_link : String,
+    pub wiki_link: String,
 }
 #[derive(Deserialize, Serialize, Debug, Clone, Default)]
 pub struct Score {
@@ -88,7 +88,8 @@ pub fn rename_score_folder(path1: PathBuf, path2: PathBuf) {
 
 pub fn list_folders(path: PathBuf) -> Vec<String> {
     let a = fs::read_dir(path).unwrap();
-    let mut v: Vec<String> = a.into_iter()
+    let mut v: Vec<String> = a
+        .into_iter()
         .map(|x| x.unwrap().file_name().into_string().unwrap())
         .collect();
     v.sort();

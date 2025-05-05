@@ -6,4 +6,4 @@ sources/*
 !sources/wiki_names.json
 .vscode/
 scores/
-ui/img/inkscape
+inkscape/

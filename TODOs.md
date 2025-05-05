@@ -25,7 +25,7 @@
 - [x] Simplify score icon by using colorize
 - [x] Add a previous score / score animation on hover
 - [x] Add a Reset score button
-- [ ] Android
+- [x] Android
   - [x] Install Android NDK & SDK 
   - [x] building with x build 
   - [x] See how to use release and not debug 
@@ -119,11 +119,11 @@
 - [x] `FEATURE` Add wiki link in look up
 - [x] `BUGFIX` reset select look up
 - [x] `ANDROID` open mailto links 
+- [x] `PROJECT` Add screenshots to readme
 
 
 ## Project 
-- [ ] Add screenshots to readme
-- [ ] Commit data
+- [ ] Commit data ?
 
 ## Bug fixes
 

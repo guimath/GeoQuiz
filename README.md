@@ -1,8 +1,18 @@
-# Geo Quiz
 
-A quiz app to help you learn more about the world's geography.
+![](images/000_Title_Readme.png)
 
-## Sources
+App still under dev - no official version 
+
+# Screenshots 
+
+|              |    |
+:---------------------:|:-------------------:
+![](images/100_SelectPlay.png)  |  ![](images/101_InfoSelect.png)
+![](images/111_MainPlay.png)  |  ![](images/121_ChoicePlay.png)
+![](images/200_LookUp.png)  |  ![](images/300_Score.png)
+
+
+# Sources
 
 |type| source | last update| Place to put sources|
 |- | - | - | - |
@@ -11,7 +21,7 @@ A quiz app to help you learn more about the world's geography.
 | Everything else | [mledoze github](https://github.com/mledoze/countries) | 10/03/2025 | [sources/countries.json](sources/countries.json) & [sources/flags](sources/flags) folder|
 
 
-## Contact
+# Contact
 
 Guilhem Mathieux [@guimath](https://github.com/guimath)
 - dedicated mail: [guilhem.geoquiz@gmail.com](mailto:guilhem.geoquiz@gmail.com)

@@ -116,5 +116,34 @@ def main():
         plt.savefig((util.OUT_FOLDER_OUTLINES)/f"{cca}.svg", format='svg', transparent=True, bbox_inches='tight')
         plt.close('all')
 
+def make_background():
+    if True:
+        background_color= '#0d1117ff'
+        continents_color = 'white'
+    else :
+        background_color= 'white'
+        continents_color = '#4a4458ff'
+
+    m = Basemap(
+        projection='merc', 
+        resolution='c',
+        llcrnrlat=-60,urcrnrlat=85,
+        llcrnrlon=-180,urcrnrlon=180,
+        lat_ts=20
+    )
+    m.drawmapboundary(fill_color=background_color)
+    m.fillcontinents(color=continents_color, lake_color=background_color)
+    plt.axis('off')
+    plt.subplots_adjust(
+        top=1.0,
+        bottom=0,
+        left=0,
+        right=1.0,
+        hspace=0.0,
+        wspace=0.0
+    )
+    plt.savefig("images/inkscape/map.svg", format='svg', transparent=True, bbox_inches='tight')
+
 if __name__ == '__main__' :
+    # make_background()
     main()

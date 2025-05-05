@@ -13,7 +13,7 @@ use logic::{AppLogic, AppWindow, ScoreStatSlint, HyperLinkClick};
 
 fn vec_to_model(vec: &Vec<String>) -> ModelRc<SharedString> {
     let vc = vec.clone();
-    let v: VecModel<SharedString> = vc.iter().map(|x| SharedString::from(x)).collect();
+    let v: VecModel<SharedString> = vc.iter().map(SharedString::from).collect();
     ModelRc::new(v)
 }
 
@@ -143,7 +143,7 @@ fn init(path: PathBuf) -> Result<(), Box<dyn Error>> {
             let down_ref: &VecModel<i32> = guess_types.as_any().downcast_ref().unwrap();
             let v: Vec<usize> = down_ref.iter().map(|x| x as usize).collect();
             let guess_types = [v[0], v[1], v[2]];
-            logic.prepare_main_play(info_type as usize, guess_types.into());
+            logic.prepare_main_play(info_type as usize, guess_types);
             let (update, cat) = logic.get_stat();
             ui.invoke_update_screen(update, cat.into());
         }
@@ -251,8 +251,8 @@ fn init(path: PathBuf) -> Result<(), Box<dyn Error>> {
                 main_last: stat.main_last.into(),
                 choice_avg: stat.choice_avg.into(),
                 choice_last: stat.choice_last.into(),
-                main_max: stat.main_max.into(),
-                choice_max: stat.choice_max.into(),
+                main_max: stat.main_max,
+                choice_max: stat.choice_max,
             });
         }
     });

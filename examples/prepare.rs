@@ -1,6 +1,5 @@
 use num_format::{Locale, ToFormattedString};
 use serde::Deserialize;
-use serde_json;
 use std::collections::HashMap;
 use std::fs::{self, File};
 use std::io::Write;
@@ -49,7 +48,7 @@ struct OtherStat {
 }
 
 fn hint_from_name(s: String) -> String {
-    let mut hint = s.chars().nth(0).unwrap_or(' ').to_string();
+    let mut hint = s.chars().next().unwrap_or(' ').to_string();
     hint.push_str("...");
     for _ in 1..s.split_whitespace().count() {
         hint.push_str(" ...");
@@ -78,7 +77,7 @@ impl CategoryCreator {
             .iter()
             .map(|s| hint_from_name(s.clone()))
             .collect();
-        if x.capital.len() == 0 {
+        if x.capital.is_empty() {
             Category {
                 full: "No capital".to_string(),
                 hint: Some("No capital".to_string()),
@@ -97,7 +96,7 @@ impl CategoryCreator {
             .iter()
             .map(|s| self.cca3_to_name.get_key_value(s).unwrap().1.to_string())
             .collect();
-        if full.len() == 0 {
+        if full.is_empty() {
             Category {
                 full: "No borders".to_string(),
                 hint: Some("No borders".to_string()),
@@ -143,7 +142,7 @@ impl CategoryCreator {
     fn get_language(&self, x: &CountryStat) -> Category {
         let full: Vec<String> = x.languages.values().map(|v| v.to_string()).collect();
         let hint: Vec<String> = full.iter().map(|s| hint_from_name(s.clone())).collect();
-        if full.len() == 0 {
+        if full.is_empty() {
             Category {
                 full: "No data".to_string(),
                 hint: Some("No data".to_string()),
@@ -165,7 +164,7 @@ impl CategoryCreator {
                 }
             }
         }
-        if full.len() == 0 {
+        if full.is_empty() {
             Category {
                 full: "No data".to_string(),
                 hint: None,
@@ -248,7 +247,7 @@ fn main() {
             images.push(cat.get_map(x));
             images.push(cat.get_outline(x));
             
-            println!("{}", x.cca3.to_string());
+            println!("{}", x.cca3);
             let wiki_name = cca3_to_wiki.get(&x.cca3.to_string()).unwrap();
             let wiki_link = format!("https://en.wikipedia.org/wiki/{}", wiki_name.replace(" ", "_"));
             println!("{}",wiki_link);

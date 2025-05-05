@@ -76,7 +76,7 @@ impl AppLogic {
         s.search_names = s.all_names.iter().map(|x| x.to_lowercase()).collect();
         s.score_folder = score_path.join("scores/User 1");
         let v = s.list_users();
-        if v.len() == 0 {
+        if v.is_empty() {
             info_parse::init_score_folder(s.score_folder.clone());
         } else {
             s.score_folder.pop();
@@ -120,13 +120,13 @@ impl AppLogic {
         self.all_countries.shuffle(&mut rng);
         let compare = |a: &CountryInfos, b: &CountryInfos| -> Ordering {
             scores
-                .get(&get_score_key(&b))
+                .get(&get_score_key(b))
                 .unwrap()
                 .total_score
-                .cmp(&scores.get(&get_score_key(&a)).unwrap().total_score)
+                .cmp(&scores.get(&get_score_key(a)).unwrap().total_score)
         };
         if self.order_type == 0 {
-            self.all_countries.sort_by(|a, b| compare(a, b));
+            self.all_countries.sort_by(&compare);
         } else if self.order_type == 2 {
             self.all_countries.sort_by(|b, a| compare(a, b));
         }
@@ -232,7 +232,7 @@ impl AppLogic {
         for s in self.last_scores.values() {
             v[*s] += 1;
         }
-        let choice_max = v.iter().max().unwrap().clone();
+        let choice_max = *v.iter().max().unwrap();
         if choice_play {
             (v[0..5].to_vec(), choice_max)
         } else {
@@ -262,11 +262,9 @@ impl AppLogic {
             score.last_score = (5 - guess_num) as u32;
             score.total_score += (5 - guess_num) as u32;
             self.save_scores();
-            self.last_scores.insert(score_key, (5 - guess_num) as usize);
-        } else {
-            if !self.last_scores.contains_key(&score_key) && next {
-                self.last_scores.insert(score_key, 0);
-            }
+            self.last_scores.insert(score_key, 5 - guess_num);
+        } else if !self.last_scores.contains_key(&score_key) && next {
+            self.last_scores.insert(score_key, 0);
         }
 
         if next {
@@ -275,12 +273,10 @@ impl AppLogic {
             } else {
                 return None;
             }
+        } else if self.current > 0 {
+            self.current -= 1;
         } else {
-            if self.current > 0 {
-                self.current -= 1;
-            } else {
-                return None;
-            }
+            return None;
         }
         Some(self.get_choices())
     }
@@ -365,7 +361,7 @@ impl AppLogic {
         let guess_num = down_ref.iter().filter(|&x| x).count();
         // getting randomly sorted array of guess idx
         let guess_idx = match self.choice_index_guesses.get(&self.current) {
-            Some(v) => v.clone(),
+            Some(v) => *v,
             None => {
                 let v = self.generate_guesses();
                 self.choice_index_guesses.insert(self.current, v);
@@ -411,10 +407,10 @@ impl AppLogic {
             correct_guess: correct_guess as i32,
             guess_num: guess_num as i32,
             guesses: VecModel::from_slice(&guesses),
-            info: info,
+            info,
             num: self.current as i32,
             out_of: self.all_countries.len() as i32,
-            prev_guess: prev_guess,
+            prev_guess,
             default_info: default_info.into(),
         }
     }
@@ -497,7 +493,7 @@ impl AppLogic {
             info_parse::delete_score(f.clone());
             let mut v = self.list_users();
             v.retain(|x| *x != name.clone());
-            if v.len() == 0 {
+            if v.is_empty() {
                 self.score_folder.pop();
                 self.score_folder.push("User 1");
                 info_parse::init_score_folder(self.score_folder.clone());
@@ -569,20 +565,18 @@ impl AppLogic {
                 stat.choice_avg[0] += 1;
             }
         }
-        stat.main_max = stat
+        stat.main_max = *stat
             .main_avg
             .iter()
             .max()
             .unwrap()
-            .max(stat.main_last.iter().max().unwrap())
-            .clone();
-        stat.choice_max = stat
+            .max(stat.main_last.iter().max().unwrap());
+        stat.choice_max = *stat
             .choice_avg
             .iter()
             .max()
             .unwrap()
-            .max(stat.choice_last.iter().max().unwrap())
-            .clone();
+            .max(stat.choice_last.iter().max().unwrap());
         stat
     }
 
@@ -623,6 +617,6 @@ impl AppLogic {
         i - self.img_cat_names.len()
     }
     pub fn is_at_end(&self) -> bool {
-        !(self.current < self.all_countries.len() - 1)
+        self.current >= self.all_countries.len() - 1
     }
 }

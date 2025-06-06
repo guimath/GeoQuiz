@@ -25,7 +25,12 @@ export component MainPlayScreen inherits Rectangle {
         root.num = info.num;
         root.out_of = info.out_of;
         root.info = info.info;
-        info_btn.visible = info.seen;
+        if play_mode == 3 {
+            info_btn.visible = true;
+        }
+        else {
+            info_btn.visible = info.seen;
+        }
     }
 
     function prep_next(score: int) {

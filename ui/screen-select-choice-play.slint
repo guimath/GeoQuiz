@@ -10,6 +10,7 @@ export component SelectChoicePlayScreen inherits Rectangle {
     in property <[string]> info_types;
     property <[int]> preset_1: [0,1,2,4];
     property <[int]> preset_2: [3,3,3,3];
+    property <bool> custom: false;
 
 
     VerticalLayout {
@@ -19,11 +20,9 @@ export component SelectChoicePlayScreen inherits Rectangle {
             text: "4 Choices";
         }
         Rectangle {}
-        RegularText {
+        TitleText {
             text: "Presets";
             style: FontSettings.title-small;
-            horizontal-alignment: center;
-            vertical-stretch: 0;
         }
         for _a[i] in preset_1: HorizontalLayout{
             padding: 0;
@@ -38,6 +37,9 @@ export component SelectChoicePlayScreen inherits Rectangle {
                 clicked => {
                     info_cat.set_choice_num(preset_1[i]);
                     guess_cat.set_choice_num(preset_2[i]);
+                    if !root.custom {
+                        invoke_play()
+                    }
                 }
             }
             TextButton {
@@ -49,34 +51,58 @@ export component SelectChoicePlayScreen inherits Rectangle {
                 clicked => {
                     info_cat.set_choice_num(preset_2[i]);
                     guess_cat.set_choice_num(preset_1[i]);
+                    if !root.custom {
+                        invoke_play()
+                    }
                 }
             }
-            
         }
-        
-        TitleText {
-            text: "Info shown";
-            style: FontSettings.title-small;
+        HorizontalBox {
+            padding: 0;
+            alignment: center;
+            TextButton {
+                height: Sizes.height_multi_choice;
+                width: root.width*0.4;
+                text: root.custom?  "Hide custom" : "Custom";
+                clicked => {
+                    root.custom = !root.custom;
+                }
+            }
         }
-        info_cat := ScrollChoice {
-            width: 100%;
-            choices: root.info_types;
+        VerticalBox {
+            padding: 0;
+            spacing: Sizes.spacing;
+            visible: root.custom;
+            height: root.custom? self.preferred-height: 0px;
+            animate height {
+                duration: 500ms;
+                easing: ease-in-out;
+            }
+            TitleText {
+                text: "Info shown";
+                style: FontSettings.title-small;
+            }
+            info_cat := ScrollChoice {
+                width: 100%;
+                choices: root.info_types;
+            }
+            TitleText {
+                text: "Info to guess";
+                style: FontSettings.title-small;
+            }
+            guess_cat := ScrollChoice {
+                width: 100%;
+                choices: root.info_types  ;
+                choice_num: 3;
+            }
+            Rectangle {height: Sizes.spacing;}
+            TextButtonWithIcon {
+                height: root.height/10;
+                text: "Play";
+                clicked => {invoke_play()}
+            }
         }
-        TitleText {
-            text: "Info to guess";
-            style: FontSettings.title-small;
-        }
-        guess_cat := ScrollChoice {
-            width: 100%;
-            choices: root.info_types  ;
-            choice_num: 3;
-        }
-        Rectangle {height: Sizes.spacing;}
-        TextButtonWithIcon {
-            height: root.height/10;
-            text: "Play";
-            clicked => {invoke_play()}
-        }
+
 
         Rectangle {}
     }

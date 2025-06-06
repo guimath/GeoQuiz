@@ -22,7 +22,7 @@ export component SelectMainPlayScreen inherits Rectangle {
             text: "Free Play";
         }
         Rectangle {}
-        
+
         Rectangle {
             background: Palette.highlight1;
             border-radius: Sizes.std_radius;
@@ -54,14 +54,12 @@ export component SelectMainPlayScreen inherits Rectangle {
         VerticalBox {
             padding: 0;
             spacing: Sizes.spacing;
-            RegularText {
+            TitleText {
                 text: "Presets";
                 style: FontSettings.title-small;
-                horizontal-alignment: center;
-                vertical-stretch: 0;
             }
             HorizontalBox {
-                visible: !root.custom;
+                // visible: !root.custom;
                 alignment: center;
                 spacing: Sizes.spacing;
                 padding: 0;
@@ -74,6 +72,9 @@ export component SelectMainPlayScreen inherits Rectangle {
                         cat1.set_choice_num(0);
                         cat2.set_choice_num(1);
                         cat3.set_choice_num(4);
+                        if !root.custom {
+                            invoke_play()
+                        }
                     }
                 }
 
@@ -86,6 +87,9 @@ export component SelectMainPlayScreen inherits Rectangle {
                         cat1.set_choice_num(0);
                         cat2.set_choice_num(2);
                         cat3.set_choice_num(3);
+                        if !root.custom {
+                            invoke_play()
+                        }
                     }
                 }
                 TextButton {
@@ -97,6 +101,9 @@ export component SelectMainPlayScreen inherits Rectangle {
                         cat1.set_choice_num(7);
                         cat2.set_choice_num(2);
                         cat3.set_choice_num(0);
+                        if !root.custom {
+                            invoke_play()
+                        }
                     }
                 }
                 TextButton {
@@ -108,53 +115,73 @@ export component SelectMainPlayScreen inherits Rectangle {
                         cat1.set_choice_num(1);
                         cat2.set_choice_num(5);
                         cat3.set_choice_num(6);
+                        if !root.custom {
+                            invoke_play()
+                        }
                     }
                 }
             }
-            
-            RegularText {
-                text: "Info shown";
-                width:  100%;
-                horizontal-alignment: center;
-                style: FontSettings.title-small;
-            }
-            // Rectangle {height: Sizes.spacing;}
-            cat_im := ScrollChoice {
-                choices: root.info_type_names;
-                width:  100%;
-            }
-            RegularText {
-                text: "Info to guess";
-                width:  100%;
-                horizontal-alignment: center;
-                style: FontSettings.title-small;
-            }
-
-            VerticalLayout {
+            HorizontalBox {
                 padding: 0;
-                // spacing: Sizes.spacing - Sizes.size_bar;
-                cat1 := ScrollChoice {
-                    width: 100%;
-                    choices: root.guess_type_names;
-                }
-
-                cat2 := ScrollChoice {
-                    width: 100%;
-                    choices: root.guess_type_names;
-                    choice_num: 1;
-                }
-
-                cat3 := ScrollChoice {
-                    width: 100%;
-                    choices: root.guess_type_names;
-                    choice_num: 4;
+                alignment: center;
+                TextButton {
+                    height: Sizes.height_multi_choice;
+                    width: 2*root.preset_btn_length + Sizes.spacing;
+                    text: root.custom?  "Hide custom" : "Custom";
+                    clicked => {
+                        root.custom = !root.custom;
+                    }
                 }
             }
-            TextButtonWithIcon {
-                height: root.height / 10;
-                text: "Play";
-                clicked => {
-                    invoke_play()
+            VerticalBox {
+                visible: root.custom;
+                padding: 0;
+                spacing: Sizes.spacing;
+                height: root.custom? self.preferred-height: 0px;
+                animate height {
+                    duration: 500ms;
+                    easing: ease-in-out;
+                }
+                TitleText {
+                    text: "Info shown";
+                    style: FontSettings.title-small;
+                }
+                // Rectangle {height: Sizes.spacing;}
+                cat_im := ScrollChoice {
+                    choices: root.info_type_names;
+                    width:  100%;
+                }
+                TitleText {
+                    text: "Info to guess";
+                    style: FontSettings.title-small;
+                }
+
+                VerticalLayout {
+                    padding: 0;
+                    // spacing: Sizes.spacing - Sizes.size_bar;
+                    cat1 := ScrollChoice {
+                        width: 100%;
+                        choices: root.guess_type_names;
+                    }
+
+                    cat2 := ScrollChoice {
+                        width: 100%;
+                        choices: root.guess_type_names;
+                        choice_num: 1;
+                    }
+
+                    cat3 := ScrollChoice {
+                        width: 100%;
+                        choices: root.guess_type_names;
+                        choice_num: 4;
+                    }
+                }
+                TextButtonWithIcon {
+                    height: root.height / 10;
+                    text: "Play";
+                    clicked => {
+                        invoke_play()
+                    }
                 }
             }
         }

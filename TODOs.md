@@ -120,16 +120,21 @@
 - [x] `BUGFIX` reset select look up
 - [x] `ANDROID` open mailto links 
 - [x] `PROJECT` Add screenshots to readme
+- [x] `UI` Hide custom presets by default to avoid clutter;
 
 
 ## Project 
 - [ ] Commit data ?
 
 ## Bug fixes
+- [ ] `BUGFIX` show look up in learn mode (main play)
+
 
 ## New features
 - [ ] Add a swipe to next for look up
 - [ ] Add a zoomed in version of the map that user can toggle
+- [ ] Add a number data flag (is_num field on cat with Option<i32>) to do specific things for number (sort by in choices)
+- [ ] Add a full input play mode 
 
 ## Android features
 - [ ] follow [issue](https://github.com/slint-ui/slint/issues/8323) to patch back button

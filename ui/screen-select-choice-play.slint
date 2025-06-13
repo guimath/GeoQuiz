@@ -10,7 +10,7 @@ export component SelectChoicePlayScreen inherits Rectangle {
     in property <[string]> info_types;
     property <[int]> preset_1: [0,1,2,4];
     property <[int]> preset_2: [3,3,3,3];
-    property <bool> custom: false;
+    in-out property <bool> custom: false;
 
 
     VerticalLayout {

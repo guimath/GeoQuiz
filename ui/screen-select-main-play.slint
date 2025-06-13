@@ -13,7 +13,7 @@ export component SelectMainPlayScreen inherits Rectangle {
     }
     in property <[string]> info_type_names;
     in property <[string]> guess_type_names;
-    property <bool> custom : false;
+    in-out property <bool> custom: false;
     property <length> preset_btn_length: (root.width - 2*Sizes.padding - 3*Sizes.spacing)/4;
     VerticalBox {
         padding: Sizes.padding;

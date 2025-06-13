@@ -122,6 +122,7 @@
 - [x] `PROJECT` Add screenshots to readme
 - [x] `UI` Hide custom presets by default to avoid clutter;
 - [x] `BUGFIX` show look up in learn mode (main play)
+- [x] `BUGFIX` Remove custom when leaving select
 
 
 ## Project 

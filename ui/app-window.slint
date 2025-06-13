@@ -64,6 +64,7 @@ export component AppWindow inherits Window {
         if root.screen == Screen.MainPlay {
             root.screen = Screen.SelectMainPlay;
         } else if root.screen == Screen.SelectMainPlay {
+            sel_main_play_s.custom = false;
             root.screen = Screen.SelectPlay
         } else if root.screen == Screen.LookUp {
             if root.previous_screen == Screen.Start {
@@ -75,6 +76,7 @@ export component AppWindow inherits Window {
         } else if root.screen == Screen.ChoicePlay {
             root.screen = Screen.SelectChoicePlay;
         } else if root.screen == Screen.SelectChoicePlay {
+            sel_choice_play_s.custom = false;
             root.screen = Screen.SelectPlay
         } else { // Score, SelectLookUp, SelectPlay, Help
             root.screen = Screen.Start;

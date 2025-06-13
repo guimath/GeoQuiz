@@ -123,6 +123,7 @@
 - [x] `UI` Hide custom presets by default to avoid clutter;
 - [x] `BUGFIX` show look up in learn mode (main play)
 - [x] `BUGFIX` Remove custom when leaving select
+- [x] `UI` Renamed Free play to flash cards
 
 
 ## Project 
@@ -141,6 +142,5 @@
 - [ ] follow [issue](https://github.com/slint-ui/slint/issues/8323) to patch back button
 
 ## Improvements
-- [ ] `UI` Better scrolling on categories : need way to deactivate inertia of scroll area
 
 ## Sources

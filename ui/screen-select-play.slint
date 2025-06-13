@@ -55,7 +55,8 @@ export component SelectPlayScreen inherits Rectangle {
         Rectangle {height: Sizes.spacing;}
         TextButtonWithIcon {
             height: root.height/10;
-            text: "Free Play";
+            text: "Flashcards";
+            icon: @image-url("img/flashcard.svg");
             clicked => {
                 set_play_config(
                     {

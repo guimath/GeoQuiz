@@ -17,7 +17,7 @@ pub struct AppLogic {
     results: Vec<u32>,
     scores: HashMap<String, Score>,
     last_scores: HashMap<String, usize>,
-    all_countries: Vec<CountryInfos>,
+    all_countries: Vec<CountryInfos>, // Make &countryInfos ?
     all_countries_order: Vec<CountryInfos>,
     pub all_names: Vec<SharedString>,
     pub txt_cat_names: Vec<String>,
@@ -46,8 +46,8 @@ pub struct ScoreStats {
     pub choice_max: i32,
 }
 
-fn get_score_key(country: &CountryInfos) -> String {
-    country.infos[0].full.clone()
+fn get_score_key(country: &CountryInfos) -> &String {
+    &country.infos[0].full
 }
 impl AppLogic {
     pub fn new(score_path: PathBuf) -> Self {
@@ -63,7 +63,7 @@ impl AppLogic {
         s.all_names = s
             .all_countries_order
             .iter()
-            .map(|x| x.infos[0].full.clone().into())
+            .map(|x| x.infos[0].full.as_str().into())
             .collect();
         s.sub_cat_names = vec![
             "World".to_string(),
@@ -77,10 +77,9 @@ impl AppLogic {
         s.score_folder = score_path.join("scores/User 1");
         let v = s.list_users();
         if v.is_empty() {
-            info_parse::init_score_folder(s.score_folder.clone());
+            info_parse::init_score_folder(&s.score_folder);
         } else {
-            s.score_folder.pop();
-            s.score_folder.push(v[0].clone());
+            s.score_folder.set_file_name(&v[0]);
         }
         s.data_path = score_path.join("data");
         s
@@ -92,6 +91,7 @@ impl AppLogic {
         } else {
             self.score_folder.join(CHOICE_SCORE_NAME)
         };
+
         self.all_countries = if !conf.include_hard {
             self.all_countries_order
                 .clone()
@@ -103,27 +103,23 @@ impl AppLogic {
         };
         if conf.region_idx > 0 {
             let idx = conf.region_idx as usize;
-            self.all_countries = self
-                .all_countries
-                .clone()
-                .into_iter()
-                .filter(|country| country.region == self.sub_cat_names[idx])
-                .collect();
+            self.all_countries
+                .retain(|country| country.region == self.sub_cat_names[idx]);
         }
         self.order_type = conf.order as u32;
     }
 
     fn randomize_order(&mut self) {
-        let scores = info_parse::read(&self.all_countries_order, self.score_path.clone());
+        let scores = info_parse::read(&self.all_countries_order, &self.score_path);
 
         let mut rng = thread_rng();
         self.all_countries.shuffle(&mut rng);
         let compare = |a: &CountryInfos, b: &CountryInfos| -> Ordering {
             scores
-                .get(&get_score_key(b))
+                .get(get_score_key(b))
                 .unwrap()
                 .total_score
-                .cmp(&scores.get(&get_score_key(a)).unwrap().total_score)
+                .cmp(&scores.get(get_score_key(a)).unwrap().total_score)
         };
         if self.order_type == 0 {
             self.all_countries.sort_by(&compare);
@@ -150,7 +146,7 @@ impl AppLogic {
     }
 
     pub fn next(&mut self, result: u32) -> Option<(MainPlayUpdate, [CatInfo; 3])> {
-        let score_key = get_score_key(&self.all_countries[self.current]);
+        let score_key = get_score_key(&self.all_countries[self.current]).to_owned();
         if result != 0 {
             let score = self.scores.get_mut(&score_key).unwrap();
             if self.results[self.current] == 0 {
@@ -180,11 +176,11 @@ impl AppLogic {
     }
 
     pub fn get_stat(&mut self) -> (MainPlayUpdate, [CatInfo; 3]) {
-        let country = self.all_countries[self.current].clone();
+        let country = &self.all_countries[self.current];
         let score = self.results[self.current] as i32;
         let last_score = self
             .scores
-            .get(&get_score_key(&self.all_countries[self.current]))
+            .get(get_score_key(&self.all_countries[self.current]))
             .unwrap()
             .last_score as i32;
 
@@ -197,7 +193,7 @@ impl AppLogic {
         if info.is_txt {
             info.txt = country.infos[self.to_txt_idx(self.main_info_type)]
                 .full
-                .clone()
+                .as_str()
                 .into();
         } else {
             info.img = self.load_img(&country.images[self.main_info_type]);
@@ -213,11 +209,15 @@ impl AppLogic {
         };
         let infos: [CatInfo; 3] = (0..3)
             .map(|i| {
-                let cat = country.infos[self.to_txt_idx(self.main_guess_types[i])].clone();
+                let cat = &country.infos[self.to_txt_idx(self.main_guess_types[i])];
                 CatInfo {
-                    full: cat.full.into(),
-                    category: self.all_cat_names[self.main_guess_types[i]].clone().into(),
-                    first: cat.hint.clone().unwrap_or(" ".to_string()).into(),
+                    full: cat.full.as_str().into(),
+                    category: self.all_cat_names[self.main_guess_types[i]].as_str().into(),
+                    first: cat
+                        .hint
+                        .as_ref()
+                        .map(|s| s.as_str().into())
+                        .unwrap_or(SharedString::new()),
                     with_hint: cat.hint.is_some(),
                 }
             })
@@ -253,7 +253,7 @@ impl AppLogic {
     ) -> Option<ChoicePlayUpdate> {
         self.choice_prev_guesses
             .insert(self.current, was_guessed.clone());
-        let score_key = get_score_key(&self.all_countries[self.current]);
+        let score_key = get_score_key(&self.all_countries[self.current]).to_owned();
         if found {
             let down_ref: &VecModel<bool> = was_guessed.as_any().downcast_ref().unwrap();
             let guess_num = down_ref.iter().filter(|&x| x).count();
@@ -301,43 +301,39 @@ impl AppLogic {
                 if self.choice_same_info(idx) {
                     continue;
                 }
-                let t_value = item.infos[guess_idx].full.clone();
-                hash_map.entry(t_value).or_insert(idx);
+                hash_map
+                    .entry(item.infos[guess_idx].full.clone())
+                    .or_insert(idx);
             }
-            let true_value = self.all_countries[self.current].infos[guess_idx]
-                .full
-                .clone();
-            hash_map.remove(&true_value);
-            hash_map.values().cloned().collect()
+            hash_map.remove(&self.all_countries[self.current].infos[guess_idx].full);
+            hash_map.into_values().collect()
         } else {
             let mut hash_map = HashMap::new();
             for (idx, item) in self.all_countries.iter().enumerate() {
                 if self.choice_same_info(idx) {
                     continue;
                 }
-                let t_value = item.images[guess_type].clone();
-                hash_map.entry(t_value).or_insert(idx);
+                hash_map
+                    .entry(item.images[guess_type].clone())
+                    .or_insert(idx);
             }
-            let true_value = self.all_countries[self.current].images[guess_type].clone();
-            hash_map.remove(&true_value);
-            hash_map.values().cloned().collect()
+            hash_map.remove(&self.all_countries[self.current].images[guess_type]);
+            hash_map.into_values().collect()
         };
         let mut rng = rand::thread_rng();
-        let mut random_elements: Vec<usize> = unique_indices
-            .choose_multiple(&mut rng, 3)
-            .cloned()
-            .collect();
-        random_elements.push(self.current);
+        let mut random_elements: Vec<&usize> =
+            unique_indices.choose_multiple(&mut rng, 3).collect();
+        random_elements.push(&&self.current);
         if random_elements.len() != 4 {
             // TODO treat cases less than 4 possible choices (rare but you never know)
             panic!("Not enough possibilities to chose from")
         }
         random_elements.shuffle(&mut rng);
         [
-            random_elements[0],
-            random_elements[1],
-            random_elements[2],
-            random_elements[3],
+            *random_elements[0],
+            *random_elements[1],
+            *random_elements[2],
+            *random_elements[3],
         ]
     }
 
@@ -370,20 +366,20 @@ impl AppLogic {
         };
         let correct_guess = guess_idx.iter().position(|x| *x == self.current).unwrap();
 
-        let country = self.all_countries[self.current].clone();
+        let country = &self.all_countries[self.current];
         // adding default info only if the idx 0 info is not either infos
         let default_type = self.txt_only_to_global_type(0);
         let default_info =
             if self.choice_guess_type != default_type && self.choice_info_type != default_type {
-                country.infos[0].full.clone()
+                &country.infos[0].full
             } else {
-                String::new()
+                &String::new()
             };
 
         if info.is_txt {
             info.txt = country.infos[self.to_txt_idx(self.choice_info_type)]
                 .full
-                .clone()
+                .as_str()
                 .into();
         } else {
             info.img = self.load_img(&country.images[self.choice_info_type]);
@@ -394,7 +390,7 @@ impl AppLogic {
             for i in 0..4 {
                 guesses[i].txt = self.all_countries[guess_idx[i]].infos[idx]
                     .full
-                    .clone()
+                    .as_str()
                     .into();
             }
         } else {
@@ -424,27 +420,25 @@ impl AppLogic {
             .collect()
     }
     pub fn look_up_current(&self) -> FullInfo {
-        let country = self.all_countries[self.current].clone();
-        self.get_full_info_country(country)
+        self.get_full_info_country(&self.all_countries[self.current])
     }
     pub fn look_up_selected(&self, num: usize) -> FullInfo {
-        let country = self.all_countries_order[num].clone();
-        self.get_full_info_country(country)
+        self.get_full_info_country(&self.all_countries_order[num])
     }
-    fn get_full_info_country(&self, country: CountryInfos) -> FullInfo {
-        let name = country.infos[0].full.clone();
+    fn get_full_info_country(&self, country: &CountryInfos) -> FullInfo {
+        let name = &country.infos[0].full;
         let mut text_infos: Vec<TextWithTitle> = Vec::new();
         let mut image_infos: Vec<ImageWithTitle> = Vec::new();
 
         for i in 0..self.all_cat_names.len() {
             if self.is_info_txt(i) {
                 text_infos.push(TextWithTitle {
-                    title: self.all_cat_names[i].clone().into(),
-                    text: country.infos[self.to_txt_idx(i)].full.clone().into(),
+                    title: self.all_cat_names[i].as_str().into(),
+                    text: country.infos[self.to_txt_idx(i)].full.as_str().into(),
                 });
             } else {
                 image_infos.push(ImageWithTitle {
-                    title: self.all_cat_names[i].clone().into(),
+                    title: self.all_cat_names[i].as_str().into(),
                     image: self.load_img(&country.images[i]),
                 });
             }
@@ -462,13 +456,13 @@ impl AppLogic {
             title: SharedString::from("UN Member"),
             text: status,
         });
-        let mut paths = [self.score_folder.clone(), self.score_folder.clone()];
-        paths[0].push(MAIN_SCORE_NAME);
-        paths[1].push(CHOICE_SCORE_NAME);
+
+        // TODO TEST VALID
         let mut val = [0; 2];
-        for i in 0..2 {
-            let s = info_parse::read(&self.all_countries_order, paths[i].clone());
-            let score = s.get(&name).unwrap();
+        for (i, score_type) in [MAIN_SCORE_NAME, CHOICE_SCORE_NAME].iter().enumerate() {
+            let path = self.score_folder.join(score_type);
+            let s = info_parse::read(&self.all_countries_order, &path);
+            let score = s.get(name).unwrap();
             val[i] = score.last_score as i32;
         }
         FullInfo {
@@ -477,7 +471,7 @@ impl AppLogic {
             image_infos: image_infos.as_slice().into(),
             score_free_play: val[0],
             score_choice_play: val[1],
-            wiki_link: country.wiki_link.into(),
+            wiki_link: country.wiki_link.as_str().into(),
         }
     }
 
@@ -486,32 +480,24 @@ impl AppLogic {
         self.score_folder.push(name);
     }
     pub fn score_user_change(&mut self, name: String, delete: bool) {
-        let mut f = self.score_folder.clone();
-        f.pop();
-        f.push(name.clone());
+        self.score_folder.set_file_name(&name);
         if delete {
-            info_parse::delete_score(f.clone());
+            info_parse::delete_score(&self.score_folder);
             let mut v = self.list_users();
-            v.retain(|x| *x != name.clone());
+            v.retain(|x| x != &name); // TODO CHECK UF VALID
             if v.is_empty() {
-                self.score_folder.pop();
-                self.score_folder.push("User 1");
-                info_parse::init_score_folder(self.score_folder.clone());
+                self.score_folder.set_file_name("User 1");
             } else {
-                self.score_folder.pop();
-                self.score_folder.push(v[0].clone());
+                self.score_folder.set_file_name(v.remove(0));
             }
-        } else {
-            info_parse::init_score_folder(f.clone());
-            self.score_folder = f.clone();
         }
+        info_parse::init_score_folder(&self.score_folder);
     }
     pub fn score_rename_user(&mut self, name1: String, name2: String) {
-        self.score_folder.pop();
         let mut p1 = self.score_folder.clone();
-        p1.push(name1);
-        self.score_folder.push(name2);
-        info_parse::rename_score_folder(p1, self.score_folder.clone())
+        p1.set_file_name(name1);
+        self.score_folder.set_file_name(name2);
+        info_parse::rename_score_folder(&p1, &self.score_folder)
     }
 
     pub fn score_filter_changed(&mut self, all: bool) {
@@ -526,29 +512,27 @@ impl AppLogic {
         };
     }
     pub fn score_sub_cat_changed(&self, sub_cat_idx: usize) -> ScoreStats {
-        let filtered_countries: Vec<String> = if sub_cat_idx == 0 {
+        let filtered_countries: Vec<&String> = if sub_cat_idx == 0 {
             self.all_countries
-                .clone()
-                .into_iter()
-                .map(|x| x.infos[0].full.clone())
+                .iter()
+                .map(|x| &x.infos[0].full)
                 .collect()
         } else {
             self.all_countries
-                .clone()
-                .into_iter()
+                .iter()
                 .filter(|country| country.region == self.sub_cat_names[sub_cat_idx])
-                .map(|x| x.infos[0].full.clone())
+                .map(|x| &x.infos[0].full)
                 .collect()
         };
 
         let score_path_main = self.score_folder.join(MAIN_SCORE_NAME);
         let score_path_choice = self.score_folder.join(CHOICE_SCORE_NAME);
-        let main_scores = info_parse::read(&self.all_countries_order, score_path_main);
-        let choice_scores = info_parse::read(&self.all_countries_order, score_path_choice);
+        let main_scores = info_parse::read(&self.all_countries_order, &score_path_main);
+        let choice_scores = info_parse::read(&self.all_countries_order, &score_path_choice);
 
         let mut stat = ScoreStats::default();
         for country_name in filtered_countries {
-            let s = main_scores.get(&country_name).unwrap();
+            let s = main_scores.get(country_name).unwrap();
             stat.main_last[s.last_score as usize] += 1;
             if s.time_played > 0 {
                 let avg = ((s.total_score as f32) / (s.time_played as f32)).round() as usize;
@@ -556,7 +540,7 @@ impl AppLogic {
             } else {
                 stat.main_avg[0] += 1;
             }
-            let s = choice_scores.get(&country_name).unwrap();
+            let s = choice_scores.get(country_name).unwrap();
             stat.choice_last[s.last_score as usize] += 1;
             if s.time_played > 0 {
                 let avg = ((s.total_score as f32) / (s.time_played as f32)).round() as usize;
@@ -600,12 +584,10 @@ impl AppLogic {
             .to_string()
     }
     pub fn list_users(&self) -> Vec<String> {
-        let mut f = self.score_folder.clone();
-        f.pop();
-        info_parse::list_folders(f)
+        info_parse::list_folders(self.score_folder.parent().unwrap())
     }
     pub fn save_scores(&self) {
-        info_parse::save(&self.scores, self.score_path.clone());
+        info_parse::save(&self.scores, &self.score_path);
     }
     fn is_info_txt(&self, i: usize) -> bool {
         i >= self.img_cat_names.len()

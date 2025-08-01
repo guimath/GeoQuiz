@@ -3,7 +3,7 @@ use serde_json;
 use std::collections::HashMap;
 use std::fs::{self, File};
 use std::io::{Read, Write};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Category {
@@ -47,7 +47,7 @@ pub fn get_data() -> AllInfos {
     serde_json::from_str(JSON_DATA).unwrap()
 }
 
-pub fn read(all_countries: &Vec<CountryInfos>, score_path: PathBuf) -> HashMap<String, Score> {
+pub fn read(all_countries: &Vec<CountryInfos>, score_path: &PathBuf) -> HashMap<String, Score> {
     if score_path.exists() {
         let mut file = File::open(score_path).unwrap();
         let mut file_content = String::new();
@@ -63,30 +63,30 @@ pub fn read(all_countries: &Vec<CountryInfos>, score_path: PathBuf) -> HashMap<S
         .collect()
 }
 
-pub fn save(scores: &HashMap<String, Score>, score_path: PathBuf) {
+pub fn save(scores: &HashMap<String, Score>, score_path: &PathBuf) {
     let json_data = serde_json::to_string(scores).unwrap();
     let mut file = File::create(score_path).unwrap();
     file.write_all(json_data.as_bytes()).unwrap();
 }
 
-pub fn delete_score(score_folder: PathBuf) {
+pub fn delete_score(score_folder: &PathBuf) {
     if score_folder.exists() {
         fs::remove_dir_all(score_folder.clone()).unwrap();
     }
     // init_score_folder(score_folder);
 }
 
-pub fn init_score_folder(score_folder: PathBuf) {
+pub fn init_score_folder(score_folder: &PathBuf) {
     if !score_folder.exists() {
         fs::create_dir_all(score_folder).unwrap();
     }
 }
 
-pub fn rename_score_folder(path1: PathBuf, path2: PathBuf) {
+pub fn rename_score_folder(path1: &PathBuf, path2: &PathBuf) {
     fs::rename(path1, path2).unwrap();
 }
 
-pub fn list_folders(path: PathBuf) -> Vec<String> {
+pub fn list_folders(path: &Path) -> Vec<String> {
     let a = fs::read_dir(path).unwrap();
     let mut v: Vec<String> = a
         .into_iter()

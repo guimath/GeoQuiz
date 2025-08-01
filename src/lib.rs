@@ -19,11 +19,19 @@ lazy_static! {
     static ref ALL_INFOS: AllInfos = info_parse::get_data();
 }
 
-
 fn vec_to_model(vec: &Vec<String>) -> ModelRc<SharedString> {
-    let vc = vec.clone();
-    let v: VecModel<SharedString> = vc.iter().map(SharedString::from).collect();
-    ModelRc::new(v)
+    ModelRc::new(
+        vec.iter()
+            .map(SharedString::from)
+            .collect::<VecModel<SharedString>>(),
+    )
+}
+fn arr_to_model(vec: &[&str]) -> ModelRc<SharedString> {
+    ModelRc::new(
+        vec.iter()
+            .map(|&s| s.into())
+            .collect::<VecModel<SharedString>>(),
+    )
 }
 
 pub fn main() {
@@ -88,6 +96,11 @@ fn init(path: PathBuf) -> Result<(), Box<dyn Error>> {
     // slint::init_translations!(concat!(env!("CARGO_MANIFEST_DIR"), "/lang/"));
     // let all_infos = info_parse::get_data();
 
+    let all_names: Vec<SharedString> = ALL_INFOS
+        .all_countries
+        .iter()
+        .map(|x| x.infos[0].full.as_str().into())
+        .collect();
     let logic = Arc::new(Mutex::new(AppLogic::new(&path, &ALL_INFOS)));
     let ui = AppWindow::new()?;
     ui.window().set_size(LogicalSize {
@@ -97,10 +110,10 @@ fn init(path: PathBuf) -> Result<(), Box<dyn Error>> {
     {
         let logic_lock = logic.lock().unwrap();
         ui.set_search_countries_mask(logic_lock.search_changed("".into()).as_slice().into());
-        ui.set_search_all_countries(logic_lock.all_names.as_slice().into());
-        ui.set_all_categories_name(vec_to_model(&logic_lock.all_cat_names));
-        ui.set_txt_categories_name(vec_to_model(&logic_lock.txt_cat_names));
-        ui.set_sub_categories_name(vec_to_model(&logic_lock.sub_cat_names));
+        ui.set_search_all_countries(all_names.as_slice().into());
+        ui.set_all_categories_name(vec_to_model(logic_lock.get_all_categories_name()));
+        ui.set_txt_categories_name(vec_to_model(&ALL_INFOS.info_names));
+        ui.set_sub_categories_name(arr_to_model(&logic::SUB_CAT_NAMES));
         ui.set_users(vec_to_model(&logic_lock.list_users()));
         ui.invoke_set_active_user_look_up(logic_lock.get_active_user().into());
     }

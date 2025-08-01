@@ -10,7 +10,8 @@ slint::include_modules!();
 
 const MAIN_SCORE_NAME: &str = "score_main.json";
 const CHOICE_SCORE_NAME: &str = "score_choice.json";
-pub struct AppLogic <'a> {
+pub const SUB_CAT_NAMES: [&str; 6] = ["World", "Africa", "Americas", "Asia", "Europe", "Oceania"];
+pub struct AppLogic<'a> {
     order_type: u32,
     current: usize,
     results: Vec<u32>,
@@ -18,11 +19,8 @@ pub struct AppLogic <'a> {
     last_scores: HashMap<String, usize>,
     all_countries: Vec<&'a CountryInfos>,
     all_countries_order: &'a Vec<CountryInfos>,
-    pub all_names: Vec<SharedString>,
-    pub txt_cat_names: Vec<String>,
-    pub img_cat_names: Vec<String>,
-    pub all_cat_names: Vec<String>,
-    pub sub_cat_names: Vec<String>,
+    cat_img_len: usize,
+    all_cat_names: Vec<String>,
     search_names: Vec<String>,
     main_info_type: usize,
     main_guess_types: [usize; 3],
@@ -48,24 +46,19 @@ pub struct ScoreStats {
 fn get_score_key(country: &CountryInfos) -> &String {
     &country.infos[0].full
 }
-impl <'a>AppLogic <'a> {
+impl<'a> AppLogic<'a> {
     pub fn new(score_path: &PathBuf, all_data: &'a AllInfos) -> Self {
-        let mut all_cat_names = all_data.info_names.clone();
-        all_cat_names.extend(all_data.image_names.clone());
-        let all_names:Vec<SharedString> = all_data
+        let all_cat_names: Vec<String> = all_data
+            .info_names
+            .iter()
+            .cloned()
+            .chain(all_data.image_names.iter().cloned())
+            .collect();
+        let search_names = all_data
             .all_countries
             .iter()
-            .map(|x| x.infos[0].full.as_str().into())
+            .map(|x| x.infos[0].full.to_lowercase())
             .collect();
-        let sub_cat_names = vec![
-            "World".to_string(),
-            "Africa".to_string(),
-            "Americas".to_string(),
-            "Asia".to_string(),
-            "Europe".to_string(),
-            "Oceania".to_string(),
-        ];
-        let search_names = all_names.iter().map(|x| x.to_lowercase()).collect();
         let mut score_folder = score_path.join("scores/User 1");
         let v = info_parse::list_folders(score_folder.parent().unwrap());
         if v.is_empty() {
@@ -81,11 +74,8 @@ impl <'a>AppLogic <'a> {
             last_scores: Default::default(),
             all_countries: Default::default(),
             all_countries_order: &all_data.all_countries,
-            all_names,
-            txt_cat_names: all_data.info_names.clone(),
-            img_cat_names: all_data.image_names.clone(),
+            cat_img_len: all_data.image_names.len(),
             all_cat_names,
-            sub_cat_names,
             search_names,
             main_info_type: Default::default(),
             main_guess_types: Default::default(),
@@ -98,7 +88,9 @@ impl <'a>AppLogic <'a> {
             score_folder,
         }
     }
-
+    pub fn get_all_categories_name(&self) -> &Vec<String> {
+        &self.all_cat_names
+    }
     pub fn set_config(&mut self, conf: PlaySelectParams) {
         self.score_path = if conf.play_type {
             self.score_folder.join(MAIN_SCORE_NAME)
@@ -117,7 +109,7 @@ impl <'a>AppLogic <'a> {
         if conf.region_idx > 0 {
             let idx = conf.region_idx as usize;
             self.all_countries
-                .retain(|country| country.region == self.sub_cat_names[idx]);
+                .retain(|country| country.region == SUB_CAT_NAMES[idx]);
         }
         self.order_type = conf.order as u32;
     }
@@ -532,7 +524,7 @@ impl <'a>AppLogic <'a> {
         } else {
             self.all_countries
                 .iter()
-                .filter(|country| country.region == self.sub_cat_names[sub_cat_idx])
+                .filter(|country| country.region == SUB_CAT_NAMES[sub_cat_idx])
                 .map(|x| &x.infos[0].full)
                 .collect()
         };
@@ -602,13 +594,13 @@ impl <'a>AppLogic <'a> {
         info_parse::save(&self.scores, &self.score_path);
     }
     fn is_info_txt(&self, i: usize) -> bool {
-        i >= self.img_cat_names.len()
+        i >= self.cat_img_len
     }
     fn txt_only_to_global_type(&self, i: usize) -> usize {
-        i + self.img_cat_names.len()
+        i + self.cat_img_len
     }
     fn to_txt_idx(&self, i: usize) -> usize {
-        i - self.img_cat_names.len()
+        i - self.cat_img_len
     }
     pub fn is_at_end(&self) -> bool {
         self.current >= self.all_countries.len() - 1

@@ -44,7 +44,11 @@ pub enum ImageLink {
 
 const JSON_DATA: &str = include_str!("../data/infos.json"); // Embed the JSON file
 pub fn get_data() -> AllInfos {
-    serde_json::from_str(JSON_DATA).unwrap()
+    let mut all_infos: AllInfos = serde_json::from_str(JSON_DATA).unwrap();
+    all_infos.all_countries
+            .sort_by(|a, b| a.infos[0].full.cmp(&b.infos[0].full));
+
+    all_infos
 }
 
 pub fn read(all_countries: &Vec<CountryInfos>, score_path: &PathBuf) -> HashMap<String, Score> {

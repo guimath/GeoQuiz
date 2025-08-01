@@ -11,6 +11,15 @@ use slint::{ComponentHandle, LogicalSize, Model, ModelRc, SharedString, VecModel
 
 use logic::{AppLogic, AppWindow, HyperLinkClick, ScoreStatSlint};
 
+use crate::info_parse::AllInfos;
+
+use lazy_static::lazy_static;
+
+lazy_static! {
+    static ref ALL_INFOS: AllInfos = info_parse::get_data();
+}
+
+
 fn vec_to_model(vec: &Vec<String>) -> ModelRc<SharedString> {
     let vc = vec.clone();
     let v: VecModel<SharedString> = vc.iter().map(SharedString::from).collect();
@@ -77,7 +86,9 @@ pub fn android_main(app: slint::android::android_activity::AndroidApp) {
 
 fn init(path: PathBuf) -> Result<(), Box<dyn Error>> {
     // slint::init_translations!(concat!(env!("CARGO_MANIFEST_DIR"), "/lang/"));
-    let logic = Arc::new(Mutex::new(AppLogic::new(path)));
+    // let all_infos = info_parse::get_data();
+
+    let logic = Arc::new(Mutex::new(AppLogic::new(&path, &ALL_INFOS)));
     let ui = AppWindow::new()?;
     ui.window().set_size(LogicalSize {
         width: 1000.0,

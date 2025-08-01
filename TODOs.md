@@ -125,6 +125,7 @@
 - [x] `BUGFIX` Remove custom when leaving select
 - [x] `UI` Renamed Free play to flash cards
 - [x] `IMPROVEMENTS` coding improvements (less clones)
+- [x] `IMPROVEMENTS` Remove cloning of all countries
 
 
 ## Project 
@@ -143,6 +144,5 @@
 - [ ] follow [issue](https://github.com/slint-ui/slint/issues/8323) to patch back button
 
 ## Improvements
-- [ ] Remove cloning of all countries
 
 ## Sources

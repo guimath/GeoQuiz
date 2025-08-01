@@ -2,7 +2,7 @@ use rand::seq::SliceRandom;
 use rand::thread_rng;
 use slint::{Image, Model, ModelRc, SharedString, VecModel};
 
-use crate::info_parse::{self, CountryInfos, ImageLink, Score};
+use crate::info_parse::{self, AllInfos, CountryInfos, ImageLink, Score};
 use std::collections::HashMap;
 use std::{cmp::Ordering, path::PathBuf};
 
@@ -10,15 +10,14 @@ slint::include_modules!();
 
 const MAIN_SCORE_NAME: &str = "score_main.json";
 const CHOICE_SCORE_NAME: &str = "score_choice.json";
-#[derive(Default)]
-pub struct AppLogic {
+pub struct AppLogic <'a> {
     order_type: u32,
     current: usize,
     results: Vec<u32>,
     scores: HashMap<String, Score>,
     last_scores: HashMap<String, usize>,
-    all_countries: Vec<CountryInfos>, // Make &countryInfos ?
-    all_countries_order: Vec<CountryInfos>,
+    all_countries: Vec<&'a CountryInfos>,
+    all_countries_order: &'a Vec<CountryInfos>,
     pub all_names: Vec<SharedString>,
     pub txt_cat_names: Vec<String>,
     pub img_cat_names: Vec<String>,
@@ -49,23 +48,16 @@ pub struct ScoreStats {
 fn get_score_key(country: &CountryInfos) -> &String {
     &country.infos[0].full
 }
-impl AppLogic {
-    pub fn new(score_path: PathBuf) -> Self {
-        let mut s = Self::default();
-        let all_data = info_parse::get_data();
-        s.all_countries_order = all_data.all_countries;
-        s.txt_cat_names = all_data.info_names;
-        s.img_cat_names = all_data.image_names;
-        s.all_cat_names = s.img_cat_names.clone();
-        s.all_cat_names.extend(s.txt_cat_names.clone());
-        s.all_countries_order
-            .sort_by(|a, b| a.infos[0].full.cmp(&b.infos[0].full));
-        s.all_names = s
-            .all_countries_order
+impl <'a>AppLogic <'a> {
+    pub fn new(score_path: &PathBuf, all_data: &'a AllInfos) -> Self {
+        let mut all_cat_names = all_data.info_names.clone();
+        all_cat_names.extend(all_data.image_names.clone());
+        let all_names:Vec<SharedString> = all_data
+            .all_countries
             .iter()
             .map(|x| x.infos[0].full.as_str().into())
             .collect();
-        s.sub_cat_names = vec![
+        let sub_cat_names = vec![
             "World".to_string(),
             "Africa".to_string(),
             "Americas".to_string(),
@@ -73,16 +65,38 @@ impl AppLogic {
             "Europe".to_string(),
             "Oceania".to_string(),
         ];
-        s.search_names = s.all_names.iter().map(|x| x.to_lowercase()).collect();
-        s.score_folder = score_path.join("scores/User 1");
-        let v = s.list_users();
+        let search_names = all_names.iter().map(|x| x.to_lowercase()).collect();
+        let mut score_folder = score_path.join("scores/User 1");
+        let v = info_parse::list_folders(score_folder.parent().unwrap());
         if v.is_empty() {
-            info_parse::init_score_folder(&s.score_folder);
+            info_parse::init_score_folder(&score_folder);
         } else {
-            s.score_folder.set_file_name(&v[0]);
+            score_folder.set_file_name(&v[0]);
         }
-        s.data_path = score_path.join("data");
-        s
+        Self {
+            order_type: Default::default(),
+            current: Default::default(),
+            results: Default::default(),
+            scores: Default::default(),
+            last_scores: Default::default(),
+            all_countries: Default::default(),
+            all_countries_order: &all_data.all_countries,
+            all_names,
+            txt_cat_names: all_data.info_names.clone(),
+            img_cat_names: all_data.image_names.clone(),
+            all_cat_names,
+            sub_cat_names,
+            search_names,
+            main_info_type: Default::default(),
+            main_guess_types: Default::default(),
+            choice_prev_guesses: Default::default(),
+            choice_index_guesses: Default::default(),
+            choice_info_type: Default::default(),
+            choice_guess_type: Default::default(),
+            score_path: Default::default(),
+            data_path: score_path.join("data"),
+            score_folder,
+        }
     }
 
     pub fn set_config(&mut self, conf: PlaySelectParams) {
@@ -94,12 +108,11 @@ impl AppLogic {
 
         self.all_countries = if !conf.include_hard {
             self.all_countries_order
-                .clone()
-                .into_iter()
+                .iter()
                 .filter(|country| country.un_member)
                 .collect()
         } else {
-            self.all_countries_order.clone()
+            self.all_countries_order.iter().collect()
         };
         if conf.region_idx > 0 {
             let idx = conf.region_idx as usize;
@@ -122,7 +135,7 @@ impl AppLogic {
                 .cmp(&scores.get(get_score_key(a)).unwrap().total_score)
         };
         if self.order_type == 0 {
-            self.all_countries.sort_by(&compare);
+            self.all_countries.sort_by(|a, b| compare(a, b));
         } else if self.order_type == 2 {
             self.all_countries.sort_by(|b, a| compare(a, b));
         }
@@ -503,12 +516,11 @@ impl AppLogic {
     pub fn score_filter_changed(&mut self, all: bool) {
         self.all_countries = if !all {
             self.all_countries_order
-                .clone()
-                .into_iter()
+                .iter()
                 .filter(|country| country.un_member)
                 .collect()
         } else {
-            self.all_countries_order.clone()
+            self.all_countries_order.iter().collect()
         };
     }
     pub fn score_sub_cat_changed(&self, sub_cat_idx: usize) -> ScoreStats {

@@ -124,10 +124,11 @@
 - [x] `BUGFIX` show look up in learn mode (main play)
 - [x] `BUGFIX` Remove custom when leaving select
 - [x] `UI` Renamed Free play to flash cards
+- [x] `IMPROVEMENTS` coding improvements (less clones)
 
 
 ## Project 
-- [ ] Commit data ?
+- [ ] Commit data or find a way to build that is easier ?
 
 ## Bug fixes
 
@@ -142,5 +143,6 @@
 - [ ] follow [issue](https://github.com/slint-ui/slint/issues/8323) to patch back button
 
 ## Improvements
+- [ ] Remove cloning of all countries
 
 ## Sources

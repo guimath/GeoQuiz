@@ -155,7 +155,7 @@ impl AppLogic {
             score.total_score = (score.total_score + result) - self.results[self.current];
             score.last_score = result;
             self.results[self.current] = result;
-            self.save_scores(); // TODO ONLY SAVE WHEN LEAVING APP OR BACK TO MENU
+            self.save_scores();
             self.last_scores.insert(score_key, result as usize);
         } else if self.results[self.current] == 0 {
             self.last_scores.insert(score_key, 0);
@@ -457,7 +457,6 @@ impl AppLogic {
             text: status,
         });
 
-        // TODO TEST VALID
         let mut val = [0; 2];
         for (i, score_type) in [MAIN_SCORE_NAME, CHOICE_SCORE_NAME].iter().enumerate() {
             let path = self.score_folder.join(score_type);
@@ -484,13 +483,14 @@ impl AppLogic {
         if delete {
             info_parse::delete_score(&self.score_folder);
             let mut v = self.list_users();
-            v.retain(|x| x != &name); // TODO CHECK UF VALID
+            v.retain(|x| x != &name);
             if v.is_empty() {
                 self.score_folder.set_file_name("User 1");
             } else {
                 self.score_folder.set_file_name(v.remove(0));
             }
         }
+        println!("{:?}", self.score_folder);
         info_parse::init_score_folder(&self.score_folder);
     }
     pub fn score_rename_user(&mut self, name1: String, name2: String) {

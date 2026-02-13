@@ -1,6 +1,19 @@
 import { Button, HorizontalBox, VerticalBox } from "std-widgets.slint";
-import { RegularText, BarGraph, HyperLinkClick, TextButtonWithIcon } from "widgets.slint";
-import { CatInfo, MainPlayUpdate, Screen, FullInfo, ChoicePlayUpdate, PlaySelectParams, ScoreStatSlint } from "structs.slint";
+import {
+    RegularText,
+    BarGraph,
+    HyperLinkClick,
+    TextButtonWithIcon,
+} from "widgets.slint";
+import {
+    CatInfo,
+    MainPlayUpdate,
+    Screen,
+    FullInfo,
+    ChoicePlayUpdate,
+    PlaySelectParams,
+    ScoreStatSlint,
+} from "structs.slint";
 import { SelectLookUpScreen, LookUpScreen } from "screen-look-up.slint";
 import { SelectMainPlayScreen } from "screen-select-main-play.slint";
 import { MainPlayScreen } from "screen-main-play.slint";
@@ -23,22 +36,43 @@ export component AppWindow inherits Window {
     // ***************************************************************** //
     in-out property <Screen> screen: Screen.Start;
     in-out property <Screen> previous_screen: Screen.Start;
-    in property <[string]> search_all_countries : ["Jamaica"]; 
+    in property <[string]> search_all_countries: ["Jamaica"];
     in property <[bool]> search_countries_mask: [true];
-    in property <[string]> all_categories_name: ["Flag",  "Map", "Outline", "Country", "Capital", "Borders", "Area", "Population", "Languages", "Currency", "Region",];
-    in property <[string]> txt_categories_name: ["Country", "Capital", "Borders", "Area", "Population", "Languages", "Currency", "Region",];
+    in property <[string]> all_categories_name: [
+        "Flag",
+        "Map",
+        "Outline",
+        "Country",
+        "Capital",
+        "Borders",
+        "Area",
+        "Population",
+        "Languages",
+        "Currency",
+        "Region",
+    ];
+    in property <[string]> txt_categories_name: [
+        "Country",
+        "Capital",
+        "Borders",
+        "Area",
+        "Population",
+        "Languages",
+        "Currency",
+        "Region",
+    ];
     in property <[string]> sub_categories_name: ["World", "Africa", "Americas", "Asia", "Europe", "Oceania"];
     in property <[string]> users: ["User 0"];
     property <int> last_num;
-    property <int> play_score_max : 5;
-    property <[int]> play_score_val : [1, 2, 5, 1, 5, 2];
+    property <int> play_score_max: 5;
+    property <[int]> play_score_val: [1, 2, 5, 1, 5, 2];
     // ***************************************************************** //
     //                            CALLBACKS
     // ***************************************************************** //
     callback look_up_search_changed(search: string);
     callback look_up_selected(num: int);
     callback look_up_current();
-    callback set_play_config(params:PlaySelectParams);
+    callback set_play_config(params: PlaySelectParams);
     callback close();
     callback save_score();
     callback prep_look_up();
@@ -51,11 +85,11 @@ export component AppWindow inherits Window {
     callback choice_changed([bool], bool, bool);
     callback get_play_scores(choice_play: bool);
     // score
-    callback score_user_selected(name:string);
+    callback score_user_selected(name: string);
     callback score_filter_changed(bool);
     callback score_sub_cat_changed(int);
-    callback score_user_change(name:string, delete:bool);
-    callback score_rename_user(name1:string, name2:string);
+    callback score_user_change(name: string, delete: bool);
+    callback score_rename_user(name1: string, name2: string);
     // ***************************************************************** //
     //                            UI LOGIC
     // ***************************************************************** //
@@ -99,7 +133,7 @@ export component AppWindow inherits Window {
         main_play_s.update_screen(info, cat);
     }
 
-    public function update_choice(info : ChoicePlayUpdate) {
+    public function update_choice(info: ChoicePlayUpdate) {
         choice_play_s.update_screen(info);
     }
 
@@ -115,7 +149,7 @@ export component AppWindow inherits Window {
         w_look_up.user = name;
     }
 
-    public function show_play_scores(val:[int], max:int) {
+    public function show_play_scores(val: [int], max: int) {
         root.play_score_max = max;
         root.play_score_val = val;
         play_scores_popup.show();
@@ -136,7 +170,7 @@ export component AppWindow inherits Window {
             }
             if event.text == Key.Escape && !event.repeat {
                 root.close();
-            } 
+            }
             if event.text == "b" {
                 back();
             }
@@ -160,7 +194,6 @@ export component AppWindow inherits Window {
                         root.last_num -= 1;
                         look_up_selected(root.last_num);
                     }
-                    
                 } else if event.text == Key.RightArrow {
                     if root.last_num < search_all_countries.length - 1 {
                         root.last_num += 1;
@@ -170,7 +203,6 @@ export component AppWindow inherits Window {
             }
             // accept
             accept
-            
         }
     }
     // ***************************************************************** //
@@ -191,9 +223,9 @@ export component AppWindow inherits Window {
             back();
         }
     }
+
     TouchArea {
-        visible: root.screen == Screen.ChoicePlay || 
-                 root.screen == Screen.MainPlay;
+        visible: root.screen == Screen.ChoicePlay || root.screen == Screen.MainPlay;
         x: root.width - Sizes.padding - Sizes.title_height;
         y: Sizes.padding;
         width: Sizes.title_height;
@@ -219,20 +251,24 @@ export component AppWindow inherits Window {
             Rectangle {
                 // height: Sizes.title_height;
             }
+
             Image {
                 source: @image-url("img/logo.svg");
-                height: root.height/4;
+                height: root.height / 4;
             }
-            Rectangle {}
+
+            Rectangle { }
+
             TextButtonWithIcon {
-                height: root.height/10;
+                height: root.height / 10;
                 text: "Play";
                 clicked => {
                     root.screen = Screen.SelectPlay;
                 }
             }
+
             TextButtonWithIcon {
-                height: root.height/10;
+                height: root.height / 10;
                 text: "Look Up Infos";
                 icon: @image-url("img/info.svg");
                 clicked => {
@@ -240,8 +276,9 @@ export component AppWindow inherits Window {
                     root.screen = Screen.SelectLookUp
                 }
             }
+
             TextButtonWithIcon {
-                height: root.height/10;
+                height: root.height / 10;
                 text: "Score";
                 icon: @image-url("img/score.svg");
                 clicked => {
@@ -249,18 +286,20 @@ export component AppWindow inherits Window {
                     root.screen = Screen.Score;
                 }
             }
+
             TextButtonWithIcon {
-                height: root.height/10;
+                height: root.height / 10;
                 text: "Help";
                 icon: @image-url("img/help.svg");
                 clicked => {
                     root.screen = Screen.Help;
                 }
             }
-            Rectangle {}
-            Rectangle {}
+
+            Rectangle { }
+
+            Rectangle { }
         }
-        
     }
     // ***************************************************************** //
     //                            OTHER SCREENS
@@ -268,16 +307,29 @@ export component AppWindow inherits Window {
     w_help := HelpScreen {
         visible: root.screen == Screen.Help;
     }
+
     w_score := ScoreScreen {
         visible: root.screen == Screen.Score;
         sub_categories_name: root.sub_categories_name;
         users: root.users;
-        filter_changed(all) => {score_filter_changed(all)}
-        category_changed(idx) => {score_sub_cat_changed(idx)}
-        user_selected(name) => {score_user_selected(name);}
-        user_change(name, delete) => {score_user_change(name, delete);}
-        rename_user(name1, name2) => {score_rename_user(name1, name2);}
-        reset_focus() => {root.focus();}
+        filter_changed(all) => {
+            score_filter_changed(all)
+        }
+        category_changed(idx) => {
+            score_sub_cat_changed(idx)
+        }
+        user_selected(name) => {
+            score_user_selected(name);
+        }
+        user_change(name, delete) => {
+            score_user_change(name, delete);
+        }
+        rename_user(name1, name2) => {
+            score_rename_user(name1, name2);
+        }
+        reset_focus() => {
+            root.focus();
+        }
     }
 
     w_select_play := SelectPlayScreen {
@@ -292,6 +344,7 @@ export component AppWindow inherits Window {
             set_play_config(params);
         }
     }
+
     w_sel_look_up := SelectLookUpScreen {
         visible: root.screen == Screen.SelectLookUp;
         all: root.search_all_countries;
@@ -301,20 +354,20 @@ export component AppWindow inherits Window {
         }
         selected(num) => {
             root.last_num = num;
-            look_up_selected(num) 
+            look_up_selected(num)
         }
     }
 
     w_look_up := LookUpScreen {
         visible: root.screen == Screen.LookUp;
     }
-    
+
     sel_main_play_s := SelectMainPlayScreen {
         info_type_names: root.all_categories_name;
         guess_type_names: root.txt_categories_name;
         visible: root.screen == Screen.SelectMainPlay;
         play(cat_choices, im_choice, play_mode) => {
-            main_play_s.play_mode = 3 -  play_mode;
+            main_play_s.play_mode = 3 - play_mode;
             start_play(
                 cat_choices, 
                 im_choice,
@@ -325,9 +378,15 @@ export component AppWindow inherits Window {
 
     main_play_s := MainPlayScreen {
         visible: root.screen == Screen.MainPlay;
-        next(score) => {next(score)}
-        prev() => {prev()}
-        look_up_current() => {look_up_current()}
+        next(score) => {
+            next(score)
+        }
+        prev() => {
+            prev()
+        }
+        look_up_current() => {
+            look_up_current()
+        }
     }
 
     sel_choice_play_s := SelectChoicePlayScreen {
@@ -336,30 +395,31 @@ export component AppWindow inherits Window {
         play(info_type, guess_type) => {
             choice_start_play(
                 info_type, 
-                guess_type
-            );
+                guess_type);
             root.screen = Screen.ChoicePlay;
         }
-        
     }
+
     choice_play_s := ChoicePlayScreen {
         visible: root.screen == Screen.ChoicePlay;
         changed(was_guessed, next, found) => {
             choice_changed(was_guessed, next, found)
         }
-        look_up_current() => {look_up_current()}
+        look_up_current() => {
+            look_up_current()
+        }
     }
 
-
     // On top of everything current play scores
-    play_scores_popup := PopupWindow{
+    play_scores_popup := PopupWindow {
         width: root.width;
         height: root.height;
         Rectangle {
             background: Palette.pop_up_mask;
             VerticalBox {
                 padding: Sizes.padding;
-                Rectangle {}
+                Rectangle { }
+
                 Rectangle {
                     vertical-stretch: 0;
                     background: Palette.background.transparentize(0.1);
@@ -368,35 +428,30 @@ export component AppWindow inherits Window {
                     border-width: Sizes.std_border;
                     VerticalBox {
                         padding: Sizes.padding;
-                        padding-bottom: Sizes.padding + 2*Sizes.spacing;
+                        padding-bottom: Sizes.padding + 2 * Sizes.spacing;
                         spacing: Sizes.spacing + 20px;
                         t_pop := RegularText {
                             style: FontSettings.title-small;
                             horizontal-alignment: center;
-                            text: root.screen == Screen.ChoicePlay ?
-                                "Number of countries per wrong guesses":
-                                "Number of countries per star rating";
-                            width: root.width - 4*Sizes.padding;
+                            text: root.screen == Screen.ChoicePlay ? "Number of countries per wrong guesses" : "Number of countries per star rating";
+                            width: root.width - 4 * Sizes.padding;
                             wrap: word-wrap;
                         }
+
                         BarGraph {
-                            bar_height: root.height/7;
-                            bar_width: root.screen == Screen.ChoicePlay ? 
-                                (t_pop.width - 4*Sizes.spacing - 2*Sizes.padding)/5:
-                                (t_pop.width - 5*Sizes.spacing - 2*Sizes.padding)/6;
+                            bar_height: root.height / 7;
+                            bar_width: root.screen == Screen.ChoicePlay ? (t_pop.width - 4 * Sizes.spacing - 2 * Sizes.padding) / 5 : (t_pop.width - 5 * Sizes.spacing - 2 * Sizes.padding) / 6;
                             max_num: root.play_score_max;
                             avg: root.play_score_val;
                             last: root.play_score_val;
-                            names: root.screen == Screen.ChoicePlay ? 
-                                ["Skip", 3, 2, 1, 0]:
-                                ["Skip", 1, 2, 3, 4, 5];
+                            names: root.screen == Screen.ChoicePlay ? ["Skip", 3, 2, 1, 0] : ["Skip", 1, 2, 3, 4, 5];
                             color_2: Palette.regular_text;
                         }
                     }
                 }
-                Rectangle {}
+
+                Rectangle { }
             }
         }
-
     }
 }

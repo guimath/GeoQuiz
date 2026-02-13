@@ -45,8 +45,9 @@ pub enum ImageLink {
 const JSON_DATA: &str = include_str!("../data/infos.json"); // Embed the JSON file
 pub fn get_data() -> AllInfos {
     let mut all_infos: AllInfos = serde_json::from_str(JSON_DATA).unwrap();
-    all_infos.all_countries
-            .sort_by(|a, b| a.infos[0].full.cmp(&b.infos[0].full));
+    all_infos
+        .all_countries
+        .sort_by(|a, b| a.infos[0].full.cmp(&b.infos[0].full));
 
     all_infos
 }
@@ -91,6 +92,9 @@ pub fn rename_score_folder(path1: &PathBuf, path2: &PathBuf) {
 }
 
 pub fn list_folders(path: &Path) -> Vec<String> {
+    if !path.exists() {
+        fs::create_dir_all(path).unwrap();
+    }
     let a = fs::read_dir(path).unwrap();
     let mut v: Vec<String> = a
         .into_iter()

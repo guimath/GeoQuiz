@@ -49,10 +49,10 @@ fn get_score_key(country: &CountryInfos) -> &String {
 impl<'a> AppLogic<'a> {
     pub fn new(score_path: &PathBuf, all_data: &'a AllInfos) -> Self {
         let all_cat_names: Vec<String> = all_data
-            .info_names
+            .image_names
             .iter()
             .cloned()
-            .chain(all_data.image_names.iter().cloned())
+            .chain(all_data.info_names.iter().cloned())
             .collect();
         let search_names = all_data
             .all_countries
@@ -495,7 +495,6 @@ impl<'a> AppLogic<'a> {
                 self.score_folder.set_file_name(v.remove(0));
             }
         }
-        println!("{:?}", self.score_folder);
         info_parse::init_score_folder(&self.score_folder);
     }
     pub fn score_rename_user(&mut self, name1: String, name2: String) {

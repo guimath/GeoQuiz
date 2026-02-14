@@ -1,9 +1,13 @@
-use serde::{Deserialize, Serialize};
-use serde_json;
-use std::collections::HashMap;
-use std::fs::{self, File};
-use std::io::{Read, Write};
-use std::path::{Path, PathBuf};
+use {
+    serde::{Deserialize, Serialize},
+    serde_json,
+    std::{
+        collections::HashMap,
+        fs::{self, File},
+        io::{Read, Write},
+        path::{Path, PathBuf},
+    },
+};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Category {

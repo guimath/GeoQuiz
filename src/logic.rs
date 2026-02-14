@@ -1,24 +1,27 @@
-use rand::seq::SliceRandom;
-use rand::thread_rng;
-use slint::{Image, Model, ModelRc, SharedString, VecModel};
-
 use crate::info_parse::{self, AllInfos, CountryInfos, ImageLink, Score};
-use std::collections::HashMap;
-use std::{cmp::Ordering, path::PathBuf};
+
+use {
+    rand::{seq::SliceRandom, thread_rng},
+    slint::{Image, Model, ModelRc, SharedString, VecModel},
+    std::{cmp::Ordering, collections::HashMap, path::PathBuf, sync::LazyLock},
+};
 
 slint::include_modules!();
+
+pub static ALL_INFOS: LazyLock<AllInfos> = LazyLock::new(|| info_parse::get_data());
 
 const MAIN_SCORE_NAME: &str = "score_main.json";
 const CHOICE_SCORE_NAME: &str = "score_choice.json";
 pub const SUB_CAT_NAMES: [&str; 6] = ["World", "Africa", "Americas", "Asia", "Europe", "Oceania"];
-pub struct AppLogic<'a> {
+
+pub struct AppLogic {
     order_type: u32,
     current: usize,
     results: Vec<u32>,
     scores: HashMap<String, Score>,
     last_scores: HashMap<String, usize>,
-    all_countries: Vec<&'a CountryInfos>,
-    all_countries_order: &'a Vec<CountryInfos>,
+    all_countries: Vec<&'static CountryInfos>,
+    all_countries_order: &'static Vec<CountryInfos>,
     cat_img_len: usize,
     all_cat_names: Vec<String>,
     search_names: Vec<String>,
@@ -46,15 +49,16 @@ pub struct ScoreStats {
 fn get_score_key(country: &CountryInfos) -> &String {
     &country.infos[0].full
 }
-impl<'a> AppLogic<'a> {
-    pub fn new(score_path: &PathBuf, all_data: &'a AllInfos) -> Self {
-        let all_cat_names: Vec<String> = all_data
+impl AppLogic {
+    pub fn new(score_path: &PathBuf) -> Self {
+        let cat_img_len = ALL_INFOS.image_names.len();
+        let all_cat_names: Vec<String> = ALL_INFOS
             .image_names
             .iter()
             .cloned()
-            .chain(all_data.info_names.iter().cloned())
+            .chain(ALL_INFOS.info_names.iter().cloned())
             .collect();
-        let search_names = all_data
+        let search_names = ALL_INFOS
             .all_countries
             .iter()
             .map(|x| x.infos[0].full.to_lowercase())
@@ -73,8 +77,8 @@ impl<'a> AppLogic<'a> {
             scores: Default::default(),
             last_scores: Default::default(),
             all_countries: Default::default(),
-            all_countries_order: &all_data.all_countries,
-            cat_img_len: all_data.image_names.len(),
+            all_countries_order: ALL_INFOS.all_countries.as_ref(),
+            cat_img_len,
             all_cat_names,
             search_names,
             main_info_type: Default::default(),
@@ -90,6 +94,9 @@ impl<'a> AppLogic<'a> {
     }
     pub fn get_all_categories_name(&self) -> &Vec<String> {
         &self.all_cat_names
+    }
+    pub fn get_txt_categories_name(&self) -> &[String] {
+        &self.all_cat_names[self.cat_img_len..]
     }
     pub fn set_config(&mut self, conf: PlaySelectParams) {
         self.score_path = if conf.play_type {

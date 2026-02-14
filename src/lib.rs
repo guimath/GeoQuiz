@@ -1,28 +1,27 @@
+mod choice_play;
 pub mod info_parse;
 mod logic;
-use std::{
-    error::Error,
-    path::PathBuf,
-    str::FromStr,
-    sync::{Arc, Mutex},
-};
-
-use slint::{ComponentHandle, LogicalSize, Model, ModelRc, SharedString, VecModel};
 
 use logic::{AppLogic, AppWindow, HyperLinkClick, ScoreStatSlint};
 
-use crate::info_parse::AllInfos;
+use {
+    slint::{ComponentHandle, LogicalSize, Model, ModelRc, SharedString, VecModel},
+    std::{
+        error::Error,
+        path::PathBuf,
+        str::FromStr,
+        sync::{Arc, Mutex},
+    },
+};
 
-use lazy_static::lazy_static;
-
-lazy_static! {
-    static ref ALL_INFOS: AllInfos = info_parse::get_data();
-}
-
-fn vec_to_model(vec: &Vec<String>) -> ModelRc<SharedString> {
+fn vec_to_model<I, S>(iter: I) -> ModelRc<SharedString>
+where
+    I: IntoIterator<Item = S>,
+    S: AsRef<str>,
+{
     ModelRc::new(
-        vec.iter()
-            .map(SharedString::from)
+        iter.into_iter()
+            .map(|s| SharedString::from(s.as_ref()))
             .collect::<VecModel<SharedString>>(),
     )
 }
@@ -94,14 +93,13 @@ pub fn android_main(app: slint::android::android_activity::AndroidApp) {
 
 fn init(path: PathBuf) -> Result<(), Box<dyn Error>> {
     // slint::init_translations!(concat!(env!("CARGO_MANIFEST_DIR"), "/lang/"));
-    // let all_infos = info_parse::get_data();
 
-    let all_names: Vec<SharedString> = ALL_INFOS
+    let all_names: Vec<SharedString> = logic::ALL_INFOS
         .all_countries
         .iter()
         .map(|x| x.infos[0].full.as_str().into())
         .collect();
-    let logic = Arc::new(Mutex::new(AppLogic::new(&path, &ALL_INFOS)));
+    let logic = Arc::new(Mutex::new(AppLogic::new(&path)));
     let ui = AppWindow::new()?;
     ui.window().set_size(LogicalSize {
         width: 1000.0,
@@ -112,7 +110,7 @@ fn init(path: PathBuf) -> Result<(), Box<dyn Error>> {
         ui.set_search_countries_mask(logic_lock.search_changed("".into()).as_slice().into());
         ui.set_search_all_countries(all_names.as_slice().into());
         ui.set_all_categories_name(vec_to_model(logic_lock.get_all_categories_name()));
-        ui.set_txt_categories_name(vec_to_model(&ALL_INFOS.info_names));
+        ui.set_txt_categories_name(vec_to_model(logic_lock.get_txt_categories_name()));
         ui.set_sub_categories_name(arr_to_model(&logic::SUB_CAT_NAMES));
         ui.set_users(vec_to_model(&logic_lock.list_users()));
         ui.invoke_set_active_user_look_up(logic_lock.get_active_user().into());

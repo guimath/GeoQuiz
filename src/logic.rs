@@ -1,5 +1,6 @@
 use crate::{
     choice_play::ChoicePlay,
+    flashcard_play::FlashcardPlay,
     info_parse::{self, AllInfos, CountryInfos, ImageLink, Score},
 };
 
@@ -17,23 +18,40 @@ const MAIN_SCORE_NAME: &str = "score_main.json";
 const CHOICE_SCORE_NAME: &str = "score_choice.json";
 pub const SUB_CAT_NAMES: [&str; 6] = ["World", "Africa", "Americas", "Asia", "Europe", "Oceania"];
 
+enum OrderType {
+    EasyFirst,
+    Random,
+    HardFirst,
+}
+
+impl From<i32> for OrderType {
+    fn from(value: i32) -> OrderType {
+        match value {
+            0 => OrderType::EasyFirst,
+            1 => OrderType::Random,
+            2 => OrderType::HardFirst,
+            _ => panic!("Invalid order type"),
+        }
+    }
+}
+
 pub struct AppLogic {
-    order_type: u32,
+    order_type: OrderType,
     current: usize,
     results: Vec<u32>,
     scores: HashMap<String, Score>,
     last_scores: HashMap<String, usize>,
-    all_countries: Vec<&'static CountryInfos>,
-    all_countries_order: &'static Vec<CountryInfos>,
-    cat_img_len: usize,
-    all_cat_names: Vec<String>,
-    search_names: Vec<String>,
-    main_info_type: usize,
-    main_guess_types: [usize; 3],
-    choice_play: ChoicePlay,
     score_path: PathBuf,
-    data_path: PathBuf,
     score_folder: PathBuf,
+    filter_countries: Vec<&'static CountryInfos>,
+    /// All country data, sorted in alphabetical order of country name
+    all_countries: &'static Vec<CountryInfos>,
+    cat_img_len: usize,
+    categories_names: Vec<String>,
+    country_names_sorted: Vec<String>,
+    flashcard_play: FlashcardPlay,
+    choice_play: ChoicePlay,
+    data_path: PathBuf,
 }
 
 enum TextOrImgWrapper<'a> {
@@ -63,7 +81,7 @@ impl AppLogic {
             .cloned()
             .chain(ALL_INFOS.info_names.iter().cloned())
             .collect();
-        let search_names = ALL_INFOS
+        let country_names_sorted = ALL_INFOS
             .all_countries
             .iter()
             .map(|x| x.infos[0].full.to_lowercase())
@@ -76,18 +94,17 @@ impl AppLogic {
             score_folder.set_file_name(&v[0]);
         }
         Self {
-            order_type: Default::default(),
+            order_type: OrderType::Random,
             current: Default::default(),
             results: Default::default(),
             scores: Default::default(),
             last_scores: Default::default(),
-            all_countries: Default::default(),
-            all_countries_order: ALL_INFOS.all_countries.as_ref(),
+            filter_countries: Default::default(),
+            all_countries: ALL_INFOS.all_countries.as_ref(),
             cat_img_len,
-            all_cat_names,
-            search_names,
-            main_info_type: Default::default(),
-            main_guess_types: Default::default(),
+            categories_names: all_cat_names,
+            country_names_sorted,
+            flashcard_play: Default::default(),
             choice_play: Default::default(),
             score_path: Default::default(),
             data_path: score_path.join("data"),
@@ -95,10 +112,10 @@ impl AppLogic {
         }
     }
     pub fn get_all_categories_name(&self) -> &Vec<String> {
-        &self.all_cat_names
+        &self.categories_names
     }
     pub fn get_txt_categories_name(&self) -> &[String] {
-        &self.all_cat_names[self.cat_img_len..]
+        &self.categories_names[self.cat_img_len..]
     }
     pub fn set_config(&mut self, conf: PlaySelectParams) {
         self.score_path = if conf.play_type {
@@ -107,8 +124,8 @@ impl AppLogic {
             self.score_folder.join(CHOICE_SCORE_NAME)
         };
 
-        self.all_countries = self
-            .all_countries_order
+        self.filter_countries = self
+            .all_countries
             .iter()
             .filter(|country| {
                 let sub_cat_idx = conf.region_idx as usize;
@@ -116,14 +133,14 @@ impl AppLogic {
                     && (sub_cat_idx == 0 || country.region == SUB_CAT_NAMES[sub_cat_idx])
             })
             .collect();
-        self.order_type = conf.order as u32;
+        self.order_type = conf.order.into();
     }
 
     fn randomize_order(&mut self) {
-        let scores = info_parse::read(&self.all_countries_order, &self.score_path);
+        let scores = info_parse::read(&self.all_countries, &self.score_path);
 
         let mut rng = thread_rng();
-        self.all_countries.shuffle(&mut rng);
+        self.filter_countries.shuffle(&mut rng);
         let compare = |a: &CountryInfos, b: &CountryInfos| -> Ordering {
             scores
                 .get(get_score_key(b))
@@ -131,14 +148,14 @@ impl AppLogic {
                 .total_score
                 .cmp(&scores.get(get_score_key(a)).unwrap().total_score)
         };
-        if self.order_type == 0 {
-            self.all_countries.sort_by(|a, b| compare(a, b));
-        } else if self.order_type == 2 {
-            self.all_countries.sort_by(|b, a| compare(a, b));
+        match self.order_type {
+            OrderType::EasyFirst => self.filter_countries.sort_by(|a, b| compare(a, b)),
+            OrderType::Random => (),
+            OrderType::HardFirst => self.filter_countries.sort_by(|a, b| compare(b, a)),
         }
 
         self.current = 0;
-        self.results = vec![0; self.all_countries.len()];
+        self.results = vec![0; self.filter_countries.len()];
         self.scores = scores;
         self.choice_play.prev_guesses = Default::default();
         self.choice_play.index_guesses = Default::default();
@@ -146,17 +163,14 @@ impl AppLogic {
     }
 
     pub fn prepare_main_play(&mut self, info_type: usize, guess_types: [usize; 3]) {
-        self.main_guess_types = [
-            self.txt_only_to_global_type(guess_types[0]),
-            self.txt_only_to_global_type(guess_types[1]),
-            self.txt_only_to_global_type(guess_types[2]),
-        ];
-        self.main_info_type = info_type;
+        self.flashcard_play.guess_types =
+            std::array::from_fn(|i| self.txt_only_to_global_type(guess_types[i]));
+        self.flashcard_play.info_type = info_type;
         self.randomize_order()
     }
 
     pub fn next(&mut self, result: u32) -> Option<(MainPlayUpdate, [CatInfo; 3])> {
-        let score_key = get_score_key(&self.all_countries[self.current]).to_owned();
+        let score_key = get_score_key(&self.filter_countries[self.current]).to_owned();
         if result != 0 {
             let score = self.scores.get_mut(&score_key).unwrap();
             if self.results[self.current] == 0 {
@@ -186,29 +200,31 @@ impl AppLogic {
     }
 
     pub fn get_stat(&mut self) -> (MainPlayUpdate, [CatInfo; 3]) {
-        let country = &self.all_countries[self.current];
+        let country = &self.filter_countries[self.current];
         let score = self.results[self.current] as i32;
         let last_score = self
             .scores
-            .get(get_score_key(&self.all_countries[self.current]))
+            .get(get_score_key(&self.filter_countries[self.current]))
             .unwrap()
             .last_score as i32;
 
-        let info = self.load_content(self.current, self.main_info_type);
+        let info = self.load_content(self.current, self.flashcard_play.info_type);
 
         let update = MainPlayUpdate {
             info,
             num: self.current as i32,
-            out_of: self.all_countries.len() as i32,
+            out_of: self.filter_countries.len() as i32,
             score,
             last_score,
             seen: score != 0,
         };
         let infos: [CatInfo; 3] = std::array::from_fn(|i| {
-            let cat = &country.infos[self.to_txt_idx(self.main_guess_types[i])];
+            let cat = &country.infos[self.to_txt_idx(self.flashcard_play.guess_types[i])];
             CatInfo {
                 full: cat.full.as_str().into(),
-                category: self.all_cat_names[self.main_guess_types[i]].as_str().into(),
+                category: self.categories_names[self.flashcard_play.guess_types[i]]
+                    .as_str()
+                    .into(),
                 first: cat
                     .hint
                     .as_ref()
@@ -247,7 +263,7 @@ impl AppLogic {
         self.choice_play
             .prev_guesses
             .insert(self.current, was_guessed.clone());
-        let score_key = get_score_key(&self.all_countries[self.current]).to_owned();
+        let score_key = get_score_key(&self.filter_countries[self.current]).to_owned();
         if found {
             let down_ref: &VecModel<bool> = was_guessed.as_any().downcast_ref().unwrap();
             let guess_num = down_ref.iter().filter(|&x| x).count();
@@ -277,12 +293,13 @@ impl AppLogic {
 
     fn choice_same_info(&self, idx: usize) -> bool {
         if self.is_info_txt(self.choice_play.info_type) {
-            let info = &self.all_countries[idx].infos[self.choice_play.info_type].full;
-            let compare = &self.all_countries[self.current].infos[self.choice_play.info_type].full;
+            let info = &self.filter_countries[idx].infos[self.choice_play.info_type].full;
+            let compare =
+                &self.filter_countries[self.current].infos[self.choice_play.info_type].full;
             info == compare
         } else {
-            let info = &self.all_countries[idx].images[self.choice_play.info_type];
-            let compare = &self.all_countries[self.current].images[self.choice_play.info_type];
+            let info = &self.filter_countries[idx].images[self.choice_play.info_type];
+            let compare = &self.filter_countries[self.current].images[self.choice_play.info_type];
             info == compare
         }
     }
@@ -293,7 +310,7 @@ impl AppLogic {
         let unique_indices: Vec<usize> = if self.is_info_txt(guess_type) {
             let guess_idx = self.to_txt_idx(guess_type);
             let mut hash_map: HashMap<String, usize> = HashMap::new();
-            for (idx, item) in self.all_countries.iter().enumerate() {
+            for (idx, item) in self.filter_countries.iter().enumerate() {
                 if self.choice_same_info(idx) {
                     continue;
                 }
@@ -301,11 +318,11 @@ impl AppLogic {
                     .entry(item.infos[guess_idx].full.clone())
                     .or_insert(idx);
             }
-            hash_map.remove(&self.all_countries[self.current].infos[guess_idx].full);
+            hash_map.remove(&self.filter_countries[self.current].infos[guess_idx].full);
             hash_map.into_values().collect()
         } else {
             let mut hash_map = HashMap::new();
-            for (idx, item) in self.all_countries.iter().enumerate() {
+            for (idx, item) in self.filter_countries.iter().enumerate() {
                 if self.choice_same_info(idx) {
                     continue;
                 }
@@ -313,7 +330,7 @@ impl AppLogic {
                     .entry(item.images[guess_type].clone())
                     .or_insert(idx);
             }
-            hash_map.remove(&self.all_countries[self.current].images[guess_type]);
+            hash_map.remove(&self.filter_countries[self.current].images[guess_type]);
             hash_map.into_values().collect()
         };
         let mut rng = rand::thread_rng();
@@ -358,7 +375,7 @@ impl AppLogic {
         let default_info = if self.choice_play.guess_type != default_type
             && self.choice_play.info_type != default_type
         {
-            &self.all_countries[self.current].infos[0].full
+            &self.filter_countries[self.current].infos[0].full
         } else {
             &String::new()
         };
@@ -373,7 +390,7 @@ impl AppLogic {
             guesses: VecModel::from_slice(&guesses),
             info,
             num: self.current as i32,
-            out_of: self.all_countries.len() as i32,
+            out_of: self.filter_countries.len() as i32,
             prev_guess,
             default_info: default_info.into(),
         }
@@ -382,31 +399,31 @@ impl AppLogic {
     pub fn search_changed(&self, s: String) -> Vec<bool> {
         let s = s.to_lowercase();
         let search = s.as_str();
-        self.search_names
+        self.country_names_sorted
             .iter()
             .map(|x| x.contains(search))
             .collect()
     }
     pub fn look_up_current(&self) -> FullInfo {
-        self.get_full_info_country(&self.all_countries[self.current])
+        self.get_full_info_country(&self.filter_countries[self.current])
     }
     pub fn look_up_selected(&self, num: usize) -> FullInfo {
-        self.get_full_info_country(&self.all_countries_order[num])
+        self.get_full_info_country(&self.all_countries[num])
     }
     fn get_full_info_country(&self, country: &CountryInfos) -> FullInfo {
         let name = &country.infos[0].full;
         let mut text_infos: Vec<TextWithTitle> = Vec::new();
         let mut image_infos: Vec<ImageWithTitle> = Vec::new();
 
-        for i in 0..self.all_cat_names.len() {
+        for i in 0..self.categories_names.len() {
             if self.is_info_txt(i) {
                 text_infos.push(TextWithTitle {
-                    title: self.all_cat_names[i].as_str().into(),
+                    title: self.categories_names[i].as_str().into(),
                     text: country.infos[self.to_txt_idx(i)].full.as_str().into(),
                 });
             } else {
                 image_infos.push(ImageWithTitle {
-                    title: self.all_cat_names[i].as_str().into(),
+                    title: self.categories_names[i].as_str().into(),
                     image: self.load_img(&country.images[i]),
                 });
             }
@@ -428,7 +445,7 @@ impl AppLogic {
         let mut val = [0; 2];
         for (i, score_type) in [MAIN_SCORE_NAME, CHOICE_SCORE_NAME].iter().enumerate() {
             let path = self.score_folder.join(score_type);
-            let s = info_parse::read(&self.all_countries_order, &path);
+            let s = info_parse::read(&self.all_countries, &path);
             let score = s.get(name).unwrap();
             val[i] = score.last_score as i32;
         }
@@ -468,15 +485,15 @@ impl AppLogic {
     }
 
     pub fn score_filter_changed(&mut self, all: bool) {
-        self.all_countries = self
-            .all_countries_order
+        self.filter_countries = self
+            .all_countries
             .iter()
             .filter(|country| country.un_member | all)
             .collect();
     }
     pub fn score_sub_cat_changed(&self, sub_cat_idx: usize) -> ScoreStats {
         let filtered_countries: Vec<&String> = self
-            .all_countries
+            .filter_countries
             .iter()
             .filter(|country| country.region == SUB_CAT_NAMES[sub_cat_idx] || sub_cat_idx == 0)
             .map(|x| &x.infos[0].full)
@@ -484,8 +501,8 @@ impl AppLogic {
 
         let score_path_main = self.score_folder.join(MAIN_SCORE_NAME);
         let score_path_choice = self.score_folder.join(CHOICE_SCORE_NAME);
-        let main_scores = info_parse::read(&self.all_countries_order, &score_path_main);
-        let choice_scores = info_parse::read(&self.all_countries_order, &score_path_choice);
+        let main_scores = info_parse::read(&self.all_countries, &score_path_main);
+        let choice_scores = info_parse::read(&self.all_countries, &score_path_choice);
 
         let mut stat = ScoreStats::default();
         for country_name in filtered_countries {
@@ -559,12 +576,14 @@ impl AppLogic {
         self.load_content_helper(if self.is_info_txt(global_cat_idx) {
             let idx = self.to_txt_idx(global_cat_idx);
             TextOrImgWrapper::Text(
-                self.all_countries[all_countries_idx].infos[idx]
+                self.filter_countries[all_countries_idx].infos[idx]
                     .full
                     .as_str(),
             )
         } else {
-            TextOrImgWrapper::Image(&self.all_countries[all_countries_idx].images[global_cat_idx])
+            TextOrImgWrapper::Image(
+                &self.filter_countries[all_countries_idx].images[global_cat_idx],
+            )
         })
     }
 
@@ -592,6 +611,6 @@ impl AppLogic {
         i - self.cat_img_len
     }
     pub fn is_at_end(&self) -> bool {
-        self.current >= self.all_countries.len() - 1
+        self.current >= self.filter_countries.len() - 1
     }
 }

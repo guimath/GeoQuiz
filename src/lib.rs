@@ -1,4 +1,5 @@
 mod choice_play;
+mod flashcard_play;
 pub mod info_parse;
 mod logic;
 

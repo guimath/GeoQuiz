@@ -1,39 +1,46 @@
 import { Button, VerticalBox, HorizontalBox } from "std-widgets.slint";
-import { MultiChoice, RegularText, TitleText, ScrollChoice, TextButton, TextButtonWithIcon } from "widgets.slint";
+import {
+    MultiChoice,
+    RegularText,
+    TitleText,
+    ScrollChoice,
+    TextButton,
+    TextButtonWithIcon,
+} from "widgets.slint";
 import { TextStyle, FontSettings, Palette, Sizes } from "styling.slint";
 
 export component SelectChoicePlayScreen inherits Rectangle {
-    callback play(info_cat:int, guess_cat:int);
+    callback play(info_cat: int, guess_cat: int);
     public function invoke_play() {
         play(info_cat.choice_num, guess_cat.choice_num);
     }
     in property <[string]> info_types;
-    property <[int]> preset_1: [0,1,2,4];
-    property <[int]> preset_2: [3,3,3,3];
+    property <[int]> preset_1: [0, 1, 2, 4];
+    property <[int]> preset_2: [3, 3, 3, 3];
     in-out property <bool> custom: false;
-
 
     VerticalLayout {
         padding: Sizes.padding;
         spacing: Sizes.spacing;
-        TitleText{
+        TitleText {
             text: "4 Choices";
         }
-        Rectangle {}
+
+        Rectangle { }
+
         TitleText {
             text: "Presets";
             style: FontSettings.title-small;
         }
-        for _a[i] in preset_1: HorizontalLayout{
+
+        for _a[i] in preset_1: HorizontalLayout {
             padding: 0;
             spacing: Sizes.spacing;
             alignment: center;
             TextButton {
-                height: Sizes.height_multi_choice*1.5;
-                width: root.width*0.4;
-                text: info_types[preset_2[i]]== "Country" ? 
-                "1 \{info_types[preset_1[i]]}\n4 Countries":
-                "1 \{info_types[preset_1[i]]}\n4 \{info_types[preset_2[i]]}s";
+                height: Sizes.height_multi_choice * 1.5;
+                width: root.width * 0.4;
+                text: info_types[preset_2[i]] == "Country" ? "1 \{info_types[preset_1[i]]}\n4 Countries" : "1 \{info_types[preset_1[i]]}\n4 \{info_types[preset_2[i]]}s";
                 clicked => {
                     info_cat.set_choice_num(preset_1[i]);
                     guess_cat.set_choice_num(preset_2[i]);
@@ -42,12 +49,11 @@ export component SelectChoicePlayScreen inherits Rectangle {
                     }
                 }
             }
+
             TextButton {
-                height: Sizes.height_multi_choice*1.5;
-                width: root.width*0.4;
-                text: info_types[preset_1[i]]== "Country" ? 
-                    "1 \{info_types[preset_2[i]]}\n4 Countries":
-                    "1 \{info_types[preset_2[i]]}\n4 \{info_types[preset_1[i]]}s";
+                height: Sizes.height_multi_choice * 1.5;
+                width: root.width * 0.4;
+                text: info_types[preset_1[i]] == "Country" ? "1 \{info_types[preset_2[i]]}\n4 Countries" : "1 \{info_types[preset_2[i]]}\n4 \{info_types[preset_1[i]]}s";
                 clicked => {
                     info_cat.set_choice_num(preset_2[i]);
                     guess_cat.set_choice_num(preset_1[i]);
@@ -62,18 +68,19 @@ export component SelectChoicePlayScreen inherits Rectangle {
             alignment: center;
             TextButton {
                 height: Sizes.height_multi_choice;
-                width: root.width*0.4;
-                text: root.custom?  "Hide custom" : "Custom";
+                width: root.width * 0.4;
+                text: root.custom ? "Hide custom" : "Custom";
                 clicked => {
                     root.custom = !root.custom;
                 }
             }
         }
+
         VerticalBox {
             padding: 0;
             spacing: Sizes.spacing;
             visible: root.custom;
-            height: root.custom? self.preferred-height: 0px;
+            height: root.custom ? self.preferred-height : 0px;
             animate height {
                 duration: 500ms;
                 easing: ease-in-out;
@@ -82,28 +89,36 @@ export component SelectChoicePlayScreen inherits Rectangle {
                 text: "Info shown";
                 style: FontSettings.title-small;
             }
+
             info_cat := ScrollChoice {
                 width: 100%;
                 choices: root.info_types;
             }
+
             TitleText {
                 text: "Info to guess";
                 style: FontSettings.title-small;
             }
+
             guess_cat := ScrollChoice {
                 width: 100%;
-                choices: root.info_types  ;
+                choices: root.info_types;
                 choice_num: 3;
             }
-            Rectangle {height: Sizes.spacing;}
+
+            Rectangle {
+                height: Sizes.spacing;
+            }
+
             TextButtonWithIcon {
-                height: root.height/10;
+                height: root.height / 10;
                 text: "Play";
-                clicked => {invoke_play()}
+                clicked => {
+                    invoke_play()
+                }
             }
         }
 
-
-        Rectangle {}
+        Rectangle { }
     }
 }

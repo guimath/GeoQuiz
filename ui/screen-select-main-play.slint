@@ -1,9 +1,16 @@
 import { Button, VerticalBox, HorizontalBox } from "std-widgets.slint";
-import { MultiChoice, RegularText, TitleText, ScrollChoice, TextButton, TextButtonWithIcon } from "widgets.slint";
+import {
+    MultiChoice,
+    RegularText,
+    TitleText,
+    ScrollChoice,
+    TextButton,
+    TextButtonWithIcon,
+} from "widgets.slint";
 import { TextStyle, FontSettings, Palette, Sizes } from "styling.slint";
 
 export component SelectMainPlayScreen inherits Rectangle {
-    callback play(cat_choices:[int], im_choice:int, play_mode:int);
+    callback play(cat_choices: [int], im_choice: int, play_mode: int);
     public function invoke_play() {
         play(
             [cat1.choice_num, cat2.choice_num, cat3.choice_num], 
@@ -14,14 +21,15 @@ export component SelectMainPlayScreen inherits Rectangle {
     in property <[string]> info_type_names;
     in property <[string]> guess_type_names;
     in-out property <bool> custom: false;
-    property <length> preset_btn_length: (root.width - 2*Sizes.padding - 3*Sizes.spacing)/4;
+    property <length> preset_btn_length: (root.width - 2 * Sizes.padding - 3 * Sizes.spacing) / 4;
     VerticalBox {
         padding: Sizes.padding;
         spacing: Sizes.spacing;
-        TitleText{
+        TitleText {
             text: "Flashcards";
         }
-        Rectangle {}
+
+        Rectangle { }
 
         Rectangle {
             background: Palette.highlight1;
@@ -39,17 +47,14 @@ export component SelectMainPlayScreen inherits Rectangle {
                     choices: ["Learn", "Easy", "Medium", "Hard"];
                     choice_num: 2;
                 }
+
                 RegularText {
-                    text: w_play_mode.choice_num == 0 ? "All info is shown":
-                        w_play_mode.choice_num == 1 ? "All hints are shown": 
-                        w_play_mode.choice_num == 2 ? "Hints are available":
-                        "No hints";
+                    text: w_play_mode.choice_num == 0 ? "All info is shown" : w_play_mode.choice_num == 1 ? "All hints are shown" : w_play_mode.choice_num == 2 ? "Hints are available" : "No hints";
                     horizontal-alignment: center;
                     style: FontSettings.body-small;
                 }
             }
         }
-    
 
         VerticalBox {
             padding: 0;
@@ -58,6 +63,7 @@ export component SelectMainPlayScreen inherits Rectangle {
                 text: "Presets";
                 style: FontSettings.title-small;
             }
+
             HorizontalBox {
                 // visible: !root.custom;
                 alignment: center;
@@ -92,6 +98,7 @@ export component SelectMainPlayScreen inherits Rectangle {
                         }
                     }
                 }
+
                 TextButton {
                     height: Sizes.height_multi_choice;
                     width: root.preset_btn_length;
@@ -106,6 +113,7 @@ export component SelectMainPlayScreen inherits Rectangle {
                         }
                     }
                 }
+
                 TextButton {
                     height: Sizes.height_multi_choice;
                     width: root.preset_btn_length;
@@ -121,23 +129,25 @@ export component SelectMainPlayScreen inherits Rectangle {
                     }
                 }
             }
+
             HorizontalBox {
                 padding: 0;
                 alignment: center;
                 TextButton {
                     height: Sizes.height_multi_choice;
-                    width: 2*root.preset_btn_length + Sizes.spacing;
-                    text: root.custom?  "Hide custom" : "Custom";
+                    width: 2 * root.preset_btn_length + Sizes.spacing;
+                    text: root.custom ? "Hide custom" : "Custom";
                     clicked => {
                         root.custom = !root.custom;
                     }
                 }
             }
+
             VerticalBox {
                 visible: root.custom;
                 padding: 0;
                 spacing: Sizes.spacing;
-                height: root.custom? self.preferred-height: 0px;
+                height: root.custom ? self.preferred-height : 0px;
                 animate height {
                     duration: 500ms;
                     easing: ease-in-out;
@@ -149,8 +159,9 @@ export component SelectMainPlayScreen inherits Rectangle {
                 // Rectangle {height: Sizes.spacing;}
                 cat_im := ScrollChoice {
                     choices: root.info_type_names;
-                    width:  100%;
+                    width: 100%;
                 }
+
                 TitleText {
                     text: "Info to guess";
                     style: FontSettings.title-small;
@@ -176,6 +187,7 @@ export component SelectMainPlayScreen inherits Rectangle {
                         choice_num: 4;
                     }
                 }
+
                 TextButtonWithIcon {
                     height: root.height / 10;
                     text: "Play";
@@ -185,6 +197,7 @@ export component SelectMainPlayScreen inherits Rectangle {
                 }
             }
         }
-        Rectangle {}
+
+        Rectangle { }
     }
 }

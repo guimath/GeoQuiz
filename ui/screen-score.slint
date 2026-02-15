@@ -1,13 +1,28 @@
-import { Button, VerticalBox, HorizontalBox, ComboBox, ScrollView, StandardButton } from "std-widgets.slint";
-import { MultiChoice, RegularText, TitleText, ScrollChoice, TextButton, BarGraph, SelectionFilters } from "widgets.slint";
+import {
+    Button,
+    VerticalBox,
+    HorizontalBox,
+    ComboBox,
+    ScrollView,
+    StandardButton,
+} from "std-widgets.slint";
+import {
+    MultiChoice,
+    RegularText,
+    TitleText,
+    ScrollChoice,
+    TextButton,
+    BarGraph,
+    SelectionFilters,
+} from "widgets.slint";
 import { TextStyle, FontSettings, Palette, Sizes } from "styling.slint";
 import { ScoreStatSlint, PopupType } from "structs.slint";
 
 export component ScoreScreen inherits Rectangle {
-    callback user_selected(name:string);
-    callback filter_changed(all:bool);
-    callback category_changed(idx:int);
-    callback user_change(user: string, delete:bool);
+    callback user_selected(name: string);
+    callback filter_changed(all: bool);
+    callback category_changed(idx: int);
+    callback user_change(user: string, delete: bool);
     callback rename_user(original_name: string, new_name: string);
     callback reset_focus();
     in property <[string]> sub_categories_name: ["World", "Africa", "Americas", "Asia", "Europe", "Oceania"];
@@ -21,7 +36,6 @@ export component ScoreScreen inherits Rectangle {
         choice_max: 170,
     };
     property <PopupType> popup_type: PopupType.Off;
-    
     public function set_active_user(name: string) {
         user_sel.current-value = name;
         timer.running = true;
@@ -43,20 +57,24 @@ export component ScoreScreen inherits Rectangle {
             category_changed(filter.sub_cat);
         }
     }
+
     VerticalLayout {
         padding: Sizes.padding;
         spacing: Sizes.spacing;
-        TitleText{
+        TitleText {
             text: "Score";
         }
+
         HorizontalBox {
             padding: 0;
-            spacing: Sizes.spacing/2;
-            Rectangle {}
+            spacing: Sizes.spacing / 2;
+            Rectangle { }
+
             TitleText {
                 text: "User:";
                 style: FontSettings.title-small;
             }
+
             user_sel := ComboBox {
                 height: Sizes.title_height;
                 model: root.users;
@@ -67,32 +85,34 @@ export component ScoreScreen inherits Rectangle {
                     category_changed(filter.sub_cat);
                 }
             }
+
             TouchArea {
                 width: Sizes.title_height;
                 height: Sizes.title_height;
                 TitleText {
-                    text:"+";
-                    style:  { font-size: 20pt, font-weight: 1000 };
+                    text: "+";
+                    style: { font-size: 20pt, font-weight: 1000 };
                 }
-
 
                 clicked => {
                     popup_type = PopupType.Add;
                     txt_input.text = "";
                     txt_input.focus();
                 }
-                
             }
+
             TitleText {
-                text:"/";
+                text: "/";
             }
+
             TouchArea {
                 width: Sizes.title_height;
                 height: Sizes.title_height;
                 TitleText {
-                    text:"E";
-                    style:  { font-size: 20pt, font-weight: 1000 };
+                    text: "E";
+                    style: { font-size: 20pt, font-weight: 1000 };
                 }
+
                 clicked => {
                     popup_type = PopupType.Edit;
                     txt_input.text = user_sel.current-value;
@@ -101,24 +121,25 @@ export component ScoreScreen inherits Rectangle {
                     txt_input.focus();
                 }
             }
+
             TitleText {
-                text:"/";
+                text: "/";
             }
+
             TouchArea {
                 width: Sizes.title_height;
                 height: Sizes.title_height;
                 TitleText {
-                    text:"-";
-                    style:  { font-size: 20pt, font-weight: 1000 };
+                    text: "-";
+                    style: { font-size: 20pt, font-weight: 1000 };
                 }
-
 
                 clicked => {
                     popup_type = PopupType.Delete;
                 }
             }
 
-            Rectangle {}
+            Rectangle { }
         }
 
         // scroll := ScrollView {
@@ -140,38 +161,44 @@ export component ScoreScreen inherits Rectangle {
                     category_changed(self.sub_cat);
                 }
             }
+
             HorizontalBox {
                 padding: 0;
-                Rectangle {}
+                Rectangle { }
 
                 Rectangle {
-                    width: (root.width - 5*Sizes.spacing - 4*Sizes.padding)/12;
+                    width: (root.width - 5 * Sizes.spacing - 4 * Sizes.padding) / 12;
                     Rectangle {
                         width: 100%;
                         height: Sizes.spacing;
                         background: Palette.regular_text;
                     }
                 }
+
                 RegularText {
                     text: "Average";
                     vertical-alignment: center;
                 }
-                Rectangle {}
+
+                Rectangle { }
 
                 Rectangle {
-                    width: (root.width - 5*Sizes.spacing - 4*Sizes.padding)/12;
+                    width: (root.width - 5 * Sizes.spacing - 4 * Sizes.padding) / 12;
                     Rectangle {
                         width: 100%;
                         height: Sizes.spacing;
                         background: Palette.correct;
                     }
                 }
+
                 RegularText {
                     text: "Last play";
                     vertical-alignment: center;
                 }
-                Rectangle {}
+
+                Rectangle { }
             }
+
             Rectangle {
                 vertical-stretch: 0;
                 background: Palette.highlight1;
@@ -184,14 +211,16 @@ export component ScoreScreen inherits Rectangle {
                         text: "Free play score";
                         style: FontSettings.title-small;
                     }
+
                     BarGraph {
-                        bar_height: root.height/7;
-                        bar_width: (root.width - 5*Sizes.spacing - 4*Sizes.padding)/6;
+                        bar_height: root.height / 7;
+                        bar_width: (root.width - 5 * Sizes.spacing - 4 * Sizes.padding) / 6;
                         max_num: root.stat.main_max;
                         names: ["Not Played", 1, 2, 3, 4, 5];
                         avg: root.stat.main_avg;
                         last: root.stat.main_last;
                     }
+
                     RegularText {
                         height: 50px;
                         text: "Number of countries per star rating";
@@ -213,14 +242,16 @@ export component ScoreScreen inherits Rectangle {
                         text: "4 Choices score";
                         style: FontSettings.title-small;
                     }
+
                     BarGraph {
-                        bar_height: root.height/7;
-                        bar_width: (root.width - 4*Sizes.spacing - 4*Sizes.padding)/5;
+                        bar_height: root.height / 7;
+                        bar_width: (root.width - 4 * Sizes.spacing - 4 * Sizes.padding) / 5;
                         max_num: root.stat.choice_max;
                         names: ["Not Played", 3, 2, 1, 0];
                         avg: root.stat.choice_avg;
                         last: root.stat.choice_last;
                     }
+
                     RegularText {
                         height: 50px;
                         text: "Number of countries per wrong guesses";
@@ -229,7 +260,8 @@ export component ScoreScreen inherits Rectangle {
                     }
                 }
             }
-            Rectangle {}
+
+            Rectangle { }
         }
         // }
     }
@@ -239,7 +271,9 @@ export component ScoreScreen inherits Rectangle {
         visible: popup_type != PopupType.Off;
         height: 100%;
         width: 100%;
-        clicked => {close_popup()}
+        clicked => {
+            close_popup()
+        }
         Rectangle {
             height: 100%;
             width: 100%;
@@ -247,10 +281,13 @@ export component ScoreScreen inherits Rectangle {
             VerticalLayout {
                 padding: 0;
                 spacing: 0;
-                Rectangle {height: root.height/8;}
+                Rectangle {
+                    height: root.height / 8;
+                }
+
                 HorizontalLayout {
-                    padding-left: root.width/8;
-                    padding-right: root.width/8;
+                    padding-left: root.width / 8;
+                    padding-right: root.width / 8;
                     Rectangle {
                         background: Palette.background;
                         border-radius: Sizes.std_radius;
@@ -259,11 +296,10 @@ export component ScoreScreen inherits Rectangle {
                         VerticalBox {
                             spacing: Sizes.spacing;
                             RegularText {
-                                text: popup_type == PopupType.Delete ? "Delete \{user_sel.current-value} ?":
-                                popup_type == PopupType.Add ? "Create new user":
-                                    "Modify \{user_sel.current-value}";
+                                text: popup_type == PopupType.Delete ? "Delete \{user_sel.current-value} ?" : popup_type == PopupType.Add ? "Create new user" : "Modify \{user_sel.current-value}";
                                 horizontal-alignment: center;
                             }
+
                             txt_input := TextInput {
                                 visible: popup_type == PopupType.Edit || popup_type == PopupType.Add;
                                 horizontal-alignment: center;
@@ -271,38 +307,41 @@ export component ScoreScreen inherits Rectangle {
                                 wrap: word-wrap;
                                 key-pressed(KeyEvent) => {
                                     // Quick and dirty character limitations (only latin & numbers)
-                                    if KeyEvent.text <= "Z" && KeyEvent.text >= "A"  {
+                                    if KeyEvent.text <= "Z" && KeyEvent.text >= "A" {
                                         reject
                                     } else if KeyEvent.text <= "z" && KeyEvent.text >= "a" {
                                         reject
                                     } else if KeyEvent.text == Key.Delete || KeyEvent.text == Key.Backspace || KeyEvent.text == Key.Space {
                                         reject
-                                    } else if KeyEvent.text <= "9" && KeyEvent.text >= "0"{
+                                    } else if KeyEvent.text <= "9" && KeyEvent.text >= "0" {
                                         reject
-                                    } else if KeyEvent.text == Key.LeftArrow || KeyEvent.text == Key.RightArrow{
+                                    } else if KeyEvent.text == Key.LeftArrow || KeyEvent.text == Key.RightArrow {
                                         reject
                                     } else {
                                         accept
                                     }
                                 }
                             }
+
                             HorizontalBox {
                                 padding: 0;
                                 spacing: Sizes.spacing;
                                 alignment: center;
-                                Rectangle {}
+                                Rectangle { }
+
                                 TextButton {
-                                    width: root.width/4;
+                                    width: root.width / 4;
                                     height: Sizes.height_look_up;
-                                    text:"Cancel";
+                                    text: "Cancel";
                                     clicked => {
                                         close_popup()
                                     }
                                 }
+
                                 TextButton {
-                                    width: root.width/4;
+                                    width: root.width / 4;
                                     height: Sizes.height_look_up;
-                                    text:"Ok";
+                                    text: "Ok";
                                     clicked => {
                                         if root.popup_type == PopupType.Add {
                                             user_change(txt_input.text, false);
@@ -311,15 +350,17 @@ export component ScoreScreen inherits Rectangle {
                                         } else if root.popup_type == PopupType.Edit {
                                             rename_user(user_sel.current_value, txt_input.text);
                                         }
-                                            close_popup()
+                                        close_popup()
                                     }
                                 }
-                                Rectangle {}
+
+                                Rectangle { }
                             }
                         }
                     }
                 }
-                Rectangle {}
+
+                Rectangle { }
             }
         }
     }

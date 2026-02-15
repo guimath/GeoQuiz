@@ -1,5 +1,13 @@
-import { Button, VerticalBox, HorizontalBox, TextEdit, CheckBox, ComboBox, ScrollView } from "std-widgets.slint";
-import { CatInfo, ChoiceState, TxtOrImg} from "structs.slint";
+import {
+    Button,
+    VerticalBox,
+    HorizontalBox,
+    TextEdit,
+    CheckBox,
+    ComboBox,
+    ScrollView,
+} from "std-widgets.slint";
+import { CatInfo, ChoiceState, TxtOrImg } from "structs.slint";
 import { TextStyle, FontSettings, Palette, Sizes } from "styling.slint";
 
 export component RegularText inherits Text {
@@ -7,32 +15,32 @@ export component RegularText inherits Text {
     font-size: style.font-size;
     font-weight: style.font-weight;
 }
+
 export component TitleText inherits RegularText {
     style: FontSettings.title-large;
-    height : Sizes.title_height;
+    height: Sizes.title_height;
     horizontal-alignment: center;
     vertical-alignment: center;
 }
 
 export component ChoiceElem inherits TouchArea {
     in property <string> text;
-    in property <ChoiceState> state : ChoiceState.NotClicked;
-    in property <color> text_color: Palette.regular_text; 
+    in property <ChoiceState> state: ChoiceState.NotClicked;
+    in property <color> text_color: Palette.regular_text;
     in property <color> background_elem: 
-        root.state == ChoiceState.NotClicked?  Palette.highlight3:
-        root.state == ChoiceState.Correct?  Palette.correct:
-        Palette.wrong;
+        root.state == ChoiceState.NotClicked ? Palette.highlight3 : root.state == ChoiceState.Correct ? Palette.correct : Palette.wrong;
     in property <length> radius: Sizes.std_radius;
     public function click() {
         root.clicked();
-    } 
+    }
     Rectangle {
         width: 100%;
         border-radius: radius;
         background: root.background_elem;
     }
+
     RegularText {
-        width:100%;
+        width: 100%;
         horizontal-alignment: center;
         vertical-alignment: center;
         wrap: word-wrap;
@@ -40,38 +48,42 @@ export component ChoiceElem inherits TouchArea {
         color: root.text_color;
     }
 }
+
 export component MultiChoice {
     in property <[string]> choices;
-    in-out property <int> choice_num : 0;
-    out property <bool> not_default : root.choice_num != 0;
+    in-out property <int> choice_num: 0;
+    out property <bool> not_default: root.choice_num != 0;
 
-    in property <length> height_elem : Sizes.height_multi_choice;
-    in property <length> spacing : 2*Sizes.spacing;
-    in property <length> side_padding : Sizes.spacing;
-    in property <length> width_per_elem: (root.width - 2*root.side_padding -(choices.length - 1)*root.spacing)/choices.length;
-  
+    in property <length> height_elem: Sizes.height_multi_choice;
+    in property <length> spacing: 2 * Sizes.spacing;
+    in property <length> side_padding: Sizes.spacing;
+    in property <length> width_per_elem: (root.width - 2 * root.side_padding - (choices.length - 1) * root.spacing) / choices.length;
     HorizontalBox {
         padding: 0;
         spacing: root.spacing;
         alignment: center;
-        for text[index] in root.choices : ChoiceElem {
+        for text[index] in root.choices: ChoiceElem {
             background_elem: Palette.highlight1;
             text: text;
-            text_color: index==root.choice_num ? Palette.regular_text : Palette.regular_text.darker(0.3); 
+            text_color: index == root.choice_num ? Palette.regular_text : Palette.regular_text.darker(0.3);
             width: root.width_per_elem;
             height: root.height_elem;
-            clicked => {root.choice_num = index}
+            clicked => {
+                root.choice_num = index
+            }
             animate text_color {
                 duration: 300ms;
                 easing: ease-in-out;
             }
         }
     }
-    highlight := Rectangle{
-        x: (root.width - root.width_per_elem*root.choices.length - root.spacing*(root.choices.length - 1))/2 + (root.width_per_elem+root.spacing)*root.choice_num;
-        background: Palette.highlight2;//Palette.highlight3;
+
+    highlight := Rectangle {
+        x: (root.width - root.width_per_elem * root.choices.length - root.spacing * (root.choices.length - 1)) / 2 + (root.width_per_elem + root.spacing) * root.choice_num;
+        background: Palette.highlight2;
+        //Palette.highlight3;
         height: root.height_elem;
-        width:root.width_per_elem;
+        width: root.width_per_elem;
         border-radius: Sizes.std_radius;
         animate x {
             duration: 300ms;
@@ -79,7 +91,6 @@ export component MultiChoice {
         }
     }
 }
-
 
 component ToggleStar inherits TouchArea {
     in property <bool> on: false;
@@ -90,14 +101,12 @@ component ToggleStar inherits TouchArea {
         height: Sizes.title_height;
         width: Sizes.title_height;
         source: @image-url("img/star.svg");
-        colorize: on? Palette.gold:
-            root.semi? @radial-gradient(circle, white 0%, Palette.gold 100%):
-            white;
+        colorize: on ? Palette.gold : root.semi ? @radial-gradient(circle, white 0%, Palette.gold 100%) : white;
     }
 }
 
 export component FiveStarScore {
-    in property <bool> user_modifiable : true;
+    in property <bool> user_modifiable: true;
     in-out property <int> score:0;
     in-out property <int> prev_score:2;
     callback score_changed(score: int);
@@ -106,22 +115,21 @@ export component FiveStarScore {
         HorizontalBox {
             spacing: Sizes.spacing;
             padding: 0;
-            for i in [0, 1, 2, 3, 4] : ToggleStar {
+            for i in [0, 1, 2, 3, 4]: ToggleStar {
                 clicked => {
                     if !user_modifiable {
                         return;
                     }
-                    root.score = i+1;
-                    root.prev_score = i+1;
-                    score_changed(i+1);
+                    root.score = i + 1;
+                    root.prev_score = i + 1;
+                    score_changed(i + 1);
                 }
-                on: root.score>i;
-                semi: root.prev_score>i;
+                on: root.score > i;
+                semi: root.prev_score > i;
             }
         }
     }
 }
-
 
 export component HiddenText inherits TouchArea {
     in-out property <string> name;
@@ -130,9 +138,8 @@ export component HiddenText inherits TouchArea {
     in-out property <bool> show;
     in-out property <bool> show_first_letter;
     in-out property <length> size_hint: Sizes.size_hint;
-    in property <int> play_mode; 
+    in property <int> play_mode;
     callback hint();
-    
     public function update_cat(cat: CatInfo, seen: bool) {
         self.type = cat.category;
         self.name = cat.full;
@@ -142,24 +149,18 @@ export component HiddenText inherits TouchArea {
         } else {
             root.show = false;
         }
-        
-        
-        if root.play_mode == 1 && cat.with_hint && !root.show { 
+        if root.play_mode == 1 && cat.with_hint && !root.show {
             self.size_hint = Sizes.size_hint;
-        }
-        else {
+        } else {
             self.size_hint = 0;
         }
 
         if root.play_mode == 2 && cat.with_hint {
             self.show_first_letter = true;
-        }
-        else {
+        } else {
             self.show_first_letter = false;
         }
-
     }
-    
     clicked => {
         root.show = true;
         root.show_first_letter = false;
@@ -180,22 +181,23 @@ export component HiddenText inherits TouchArea {
                     vertical-alignment: center;
                     text: "\{root.type}:";
                 }
-                RegularText { 
+
+                RegularText {
                     horizontal-stretch: 1;
                     vertical-stretch: 1;
                     height: 100%;
                     horizontal-alignment: left;
                     vertical-alignment: center;
-                    text: show ? root.name: root.first_letter;
+                    text: show ? root.name : root.first_letter;
                     visible: root.show || root.show_first_letter;
                     wrap: word-wrap;
                 }
-            }   
+            }
         }
     }
-    
+
     TouchArea {
-        x : root.width - root.size_hint - Sizes.spacing;
+        x: root.width - root.size_hint - Sizes.spacing;
         height: root.size_hint;
         width: root.size_hint;
         clicked => {
@@ -204,33 +206,32 @@ export component HiddenText inherits TouchArea {
             root.show_first_letter = true
         }
     }
+
     Image {
-        x : root.size_hint == 0 ? root.width - Sizes.size_hint/2 - Sizes.spacing : root.width - Sizes.size_hint - Sizes.spacing;
+        x: root.size_hint == 0 ? root.width - Sizes.size_hint / 2 - Sizes.spacing : root.width - Sizes.size_hint - Sizes.spacing;
         height: root.size_hint;
         width: root.size_hint;
         source: @image-url("img/hint.svg");
-        animate height, width, x {
-            duration: 250ms;
-        }
+        animate height, width, x { duration: 250ms; }
     }
 }
 
 export component ScrollChoice inherits HorizontalLayout {
     in property <[string]> choices: ["Country", "Capital", "Languages", "Borders", "Region", "Currencies"];
-    in property <length> width_per_elem: (root.width - root.spacing_i *2 - 2*Sizes.size_bar - 2*root.width_arrow)/3;
+    in property <length> width_per_elem: (root.width - root.spacing_i * 2 - 2 * Sizes.size_bar - 2 * root.width_arrow) / 3;
     in-out property <int> choice_num:0;
 
-    in property <length> spacing_i: 2*Sizes.spacing;
+    in property <length> spacing_i: 2 * Sizes.spacing;
     in property <length> width_arrow: Sizes.width_arrow;
     in property <length> height_elem: Sizes.height_multi_choice;
-    property <length> Width_w_spacing : root.spacing_i + root.width_per_elem;
+    property <length> Width_w_spacing: root.spacing_i + root.width_per_elem;
 
-    public function set_choice_num(i:int) {
+    public function set_choice_num(i: int) {
         root.choice_num = i;
-        scroll.viewport-x= set_x();
+        scroll.viewport-x = set_x();
     }
     function set_x() -> length {
-        return - (root.choice_num* (root.width_per_elem+ root.spacing_i));
+        return - (root.choice_num * (root.width_per_elem + root.spacing_i));
     }
     alignment: center;
     padding: 0;
@@ -245,48 +246,56 @@ export component ScrollChoice inherits HorizontalLayout {
             source: @image-url("img/arrow_left.svg");
             colorize: root.choice_num == 0 ? white.transparentize(0.5) : white;
         }
+
         clicked => {
-            
-            if root.choice_num > 0 {set_choice_num(root.choice_num -1)}
+            if root.choice_num > 0 {
+                set_choice_num(root.choice_num - 1)
+            }
         }
     }
 
     Rectangle {
         width: Sizes.size_bar;
     }
+
     scroll := ScrollView {
 
         height: root.height_elem + Sizes.size_bar;
         viewport-height: root.height_elem;
         horizontal-scrollbar-policy: always-off;
-        width: 3*width_per_elem+ 2*root.spacing_i + Sizes.size_bar;
+        width: 3 * width_per_elem + 2 * root.spacing_i + Sizes.size_bar;
         viewport-x: set_x();
-        
         HorizontalLayout {
             padding: 0;
             spacing: root.spacing_i;
-            Rectangle {width: root.width_per_elem;}
-            for text[index] in root.choices : ChoiceElem {
-                height: root.choice_num == index ? root.height_elem: root.height_elem - 5pt;
+            Rectangle {
+                width: root.width_per_elem;
+            }
+
+            for text[index] in root.choices: ChoiceElem {
+                height: root.choice_num == index ? root.height_elem : root.height_elem - 5pt;
                 text: text;
                 width: root.width_per_elem;
                 text_color: index == root.choice_num ? Palette.regular_text : Palette.regular_text.darker(0.3);
                 background_elem: index == root.choice_num ? Palette.highlight4 : Palette.highlight3;
-                clicked => {root.choice_num = index; scroll.viewport-x= set_x();}
+                clicked => {
+                    root.choice_num = index;
+                    scroll.viewport-x = set_x();
+                }
                 animate height {
                     duration: 50ms;
                     easing: ease-in;
-                     
                 }
             }
-            Rectangle {width: width_per_elem;}
+            Rectangle {
+                width: width_per_elem;
+            }
         }
 
         scrolled() => {
-            if scroll.viewport-x >= set_x() + root.spacing_i + root.width_per_elem/2 {
+            if scroll.viewport-x >= set_x() + root.spacing_i + root.width_per_elem / 2 {
                 root.choice_num -= 1;
-            } 
-            else if scroll.viewport-x <= set_x() - root.spacing_i - root.width_per_elem/2 {
+            } else if scroll.viewport-x <= set_x() - root.spacing_i - root.width_per_elem / 2 {
                 root.choice_num += 1;
             }
         }
@@ -295,6 +304,7 @@ export component ScrollChoice inherits HorizontalLayout {
             easing: ease-in-out;
         }
     }
+
     TouchArea {
         height: root.height_elem;
         width: root.width_arrow;
@@ -304,10 +314,13 @@ export component ScrollChoice inherits HorizontalLayout {
             width: 100%;
             source: @image-url("img/arrow_left.svg");
             rotation-angle: -180deg;
-            colorize: root.choice_num == choices.length - 1 ? white.transparentize(0.5): white;
+            colorize: root.choice_num == choices.length - 1 ? white.transparentize(0.5) : white;
         }
+
         clicked => {
-            if root.choice_num < (choices.length - 1) {set_choice_num(root.choice_num + 1)}
+            if root.choice_num < (choices.length - 1) {
+                set_choice_num(root.choice_num + 1)
+            }
         }
     }
 }
@@ -342,20 +355,17 @@ export component SwipeInfo inherits SwipeGestureHandler {
     }
 }
 
-
 export component ImageChoice inherits TouchArea {
     in property <image> image;
-    in property <ChoiceState> state : ChoiceState.NotClicked;
+    in property <ChoiceState> state: ChoiceState.NotClicked;
     in property <color> background_elem: 
-        root.state == ChoiceState.NotClicked?  Palette.highlight1:
-        root.state == ChoiceState.Correct?  Palette.correct:
-        Palette.wrong;
+        root.state == ChoiceState.NotClicked ? Palette.highlight1 : root.state == ChoiceState.Correct ? Palette.correct : Palette.wrong;
     in property <length> radius: Sizes.std_radius;
-   
     Rectangle {
         border-radius: root.radius;
         background: root.background_elem;
     }
+
     HorizontalBox {
         padding: 0;
         // padding: Sizes.padding;
@@ -368,13 +378,14 @@ export component ImageChoice inherits TouchArea {
 
 export component TextButton inherits HorizontalBox {
     callback clicked();
-    in property <length> border_radius : Sizes.std_radius;
-    in property <string> text : "Button";
-    in property <length> width_button : root.width;
+    in property <length> border_radius: Sizes.std_radius;
+    in property <string> text: "Button";
+    in property <length> width_button: root.width;
     in property <length> height_button: root.height;
     padding: 0;
     spacing: 0;
-    Rectangle {}
+    Rectangle { }
+
     ta := TouchArea {
         height: root.height_button;
         width: root.width_button;
@@ -382,17 +393,23 @@ export component TextButton inherits HorizontalBox {
             background: Palette.buttons;
             border-radius: root.border_radius;
         }
+
         RegularText {
             text: root.text;
             horizontal-alignment: center;
             vertical-alignment: center;
             wrap: word-wrap;
-            width : 100%;
-            height : 100%;
+            width: 100%;
+            height: 100%;
         }
-        clicked() => {root.clicked()}
+
+        clicked() => {
+            root.clicked()
+        }
     }
-    Rectangle {}
+
+    Rectangle { }
+
     states [
         has-hvr when ta.has-hover: {
             back_rect.color: Palette.buttons.brighter(0.3);
@@ -405,14 +422,15 @@ export component TextButton inherits HorizontalBox {
 
 export component TextButtonWithIcon inherits HorizontalBox {
     callback clicked();
-    in property <length> border_radius : root.height/2;
-    in property <string> text : "Button";
-    in property <image> icon : @image-url("img/play.svg");
-    in property <length> width_button : root.width - 10*Sizes.padding;
+    in property <length> border_radius: root.height / 2;
+    in property <string> text: "Button";
+    in property <image> icon: @image-url("img/play.svg");
+    in property <length> width_button: root.width - 10 * Sizes.padding;
     in property <length> height_button: root.height;
     padding: 0;
     spacing: 0;
-    Rectangle {}
+    Rectangle { }
+
     ta := TouchArea {
         height: root.height_button;
         width: root.width_button;
@@ -420,15 +438,17 @@ export component TextButtonWithIcon inherits HorizontalBox {
             background: Palette.buttons;
             border-radius: root.border_radius;
         }
+
         HorizontalLayout {
             padding: Sizes.padding;
             padding-right: root.border_radius; // makes it look more centered
             spacing: 0;
             Image {
                 source: root.icon;
-                height: root.height_button - 2*Sizes.padding ;
-                width: root.height_button - 2*Sizes.padding ;
+                height: root.height_button - 2 * Sizes.padding;
+                width: root.height_button - 2 * Sizes.padding;
             }
+
             RegularText {
                 style: FontSettings.title-small;
                 text: root.text;
@@ -437,9 +457,14 @@ export component TextButtonWithIcon inherits HorizontalBox {
                 wrap: word-wrap;
             }
         }
-        clicked() => {root.clicked()}
+
+        clicked() => {
+            root.clicked()
+        }
     }
-    Rectangle {}
+
+    Rectangle { }
+
     states [
         has_hover when ta.has_hover: {
             back_rect.color: Palette.buttons.brighter(0.3);
@@ -454,7 +479,7 @@ export component BarGraph {
     in property <color> color_1: Palette.regular_text;
     in property <color> color_2: Palette.correct;
     in property <length> bar_width: 80px;
-    property <length> half_bar_width: bar_width/2;
+    property <length> half_bar_width: bar_width / 2;
     in property <length> bar_height: 200px;
     in property <int> max_num: 100;
     in property <[string]> names: [0, 1, 2, 3, 4, 5];
@@ -462,81 +487,87 @@ export component BarGraph {
     in property <[int]> last: [100, 9, 31, 47, 44, 52];
     height: root.bar_height;
     Rectangle {
-        width: root.bar_width*root.names.length + Sizes.spacing*(root.names.length - 1);
+        width: root.bar_width * root.names.length + Sizes.spacing * (root.names.length - 1);
         height: root.bar_height;
-        for val[i] in root.names : Rectangle {
+        for val[i] in root.names: Rectangle {
             width: root.bar_width;
             height: 100%;
-            x: i*(bar_width+Sizes.spacing);
+            x: i * (bar_width + Sizes.spacing);
             y: 0;
             TitleText {
                 vertical-alignment: top;
-                text:val;
+                text: val;
                 width: 100%;
                 y: root.bar_height;
                 style: FontSettings.body-large;
             }
+
             Rectangle {
-                x : 0;
-                y: root.bar_height - root.avg[i]/root.max_num*root.bar_height;
-                height:  root.avg[i]/root.max_num*root.bar_height;
+                x: 0;
+                y: root.bar_height - root.avg[i] / root.max_num * root.bar_height;
+                height: root.avg[i] / root.max_num * root.bar_height;
                 width: root.half_bar_width;
                 background: root.color_1;
             }
+
             RegularText {
                 x: 0;
-                y: root.bar_height - root.avg[i]/root.max_num*root.bar_height  - 20px;
+                y: root.bar_height - root.avg[i] / root.max_num * root.bar_height - 20px;
                 width: root.half_bar_width;
                 horizontal-alignment: center;
-                text:root.avg[i];
+                text: root.avg[i];
                 visible: root.last[i] != root.avg[i];
                 style: FontSettings.body-small;
             }
+
             Rectangle {
-                x : root.half_bar_width;
-                y: root.bar_height - root.last[i]/root.max_num*root.bar_height;
-                height:  root.last[i]/root.max_num*root.bar_height;
+                x: root.half_bar_width;
+                y: root.bar_height - root.last[i] / root.max_num * root.bar_height;
+                height: root.last[i] / root.max_num * root.bar_height;
                 width: root.half_bar_width;
                 background: root.color_2;
             }
+
             RegularText {
-                x : root.half_bar_width;
-                y: root.bar_height - root.last[i]/root.max_num*root.bar_height  - 20px;
+                x: root.half_bar_width;
+                y: root.bar_height - root.last[i] / root.max_num * root.bar_height - 20px;
                 width: root.half_bar_width;
                 horizontal-alignment: center;
-                text:root.last[i];
+                text: root.last[i];
                 visible: root.last[i] != root.avg[i];
                 style: FontSettings.body-small;
             }
+
             RegularText {
-                x : 0;
-                y: root.bar_height - root.last[i]/root.max_num*root.bar_height  - 20px;
+                x: 0;
+                y: root.bar_height - root.last[i] / root.max_num * root.bar_height - 20px;
                 width: root.bar_width;
                 horizontal-alignment: center;
-                text:root.last[i];
-                visible: root.last[i] == root.avg[i] && root.last[i]!=0;
+                text: root.last[i];
+                visible: root.last[i] == root.avg[i] && root.last[i] != 0;
                 style: FontSettings.body-small;
             }
         }
-
     }
 }
 
 
 // Adapted from https://github.com/Vadoola/Tomotroid
 export global HyperLinkClick {
-    pure callback hl_clicked(url:string);
+    pure callback hl_clicked(url: string);
 }
 
 export component HyperLink inherits RegularText {
-    in property<string> url;
-    in property<color> link_color:Palette.link_color;
-    in property<color> hvr_color:Palette.regular_text;
+    in property <string> url;
+    in property <color> link_color:Palette.link_color;
+    in property <color> hvr_color:Palette.regular_text;
 
     ta := TouchArea {
-        clicked => { HyperLinkClick.hl_clicked(root.url)}
+        clicked => {
+            HyperLinkClick.hl_clicked(root.url)
+        }
     }
-    
+
     states [
         has_hover when ta.has_hover: {
             color: root.hvr_color;
@@ -545,7 +576,6 @@ export component HyperLink inherits RegularText {
             color: root.link_color;
         }
     ]
-
 }
 
 export component SelectionFilters inherits VerticalLayout {
@@ -553,7 +583,6 @@ export component SelectionFilters inherits VerticalLayout {
     out property <int> sub_cat;
     out property <bool> hard;
     in property <bool> tight: false;
-    
     padding: 0;
     spacing: Sizes.spacing;
     public function get_hard() {
@@ -566,8 +595,8 @@ export component SelectionFilters inherits VerticalLayout {
         background: root.tight ? Palette.background : Palette.highlight1;
         border-radius: Sizes.std_radius;
         VerticalBox {
-            padding: root.tight ? 0: Sizes.spacing;
-            spacing: root.tight ? 0: Sizes.spacing;
+            padding: root.tight ? 0 : Sizes.spacing;
+            spacing: root.tight ? 0 : Sizes.spacing;
             w_hard := MultiChoice {
 
                 choices: ["UN members only", "All territories"];
@@ -575,19 +604,19 @@ export component SelectionFilters inherits VerticalLayout {
                     root.hard = self.not_default;
                 }
             }
-            t:=RegularText {
-                text: root.tight ? "":
-                    w_hard.not_default?  "Show all territories (250 different)":
-                    "Show only United Nation Members (194 different)" ;
+
+            t := RegularText {
+                text: root.tight ? "" : w_hard.not_default ? "Show all territories (250 different)" : "Show only United Nation Members (194 different)";
                 horizontal-alignment: center;
                 vertical-alignment: center;
                 width: 100%;
-                height: root.tight ? 0:Sizes.regular_text_height;
+                height: root.tight ? 0 : Sizes.regular_text_height;
                 wrap: word-wrap;
                 style: FontSettings.body-small;
             }
         }
     }
+
     sub_cat_choice := ScrollChoice {
         width: 100%;
         choices: root.sub_categories_name;
@@ -595,7 +624,4 @@ export component SelectionFilters inherits VerticalLayout {
             root.sub_cat = self.choice_num;
         }
     }
-
 }
-
-

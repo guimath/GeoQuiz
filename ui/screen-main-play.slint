@@ -27,8 +27,7 @@ export component MainPlayScreen inherits Rectangle {
         root.info = info.info;
         if play_mode == 3 {
             info_btn.visible = true;
-        }
-        else {
+        } else {
             info_btn.visible = info.seen;
         }
     }
@@ -63,19 +62,23 @@ export component MainPlayScreen inherits Rectangle {
         }
 
         SwipeInfo {
-            info : root.info;
+            info: root.info;
             handle-swipe-right: root.num > 0;
             handle-swipe-left: root.num < root.out_of - 1;
-            height: root.width / 16*9;
-            prev => {prev()}
-            next => {next(0)}
+            height: root.width / 16 * 9;
+            prev => {
+                prev()
+            }
+            next => {
+                next(0)
+            }
         }
 
         HorizontalBox {
             padding-top: Sizes.spacing;
             padding-bottom: Sizes.spacing;
             alignment: center;
-            w_score := FiveStarScore {  
+            w_score := FiveStarScore {
                 score_changed(score) => {
                     info_btn.visible = true;
                     prep_next(score);
@@ -104,28 +107,28 @@ export component MainPlayScreen inherits Rectangle {
             first_letter: "E..., J...";
         }
 
-        Rectangle {}
+        Rectangle { }
+
         HorizontalLayout {
             alignment: center;
             padding: 0;
-            
             info_btn := TouchArea {
                 visible: false;
-                width: Sizes.title_height*2;
-                height: Sizes.title_height*2;
+                width: Sizes.title_height * 2;
+                height: Sizes.title_height * 2;
                 Image {
                     source: @image-url("img/info.svg");
                     height: 100%;
                 }
-                
+
                 clicked => {
                     look_up_current();
                 }
             }
         }
-        Rectangle{
 
-        }
+        Rectangle { }
+
         Rectangle { } // spacing
     }
 }

@@ -1,12 +1,23 @@
-import { ScrollView, LineEdit, HorizontalBox, VerticalBox } from "std-widgets.slint";
-import { ChoiceElem, RegularText, TitleText, FiveStarScore, HyperLinkClick } from "widgets.slint";
+import {
+    ScrollView,
+    LineEdit,
+    HorizontalBox,
+    VerticalBox,
+} from "std-widgets.slint";
+import {
+    ChoiceElem,
+    RegularText,
+    TitleText,
+    FiveStarScore,
+    HyperLinkClick,
+} from "widgets.slint";
 import { FullInfo } from "structs.slint";
 import { TextStyle, FontSettings, Palette, Sizes } from "styling.slint";
 
 export component SelectLookUpScreen inherits Rectangle {
     callback search_changed(search: string);
     callback selected(num: int);
-    public function reset_search(){
+    public function reset_search() {
         search_edit.text = "";
         search_changed("");
     }
@@ -15,35 +26,39 @@ export component SelectLookUpScreen inherits Rectangle {
     VerticalLayout {
         padding: Sizes.padding;
         spacing: Sizes.spacing;
-        TitleText {  
+        TitleText {
             text: "Look Up";
         }
+
         search_edit := LineEdit {
             placeholder-text: "Search";
-            edited(text) => {scroll.viewport-y=0; search_changed(text)}
+            edited(text) => {
+                scroll.viewport-y = 0;
+                search_changed(text)
+            }
         }
 
         scroll := ScrollView {
             VerticalLayout {
-                padding-left: Sizes.size_bar; 
-                for country[i] in all: VerticalBox{
+                padding-left: Sizes.size_bar;
+                for country[i] in all: VerticalBox {
                     padding: 0;
-                    padding-bottom: root.on[i] ? Sizes.spacing/2 : 0;
+                    padding-bottom: root.on[i] ? Sizes.spacing / 2 : 0;
                     width: 100%;
                     ChoiceElem {
-                    radius: 0;
-                    text: country;
-                    height: root.on[i] ? Sizes.height_look_up : 0;
-                    visible: root.on[i];
-                    animate height {
-                        duration: 300ms;
-                        easing: ease-in-out;
-                    }
-                    clicked => {
-                        selected(i);
+                        radius: 0;
+                        text: country;
+                        height: root.on[i] ? Sizes.height_look_up : 0;
+                        visible: root.on[i];
+                        animate height {
+                            duration: 300ms;
+                            easing: ease-in-out;
+                        }
+                        clicked => {
+                            selected(i);
+                        }
                     }
                 }
-            }
             }
         }
     }
@@ -55,24 +70,23 @@ export component LookUpScreen inherits Rectangle {
     }
     in property <string> user: "User 1";
     in property <FullInfo> infos: {
-        name: "Jamaica", 
+        name: "Jamaica",
         text-infos:[
-            {title:"Capital", text:"Kingston"},
-            {title:"Languages", text:"English, Jamaican Patois"},
-            {title:"Region", text:"Caribbean (Americas)"},
-            {title:"Borders", text:""},
-            {title:"Currencies", text:"Jamaican Dollar (JMD, $)"},
-            {title:"Independent", text:"Yes"},
-        ], 
+            { title:"Capital", text:"Kingston" },
+            { title:"Languages", text:"English, Jamaican Patois" },
+            { title:"Region", text:"Caribbean (Americas)" },
+            { title:"Borders", text:"" },
+            { title:"Currencies", text:"Jamaican Dollar (JMD, $)" },
+            { title:"Independent", text:"Yes" },
+        ],
         image-infos:[
-            {title:"Flag", image:@image-url("../sources/flags/jam.svg")},
-            {title:"Outline", image:@image-url("../data/outlines/jam.svg")}
+            { title:"Flag", image:@image-url("../sources/flags/jam.svg") },
+            { title:"Outline", image:@image-url("../data/outlines/jam.svg") }
         ],
         wiki_link: "https://en.wikipedia.org/wiki/Jamaica",
         score_free_play: 3,
         score_choice_play: 0,
     };
-    
     VerticalLayout {
         padding: 0;
         padding-top: Sizes.padding;
@@ -81,45 +95,54 @@ export component LookUpScreen inherits Rectangle {
         HorizontalBox {
             padding: 0;
             alignment: center;
-            Rectangle {width: Sizes.title_height;}
+            Rectangle {
+                width: Sizes.title_height;
+            }
+
             TitleText {
                 text: infos.name;
                 wrap: word-wrap;
             }
-            Rectangle {width: Sizes.title_height;}
+
+            Rectangle {
+                width: Sizes.title_height;
+            }
         }
+
         scroll := ScrollView {
             vertical-scrollbar-policy: always-off;
             VerticalLayout {
                 width: scroll.width - Sizes.size_bar;
                 padding-left: Sizes.size_bar;
-                for image_infos[i] in infos.image-infos: s := VerticalLayout{
+                for image_infos[i] in infos.image-infos: s := VerticalLayout {
                     padding: 0;
                     spacing: 0;
                     width: 100%;
                     Rectangle {
                         vertical-stretch: 0;
                         horizontal-stretch: 0;
-                        
-                        height: Math.min((scroll.width - 2*Sizes.size_bar)*(image_infos.image.height/image-infos.image.width), root.height/2);
+                        height: Math.min((scroll.width - 2 * Sizes.size_bar) * (image_infos.image.height / image-infos.image.width), root.height / 2);
                         Image {
-                            height : 100%;
-                            width: self.height/(image_infos.image.height/image-infos.image.width);
+                            height: 100%;
+                            width: self.height / (image_infos.image.height / image-infos.image.width);
                             // width: 100%;
                             image-fit: contain;
                             source: image_infos.image;
                         }
                     }
+
                     RegularText {
                         text: image_infos.title;
                         horizontal-alignment: center;
                         vertical-alignment: center;
                         style: FontSettings.title-small;
                     }
-                    
                 }
-                Rectangle {height: Sizes.spacing;}
-                for text_infos[i] in infos.text-infos: Rectangle{
+                Rectangle {
+                    height: Sizes.spacing;
+                }
+
+                for text_infos[i] in infos.text-infos: Rectangle {
                     background: Math.mod(i,2) == 0 ? Palette.highlight3 : Palette.background;
                     HorizontalBox {
                         RegularText {
@@ -127,6 +150,7 @@ export component LookUpScreen inherits Rectangle {
                             vertical-alignment: center;
                             style: FontSettings.title-small;
                         }
+
                         RegularText {
                             horizontal-stretch: 1;
                             vertical-alignment: center;
@@ -139,27 +163,28 @@ export component LookUpScreen inherits Rectangle {
                     padding: Sizes.spacing; // using as spacing
                     alignment: center;
                     TouchArea {
-                        height: 2*Sizes.title_height;
+                        height: 2 * Sizes.title_height;
                         Image {
                             source: @image-url("img/Wikipedia-logo-v2.svg");
                             height: 100%;
                         }
-                
+
                         clicked => {
                             HyperLinkClick.hl_clicked(root.infos.wiki_link);
                         }
                     }
                 }
-                Rectangle {
-                    height: Sizes.spacing/2;
-                    background: Palette.regular_text;
 
+                Rectangle {
+                    height: Sizes.spacing / 2;
+                    background: Palette.regular_text;
                 }
+
                 TitleText {
                     text: "Last scores (\{root.user})";
                     style: FontSettings.title-small;
-
                 }
+
                 HorizontalBox {
                     padding: 0;
                     spacing: 0;
@@ -168,7 +193,11 @@ export component LookUpScreen inherits Rectangle {
                         text: "Free play:";
                         width: ch_text.width;
                     }
-                    Rectangle {width: Sizes.spacing;}
+
+                    Rectangle {
+                        width: Sizes.spacing;
+                    }
+
                     Rectangle {
                         padding: 0;
                         HorizontalBox {
@@ -180,6 +209,7 @@ export component LookUpScreen inherits Rectangle {
                                 score: infos.score-free-play;
                             }
                         }
+
                         HorizontalBox {
                             padding: 0;
                             RegularText {
@@ -188,11 +218,15 @@ export component LookUpScreen inherits Rectangle {
                                 vertical-alignment: center;
                             }
                         }
-
                     }
-                    Rectangle {}
+
+                    Rectangle { }
                 }
-                Rectangle {height: Sizes.spacing;}
+
+                Rectangle {
+                    height: Sizes.spacing;
+                }
+
                 HorizontalBox {
                     padding: 0;
                     spacing: Sizes.spacing;
@@ -200,28 +234,29 @@ export component LookUpScreen inherits Rectangle {
                         vertical-alignment: center;
                         text: "4 choices:";
                     }
+
                     holder := Rectangle {
                         HorizontalBox {
                             padding: 0;
                             spacing: Sizes.spacing;
-                            for i in [0, 1, 2, 3] : Rectangle {
+                            for i in [0, 1, 2, 3]: Rectangle {
                                 visible: infos.score-choice-play != 0 && 4 - infos.score-choice-play >= i;
-                                background: i == 4 - infos.score-choice-play ? Palette.correct: Palette.wrong;
+                                background: i == 4 - infos.score-choice-play ? Palette.correct : Palette.wrong;
                                 width: Sizes.title_height;
                                 height: Sizes.title_height;
-                                border-radius: Sizes.title_height/2;
+                                border-radius: Sizes.title_height / 2;
                             }
                         }
+
                         RegularText {
                             x: (5 - infos.score-choice-play) * (Sizes.spacing + Sizes.title_height);
                             visible: infos.score-choice-play != 0;
-                            text: infos.score-choice-play == 4 ? "(found without mistakes)" : 
-                             infos.score-choice-play == 3 ? "(found after 1 mistake)":
-                             "(found after \{4 - infos.score-choice-play} mistakes)";
+                            text: infos.score-choice-play == 4 ? "(found without mistakes)" : infos.score-choice-play == 3 ? "(found after 1 mistake)" : "(found after \{4 - infos.score-choice-play} mistakes)";
                             vertical-alignment: center;
                             wrap: word-wrap;
                             width: scroll.width - self.x - holder.x - Sizes.spacing - Sizes.padding;
                         }
+
                         HorizontalBox {
                             padding: 0;
                             RegularText {
@@ -231,9 +266,11 @@ export component LookUpScreen inherits Rectangle {
                             }
                         }
                     }
-                    Rectangle {}
+
+                    Rectangle { }
                 }
-                Rectangle {}
+
+                Rectangle { }
             }
         }
     }

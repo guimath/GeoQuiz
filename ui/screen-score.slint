@@ -60,6 +60,7 @@ export component ScoreScreen inherits Rectangle {
 
     VerticalLayout {
         padding: Sizes.padding;
+        padding-top: Sizes.top_screen_spacing + Sizes.padding;
         spacing: Sizes.spacing;
         TitleText {
             text: "Score";
@@ -68,12 +69,6 @@ export component ScoreScreen inherits Rectangle {
         HorizontalBox {
             padding: 0;
             spacing: Sizes.spacing / 2;
-            Rectangle { }
-
-            TitleText {
-                text: "User:";
-                style: FontSettings.title-small;
-            }
 
             user_sel := ComboBox {
                 height: Sizes.title_height;
@@ -138,8 +133,6 @@ export component ScoreScreen inherits Rectangle {
                     popup_type = PopupType.Delete;
                 }
             }
-
-            Rectangle { }
         }
 
         // scroll := ScrollView {

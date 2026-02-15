@@ -17,6 +17,7 @@ export component SelectPlayScreen inherits Rectangle {
 
     VerticalBox {
         padding: Sizes.padding;
+        padding-top: Sizes.top_screen_spacing + Sizes.padding;
         TitleText {
             text: "Play";
         }
@@ -70,7 +71,8 @@ export component SelectPlayScreen inherits Rectangle {
         }
 
         TextButtonWithIcon {
-            height: root.height / 10;
+            vertical-stretch: 1;
+            min-height: 50px;
             text: "Flashcards";
             icon: @image-url("img/flashcard.svg");
             clicked => {
@@ -85,7 +87,8 @@ export component SelectPlayScreen inherits Rectangle {
         }
 
         TextButtonWithIcon {
-            height: root.height / 10;
+            vertical-stretch: 1;
+            min-height: 50px;
             text: "4 Choices";
             icon: @image-url("img/4choice.svg");
             clicked => {

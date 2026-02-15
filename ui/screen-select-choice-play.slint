@@ -21,6 +21,7 @@ export component SelectChoicePlayScreen inherits Rectangle {
 
     VerticalLayout {
         padding: Sizes.padding;
+        padding-top: Sizes.top_screen_spacing + Sizes.padding;
         spacing: Sizes.spacing;
         TitleText {
             text: "4 Choices";
@@ -76,7 +77,7 @@ export component SelectChoicePlayScreen inherits Rectangle {
             }
         }
 
-        VerticalBox {
+        custom_box := VerticalBox {
             padding: 0;
             spacing: Sizes.spacing;
             visible: root.custom;
@@ -111,7 +112,7 @@ export component SelectChoicePlayScreen inherits Rectangle {
             }
 
             TextButtonWithIcon {
-                height: root.height / 10;
+                vertical-stretch: 1;
                 text: "Play";
                 clicked => {
                     invoke_play()

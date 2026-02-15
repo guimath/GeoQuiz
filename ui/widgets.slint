@@ -313,7 +313,7 @@ export component ScrollChoice inherits HorizontalLayout {
             height: 100%;
             width: 100%;
             source: @image-url("img/arrow_left.svg");
-            rotation-angle: -180deg;
+            transform-rotation: -180deg;
             colorize: root.choice_num == choices.length - 1 ? white.transparentize(0.5) : white;
         }
 
@@ -420,50 +420,46 @@ export component TextButton inherits HorizontalBox {
     ]
 }
 
-export component TextButtonWithIcon inherits HorizontalBox {
+export component TextButtonWithIcon inherits Rectangle {
     callback clicked();
-    in property <length> border_radius: root.height / 2;
     in property <string> text: "Button";
     in property <image> icon: @image-url("img/play.svg");
-    in property <length> width_button: root.width - 10 * Sizes.padding;
-    in property <length> height_button: root.height;
-    padding: 0;
-    spacing: 0;
-    Rectangle { }
+    height: Sizes.button_height;
+    HorizontalBox {
+        padding: 0;
+        padding-left: 2 * Sizes.spacing;
+        padding-right: 2 * Sizes.spacing;
+        ta := TouchArea {
+            back_rect := Rectangle {
+                background: Palette.buttons;
+                border-radius: self.height / 2;
+                HorizontalLayout {
+                    padding: Sizes.padding;
+                    spacing: 0;
+                    Image {
+                        width: self.height;
+                        source: root.icon;
+                    }
 
-    ta := TouchArea {
-        height: root.height_button;
-        width: root.width_button;
-        back_rect := Rectangle {
-            background: Palette.buttons;
-            border-radius: root.border_radius;
-        }
+                    RegularText {
+                        style: FontSettings.title-small;
+                        text: root.text;
+                        horizontal-alignment: center;
+                        vertical-alignment: center;
+                        wrap: word-wrap;
+                    }
 
-        HorizontalLayout {
-            padding: Sizes.padding;
-            padding-right: root.border_radius; // makes it look more centered
-            spacing: 0;
-            Image {
-                source: root.icon;
-                height: root.height_button - 2 * Sizes.padding;
-                width: root.height_button - 2 * Sizes.padding;
+                    Rectangle {
+                        width: self.height / 2;
+                    }
+                }
             }
 
-            RegularText {
-                style: FontSettings.title-small;
-                text: root.text;
-                horizontal-alignment: center;
-                vertical-alignment: center;
-                wrap: word-wrap;
+            clicked() => {
+                root.clicked()
             }
-        }
-
-        clicked() => {
-            root.clicked()
         }
     }
-
-    Rectangle { }
 
     states [
         has_hover when ta.has_hover: {

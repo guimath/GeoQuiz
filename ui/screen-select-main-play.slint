@@ -24,6 +24,7 @@ export component SelectMainPlayScreen inherits Rectangle {
     property <length> preset_btn_length: (root.width - 2 * Sizes.padding - 3 * Sizes.spacing) / 4;
     VerticalBox {
         padding: Sizes.padding;
+        padding-top: Sizes.top_screen_spacing + Sizes.padding;
         spacing: Sizes.spacing;
         TitleText {
             text: "Flashcards";
@@ -143,7 +144,7 @@ export component SelectMainPlayScreen inherits Rectangle {
                 }
             }
 
-            VerticalBox {
+            custom_box := VerticalBox {
                 visible: root.custom;
                 padding: 0;
                 spacing: Sizes.spacing;
@@ -189,7 +190,7 @@ export component SelectMainPlayScreen inherits Rectangle {
                 }
 
                 TextButtonWithIcon {
-                    height: root.height / 10;
+                    vertical-stretch: 1;
                     text: "Play";
                     clicked => {
                         invoke_play()

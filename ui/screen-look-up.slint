@@ -25,6 +25,7 @@ export component SelectLookUpScreen inherits Rectangle {
     in-out property <[bool]> on: [true, true, true, true];
     VerticalLayout {
         padding: Sizes.padding;
+        padding-top: Sizes.top_screen_spacing + Sizes.padding;
         spacing: Sizes.spacing;
         TitleText {
             text: "Look Up";
@@ -89,7 +90,7 @@ export component LookUpScreen inherits Rectangle {
     };
     VerticalLayout {
         padding: 0;
-        padding-top: Sizes.padding;
+        padding-top: Sizes.top_screen_spacing + Sizes.padding;
         padding-bottom: Sizes.padding;
         spacing: Sizes.spacing;
         HorizontalBox {
@@ -121,7 +122,7 @@ export component LookUpScreen inherits Rectangle {
                     Rectangle {
                         vertical-stretch: 0;
                         horizontal-stretch: 0;
-                        height: Math.min((scroll.width - 2 * Sizes.size_bar) * (image_infos.image.height / image-infos.image.width), root.height / 2);
+                        height: Math.min((scroll.width - 2 * Sizes.size_bar) * (image_infos.image.height / image-infos.image.width), 300px);
                         Image {
                             height: 100%;
                             width: self.height / (image_infos.image.height / image-infos.image.width);
@@ -199,7 +200,6 @@ export component LookUpScreen inherits Rectangle {
                     }
 
                     Rectangle {
-                        padding: 0;
                         HorizontalBox {
                             padding: 0;
                             FiveStarScore {

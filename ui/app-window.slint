@@ -211,7 +211,7 @@ export component AppWindow inherits Window {
     TouchArea {
         visible: root.screen != Screen.Start;
         x: Sizes.padding;
-        y: Sizes.padding;
+        y: Sizes.padding + Sizes.top_screen_spacing;
         width: Sizes.title_height;
         height: Sizes.title_height;
         Image {
@@ -227,7 +227,7 @@ export component AppWindow inherits Window {
     TouchArea {
         visible: root.screen == Screen.ChoicePlay || root.screen == Screen.MainPlay;
         x: root.width - Sizes.padding - Sizes.title_height;
-        y: Sizes.padding;
+        y: Sizes.padding + Sizes.top_screen_spacing;
         width: Sizes.title_height;
         height: Sizes.title_height;
         Image {
@@ -254,45 +254,46 @@ export component AppWindow inherits Window {
 
             Image {
                 source: @image-url("img/logo.svg");
-                height: root.height / 4;
+                height: 30%;
             }
 
             Rectangle { }
 
-            TextButtonWithIcon {
-                height: root.height / 10;
-                text: "Play";
-                clicked => {
-                    root.screen = Screen.SelectPlay;
-                }
-            }
+            VerticalLayout {
+                padding: 0;
 
-            TextButtonWithIcon {
-                height: root.height / 10;
-                text: "Look Up Infos";
-                icon: @image-url("img/info.svg");
-                clicked => {
-                    w_sel_look_up.reset_search();
-                    root.screen = Screen.SelectLookUp
+                spacing: 2 * Sizes.spacing;
+                TextButtonWithIcon {
+                    text: "Play";
+                    clicked => {
+                        root.screen = Screen.SelectPlay;
+                    }
                 }
-            }
 
-            TextButtonWithIcon {
-                height: root.height / 10;
-                text: "Score";
-                icon: @image-url("img/score.svg");
-                clicked => {
-                    w_score.refresh();
-                    root.screen = Screen.Score;
+                TextButtonWithIcon {
+                    text: "Look Up Infos";
+                    icon: @image-url("img/info.svg");
+                    clicked => {
+                        w_sel_look_up.reset_search();
+                        root.screen = Screen.SelectLookUp
+                    }
                 }
-            }
 
-            TextButtonWithIcon {
-                height: root.height / 10;
-                text: "Help";
-                icon: @image-url("img/help.svg");
-                clicked => {
-                    root.screen = Screen.Help;
+                TextButtonWithIcon {
+                    text: "Score";
+                    icon: @image-url("img/score.svg");
+                    clicked => {
+                        w_score.refresh();
+                        root.screen = Screen.Score;
+                    }
+                }
+
+                TextButtonWithIcon {
+                    text: "Help";
+                    icon: @image-url("img/help.svg");
+                    clicked => {
+                        root.screen = Screen.Help;
+                    }
                 }
             }
 
@@ -439,7 +440,7 @@ export component AppWindow inherits Window {
                         }
 
                         BarGraph {
-                            bar_height: root.height / 7;
+                            bar_height: 100px;
                             bar_width: root.screen == Screen.ChoicePlay ? (t_pop.width - 4 * Sizes.spacing - 2 * Sizes.padding) / 5 : (t_pop.width - 5 * Sizes.spacing - 2 * Sizes.padding) / 6;
                             max_num: root.play_score_max;
                             avg: root.play_score_val;

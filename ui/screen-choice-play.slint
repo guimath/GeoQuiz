@@ -21,7 +21,7 @@ export component ChoicePlayScreen inherits Rectangle {
         img: @image-url("../data/outlines/jam.svg"),
     };
     property <[TxtOrImg]> guesses: [
-        { is_txt : false, txt: "New Zealand", img: @image-url("../data/outlines/nzl.svg") },
+        { is_txt : true, txt: "New Zealand", img: @image-url("../data/outlines/nzl.svg") },
         { is_txt : true, txt: "Jamaica", img: @image-url("../data/outlines/jam.svg") },
         { is_txt : true, txt: "France", img: @image-url("../data/outlines/fra.svg") },
         { is_txt : true, txt: "Brazil", img: @image-url("../data/outlines/bra.svg") },
@@ -78,6 +78,7 @@ export component ChoicePlayScreen inherits Rectangle {
 
     VerticalLayout {
         padding: Sizes.padding;
+        padding-top: Sizes.top_screen_spacing + Sizes.padding;
         spacing: Sizes.spacing;
         TitleText {
             text: "\{root.num + 1} / \{root.out_of}";
@@ -103,9 +104,7 @@ export component ChoicePlayScreen inherits Rectangle {
         }
 
         img_rect := Rectangle {
-            // height: root.height /2 + Sizes.spacing;
-            height: root.height - (Sizes.title_height + sw_info.height + Sizes.title_height + info_btn.height + 6 * Sizes.spacing);
-
+            // Use vertical-stretch to fill available space instead of calculating from root.height
             VerticalLayout {
                 visible: root.guesses[0].is_txt;
                 padding: 0;
@@ -113,7 +112,8 @@ export component ChoicePlayScreen inherits Rectangle {
                 for text[i] in root.guesses: ChoiceElem {
                     text: root.guesses[i].txt;
                     state: guess_states[i];
-                    height: Sizes.height_multi_choice;
+                    vertical-stretch: 2;
+                    // height: Sizes.height_multi_choice;
                     clicked => {
                         if root.found {
                             return;
@@ -133,7 +133,6 @@ export component ChoicePlayScreen inherits Rectangle {
             Rectangle {
                 // grid layout doesn't support for loops so I made my own
                 visible: !root.guesses[0].is_txt;
-                padding: 0;
                 for t[i] in root.guesses: ImageChoice {
                     state: guess_states[i];
                     height: (img_rect.height - Sizes.spacing) / 2;
@@ -158,7 +157,9 @@ export component ChoicePlayScreen inherits Rectangle {
             }
         }
 
-        Rectangle { }
+        Rectangle {
+            vertical-stretch: 0.2;
+        }
 
         HorizontalLayout {
             alignment: center;
@@ -178,6 +179,8 @@ export component ChoicePlayScreen inherits Rectangle {
             }
         }
 
-        Rectangle { }
+        Rectangle {
+            vertical-stretch: 0.2;
+        }
     }
 }

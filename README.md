@@ -59,7 +59,18 @@ cargo run --example prepare
 
 ## Building
 
-Once the map generation and data aggregation steps are done, you can build and run -> WIP
+Once the map generation and data aggregation steps are done, you can build and run
 
-<!-- - For Desktop : ```cargo run```
-- For Android : ```cargo run``` -->
+### Running on desktop
+
+Can run on desktop with `cargo run`
+
+### Running on android
+
+1. Install android studio and set ANDROID_NDK_ROOT & ANDROID_HOME (should be done in env.sh but you might need to change the path based on your installation)
+2. Activate developer mode on an android phone (usually in settings tap Build Number many times)
+3. Enable debugging on the device (usually settings > Developer options > USB debugging. You will need an additional confirmation when you run debugging from a desktop the first time)
+4. Connect via USB and run `x devices` to get adb handle of your device
+5. Update env.sh with your setup (adb handle & android environment variables)
+6. Install & run with `./make_geo.sh run_android`
+7. Copy the entire data directory to your device (Android/data/com.example.geo_quiz/files)

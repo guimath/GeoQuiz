@@ -126,12 +126,14 @@
 - [x] `UI` Renamed Free play to flash cards
 - [x] `IMPROVEMENTS` coding improvements (less clones)
 - [x] `IMPROVEMENTS` Remove cloning of all countries
+- [ ] `CODE_CLEANLINESS` update to latest slint version (v1.15.0)
 
 
 ## Project 
 - [ ] Commit data or find a way to build that is easier ?
 
 ## Bug fixes
+- [ ] `CODE_CLEANLINESS` better separation in logic
 
 
 ## New features

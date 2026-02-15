@@ -7,12 +7,7 @@ use logic::{AppLogic, AppWindow, HyperLinkClick, ScoreStatSlint};
 
 use {
     slint::{ComponentHandle, LogicalSize, Model, ModelRc, SharedString, VecModel},
-    std::{
-        error::Error,
-        path::PathBuf,
-        str::FromStr,
-        sync::{Arc, Mutex},
-    },
+    std::{error::Error, path::PathBuf, rc::Rc, str::FromStr, sync::Mutex},
 };
 
 fn vec_to_model<I, S>(iter: I) -> ModelRc<SharedString>
@@ -23,13 +18,6 @@ where
     ModelRc::new(
         iter.into_iter()
             .map(|s| SharedString::from(s.as_ref()))
-            .collect::<VecModel<SharedString>>(),
-    )
-}
-fn arr_to_model(vec: &[&str]) -> ModelRc<SharedString> {
-    ModelRc::new(
-        vec.iter()
-            .map(|&s| s.into())
             .collect::<VecModel<SharedString>>(),
     )
 }
@@ -100,7 +88,7 @@ fn init(path: PathBuf) -> Result<(), Box<dyn Error>> {
         .iter()
         .map(|x| x.infos[0].full.as_str().into())
         .collect();
-    let logic = Arc::new(Mutex::new(AppLogic::new(&path)));
+    let logic = Rc::new(Mutex::new(AppLogic::new(&path)));
     let ui = AppWindow::new()?;
     ui.window().set_size(LogicalSize {
         width: 1000.0,
@@ -112,8 +100,8 @@ fn init(path: PathBuf) -> Result<(), Box<dyn Error>> {
         ui.set_search_all_countries(all_names.as_slice().into());
         ui.set_all_categories_name(vec_to_model(logic_lock.get_all_categories_name()));
         ui.set_txt_categories_name(vec_to_model(logic_lock.get_txt_categories_name()));
-        ui.set_sub_categories_name(arr_to_model(&logic::SUB_CAT_NAMES));
-        ui.set_users(vec_to_model(&logic_lock.list_users()));
+        ui.set_sub_categories_name(vec_to_model(logic::SUB_CAT_NAMES));
+        ui.set_users(vec_to_model(logic_lock.list_users()));
         ui.invoke_set_active_user_look_up(logic_lock.get_active_user().into());
     }
 
@@ -236,7 +224,7 @@ fn init(path: PathBuf) -> Result<(), Box<dyn Error>> {
             let ui = ui_handle.unwrap();
             let mut logic = logic_ref.lock().unwrap();
             logic.score_user_change(name.into(), delete);
-            ui.set_users(vec_to_model(&logic.list_users()));
+            ui.set_users(vec_to_model(logic.list_users()));
             ui.invoke_set_active_user(logic.get_active_user().into());
         }
     });
@@ -247,7 +235,7 @@ fn init(path: PathBuf) -> Result<(), Box<dyn Error>> {
             let ui = ui_handle.unwrap();
             let mut logic = logic_ref.lock().unwrap();
             logic.score_rename_user(name1.into(), name2.into());
-            ui.set_users(vec_to_model(&logic.list_users()));
+            ui.set_users(vec_to_model(logic.list_users()));
             ui.invoke_set_active_user(logic.get_active_user().into());
         }
     });

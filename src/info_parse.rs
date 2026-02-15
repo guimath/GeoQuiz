@@ -56,7 +56,7 @@ pub fn get_data() -> AllInfos {
     all_infos
 }
 
-pub fn read(all_countries: &Vec<CountryInfos>, score_path: &PathBuf) -> HashMap<String, Score> {
+pub fn read(all_countries: &[CountryInfos], score_path: &PathBuf) -> HashMap<String, Score> {
     if score_path.exists() {
         let mut file = File::open(score_path).unwrap();
         let mut file_content = String::new();
@@ -78,9 +78,9 @@ pub fn save(scores: &HashMap<String, Score>, score_path: &PathBuf) {
     file.write_all(json_data.as_bytes()).unwrap();
 }
 
-pub fn delete_score(score_folder: &PathBuf) {
+pub fn delete_score(score_folder: &Path) {
     if score_folder.exists() {
-        fs::remove_dir_all(score_folder.clone()).unwrap();
+        fs::remove_dir_all(score_folder).unwrap();
     }
     // init_score_folder(score_folder);
 }

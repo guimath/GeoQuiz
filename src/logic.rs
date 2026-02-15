@@ -7,12 +7,17 @@ use crate::{
 use {
     rand::{seq::SliceRandom, thread_rng},
     slint::{Image, Model, ModelRc, SharedString, VecModel},
-    std::{cmp::Ordering, collections::HashMap, path::PathBuf, sync::LazyLock},
+    std::{
+        cmp::Ordering,
+        collections::HashMap,
+        path::{Path, PathBuf},
+        sync::LazyLock,
+    },
 };
 
 slint::include_modules!();
 
-pub static ALL_INFOS: LazyLock<AllInfos> = LazyLock::new(|| info_parse::get_data());
+pub static ALL_INFOS: LazyLock<AllInfos> = LazyLock::new(info_parse::get_data);
 
 const MAIN_SCORE_NAME: &str = "score_main.json";
 const CHOICE_SCORE_NAME: &str = "score_choice.json";
@@ -73,7 +78,7 @@ fn get_score_key(country: &CountryInfos) -> &String {
     &country.infos[0].full
 }
 impl AppLogic {
-    pub fn new(score_path: &PathBuf) -> Self {
+    pub fn new(score_path: &Path) -> Self {
         let cat_img_len = ALL_INFOS.image_names.len();
         let all_cat_names: Vec<String> = ALL_INFOS
             .image_names
@@ -137,7 +142,7 @@ impl AppLogic {
     }
 
     fn randomize_order(&mut self) {
-        let scores = info_parse::read(&self.all_countries, &self.score_path);
+        let scores = info_parse::read(self.all_countries, &self.score_path);
 
         let mut rng = thread_rng();
         self.filter_countries.shuffle(&mut rng);
@@ -170,7 +175,7 @@ impl AppLogic {
     }
 
     pub fn next(&mut self, result: u32) -> Option<(MainPlayUpdate, [CatInfo; 3])> {
-        let score_key = get_score_key(&self.filter_countries[self.current]).to_owned();
+        let score_key = get_score_key(self.filter_countries[self.current]).to_owned();
         if result != 0 {
             let score = self.scores.get_mut(&score_key).unwrap();
             if self.results[self.current] == 0 {
@@ -204,7 +209,7 @@ impl AppLogic {
         let score = self.results[self.current] as i32;
         let last_score = self
             .scores
-            .get(get_score_key(&self.filter_countries[self.current]))
+            .get(get_score_key(self.filter_countries[self.current]))
             .unwrap()
             .last_score as i32;
 
@@ -229,7 +234,7 @@ impl AppLogic {
                     .hint
                     .as_ref()
                     .map(|s| s.as_str().into())
-                    .unwrap_or(SharedString::new()),
+                    .unwrap_or_default(),
                 with_hint: cat.hint.is_some(),
             }
         });
@@ -263,7 +268,7 @@ impl AppLogic {
         self.choice_play
             .prev_guesses
             .insert(self.current, was_guessed.clone());
-        let score_key = get_score_key(&self.filter_countries[self.current]).to_owned();
+        let score_key = get_score_key(self.filter_countries[self.current]).to_owned();
         if found {
             let down_ref: &VecModel<bool> = was_guessed.as_any().downcast_ref().unwrap();
             let guess_num = down_ref.iter().filter(|&x| x).count();
@@ -336,7 +341,7 @@ impl AppLogic {
         let mut rng = rand::thread_rng();
         let mut random_elements: Vec<&usize> =
             unique_indices.choose_multiple(&mut rng, 3).collect();
-        random_elements.push(&&self.current);
+        random_elements.push(&self.current);
         if random_elements.len() != 4 {
             // TODO treat cases less than 4 possible choices (rare but you never know)
             panic!("Not enough possibilities to chose from")
@@ -405,7 +410,7 @@ impl AppLogic {
             .collect()
     }
     pub fn look_up_current(&self) -> FullInfo {
-        self.get_full_info_country(&self.filter_countries[self.current])
+        self.get_full_info_country(self.filter_countries[self.current])
     }
     pub fn look_up_selected(&self, num: usize) -> FullInfo {
         self.get_full_info_country(&self.all_countries[num])
@@ -445,7 +450,7 @@ impl AppLogic {
         let mut val = [0; 2];
         for (i, score_type) in [MAIN_SCORE_NAME, CHOICE_SCORE_NAME].iter().enumerate() {
             let path = self.score_folder.join(score_type);
-            let s = info_parse::read(&self.all_countries, &path);
+            let s = info_parse::read(self.all_countries, &path);
             let score = s.get(name).unwrap();
             val[i] = score.last_score as i32;
         }
@@ -501,8 +506,8 @@ impl AppLogic {
 
         let score_path_main = self.score_folder.join(MAIN_SCORE_NAME);
         let score_path_choice = self.score_folder.join(CHOICE_SCORE_NAME);
-        let main_scores = info_parse::read(&self.all_countries, &score_path_main);
-        let choice_scores = info_parse::read(&self.all_countries, &score_path_choice);
+        let main_scores = info_parse::read(self.all_countries, &score_path_main);
+        let choice_scores = info_parse::read(self.all_countries, &score_path_choice);
 
         let mut stat = ScoreStats::default();
         for country_name in filtered_countries {

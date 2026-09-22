@@ -126,7 +126,8 @@
 - [x] `UI` Renamed Free play to flash cards
 - [x] `IMPROVEMENTS` coding improvements (less clones)
 - [x] `IMPROVEMENTS` Remove cloning of all countries
-- [ ] `CODE_CLEANLINESS` update to latest slint version (v1.15.0)
+- [x] `CODE_CLEANLINESS` update to latest slint version (v1.17.0)
+- [x] `BUGFIX` follow [issue](https://github.com/slint-ui/slint/issues/8323) to patch back button
 
 
 ## Project 
@@ -134,6 +135,7 @@
 
 ## Bug fixes
 - [ ] `CODE_CLEANLINESS` better separation in logic
+- [ ] `UI` Look up info title gets crooked if name is too long
 
 
 ## New features
@@ -143,7 +145,6 @@
 - [ ] Add a full input play mode 
 
 ## Android features
-- [ ] follow [issue](https://github.com/slint-ui/slint/issues/8323) to patch back button
 
 ## Improvements
 
